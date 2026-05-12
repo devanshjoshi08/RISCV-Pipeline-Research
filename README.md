@@ -2,7 +2,7 @@
 
 5-stage pipelined RISC-V processor in SystemVerilog targeting the Basys 3 FPGA. Executes all 40 RV32I base integer instructions, handles data hazards through forwarding and stalling, predicts branches with a 64-entry BHT, and includes a direct-mapped instruction cache. Synthesizes at just under 99 MHz on the Artix-7 and runs C programs compiled with a standard RISC-V GCC toolchain, printing output over UART.
 
-Validated against the official [riscv-tests](https://github.com/riscv-software-src/riscv-tests) suite -- all 37 rv32ui tests pass.
+Validated against the official [riscv-tests](https://github.com/riscv-software-src/riscv-tests) suite - all 37 rv32ui tests pass.
 
 **Author:** Devansh Joshi
 
