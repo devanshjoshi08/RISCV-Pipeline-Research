@@ -1,22 +1,22 @@
 # RISC-V RV32I Pipelined Processor
 
-5-stage pipelined RISC-V processor in SystemVerilog targeting the Basys 3 FPGA. Executes all 40 RV32I base integer instructions, handles data hazards through forwarding and stalling, predicts branches with a 64-entry BHT, and includes a direct-mapped instruction cache. Synthesizes at just under 99 MHz on the Artix-7 and runs C programs compiled with a standard RISC-V GCC toolchain, printing output over UART.
+5-stage pipelined RISC-V processor in SystemVerilog targeting the Basys 3 FPGA. Executes all 40 RV32I base integer instructions, handles data hazards through forwarding and stalling, predicts branches with a 64-entry BHT, and includes a direct-mapped instruction cache. Synthesizes at ~91 MHz on the Artix-7 and runs C programs compiled with a standard RISC-V GCC toolchain, printing output over UART to a serial terminal.
 
-Validated against the official [riscv-tests](https://github.com/riscv-software-src/riscv-tests) suite -- all 37 rv32ui tests pass.
+Validated against the official [riscv-tests](https://github.com/riscv-software-src/riscv-tests) suite (37 RV32I tests). Deployed and tested on real hardware with LED output and 115200 baud serial.
 
 **Author:** Devansh Joshi
 
 ## Synthesis (Artix-7 XC7A35T, Vivado 2025.2)
 
-After place-and-route:
+After place-and-route with the fibonacci demo program embedded:
 
-- **98.6 MHz** (missed the 100 MHz constraint by 0.146 ns -- the critical path runs through the forwarding mux into the branch comparator and back to the PC, 12 logic levels total)
-- **2,473 LUTs** out of 20,800 (11.9%)
-- **3,324 flip-flops** out of 41,600 (8.0%)
+- **~91 MHz** (WNS = -0.938 ns at 100 MHz constraint, 14 logic levels on the critical path through forwarding -> branch comparison -> PC next)
+- **~2,500 LUTs** out of 20,800
+- **~3,300 flip-flops** out of 41,600
 - **512 LUTRAMs** for the data memory
 - No BRAM used
 
-The biggest chunk of area goes to the instruction cache (699 LUTs, 2,531 FFs for 64 tag+valid+data entries), which tracks with how caches tend to dominate area in any processor. The pipeline registers, forwarding logic, and control together take up the rest. The BHT is surprisingly cheap at 166 LUTs.
+The instruction cache takes up the most area (~700 LUTs, ~2,500 FFs for 64 tag+valid+data entries). The BHT is cheap at ~170 LUTs.
 
 ## Architecture
 
@@ -28,9 +28,9 @@ The PC feeds into a 64-line direct-mapped instruction cache. On a hit, the instr
 
 ### Decode
 
-The instruction gets cracked into its fields (opcode, funct3, funct7, rs1, rs2, rd). The control unit generates all the datapath signals -- what the ALU should do, whether to read/write memory, whether this is a branch or jump, etc. The immediate generator reassembles and sign-extends the immediate from whichever of the 5 RISC-V formats the instruction uses. Meanwhile, the register file reads rs1 and rs2.
+The instruction gets cracked into its fields (opcode, funct3, funct7, rs1, rs2, rd). The control unit generates all the datapath signals. The immediate generator reassembles and sign-extends the immediate from whichever of the 5 RISC-V formats the instruction uses. Meanwhile, the register file reads rs1 and rs2.
 
-The register file includes a write-through bypass. If writeback is writing to register x3 in the exact same cycle that decode is reading x3, the regfile forwards the write data directly instead of returning the stale value. This was originally a bug -- the third instruction in a dependent sequence would silently read a register that hadn't been committed yet -- and the bypass turned out to be the cleanest fix compared to adding a dedicated WB-to-ID forwarding stage.
+The register file includes a write-through bypass. If writeback is writing to a register in the exact same cycle that decode is reading it, the regfile forwards the write data directly instead of returning the stale value. This was originally a bug where the third instruction in a dependent sequence would silently read a register that hadn't been committed yet, and the bypass turned out to be the cleanest fix.
 
 ### Execute
 
@@ -40,23 +40,24 @@ The forwarding muxes check whether either source register matches the destinatio
 - **MEM-EX**: the instruction two ahead computed it
 - **WB-ID**: handled by the register file bypass described above
 
-The ALU does the computation (add, sub, shifts, comparisons, etc.), and the branch unit evaluates whether a branch should be taken. If the BHT predicted wrong, the hazard unit flushes the two instructions behind in the pipeline -- a 2-cycle penalty.
+The ALU does the computation (add, sub, shifts, comparisons, etc.), and the branch unit evaluates whether a branch should be taken. If the BHT predicted wrong, the hazard unit flushes the two instructions behind in the pipeline, a 2-cycle penalty.
 
 For load-use hazards (where the instruction right after a load needs the loaded value), forwarding can't help because the data hasn't come out of memory yet. The hazard unit detects this and stalls the pipeline for one cycle, inserting a bubble.
 
 ### Memory
 
-Loads and stores hit the memory-mapped I/O controller, which routes accesses either to the 4 KB data memory or to the peripheral registers depending on the address:
+Loads and stores hit the memory-mapped I/O controller, which routes accesses based on the address:
 
-| Address | Peripheral |
+| Address | What |
 |---|---|
-| `0x00000000` - `0x00000FFF` | Data RAM |
+| `0x000` - `0x3FF` | Instruction ROM (read-only, for .rodata like strings) |
+| `0x400` - `0xFFF` | Data RAM (read/write, stack and heap) |
 | `0x10000000` | LEDs |
 | `0x10000004` | Switches |
 | `0x10000008` | UART TX data |
 | `0x1000000C` | UART TX busy flag |
 
-The UART runs at 115200 baud, 8N1. Writing a byte to the UART data register kicks off a transmission.
+The lower 1KB of the address space is backed by the instruction ROM through a second read port, so load instructions can access string constants and other read-only data stored alongside the code. The upper portion is backed by DMEM for stack and writable data. The UART runs at 115200 baud, 8N1.
 
 ### Writeback
 
@@ -66,11 +67,13 @@ The write-back mux picks between the ALU result, memory read data, the upper imm
 
 **Forwarding over stalling**: Back-to-back dependent instructions are everywhere in compiled code. Stalling on every RAW dependency would waste 1-2 cycles each time. Forwarding eliminates the penalty for everything except load-use, which still needs a 1-cycle stall since the data isn't available until memory responds.
 
-**BHT over static prediction**: With static predict-not-taken, a 10-iteration loop wastes 20 cycles (2 per taken branch). The BHT learns the pattern after a couple iterations and only mispredicts on entry and exit, dropping the penalty to ~4 cycles. It costs 166 LUTs.
+**BHT over static prediction**: With static predict-not-taken, a 10-iteration loop wastes 20 cycles (2 per taken branch). The BHT learns the pattern after a couple iterations and only mispredicts on entry and exit, dropping the penalty to ~4 cycles. It costs ~170 LUTs.
 
 **Branches resolve in EX, not ID**: Resolving in ID would cut the misprediction penalty to 1 cycle, but it means the branch operands need to be available in the decode stage. That would require adding forwarding paths to ID, complicating the critical path. Keeping resolution in EX is simpler and the BHT makes up for the extra cycle most of the time.
 
-**Direct-mapped cache**: A set-associative cache would have better hit rates, but for the small programs running on this core, a direct-mapped cache with 64 lines covers the working set fine. It's already the most expensive module in the design at 699 LUTs.
+**Direct-mapped cache**: A set-associative cache would have better hit rates, but for the small programs running on this core, a direct-mapped cache with 64 lines covers the working set fine. It's already the most expensive module in the design.
+
+**Dual-port IMEM for .rodata access**: In a Harvard architecture, code and data memories are separate. String constants and other read-only data end up in the code ROM, but load instructions normally only read from data RAM. A second read port on the instruction ROM lets the MEM stage access .rodata without adding a separate memory or copying data at startup.
 
 ## Verification
 
@@ -81,6 +84,15 @@ Three levels of testing:
 3. **riscv-tests compliance** (`rv32i_riscv_tests_tb.sv`) -- runs all 37 official rv32ui-p-* tests covering every RV32I instruction with corner cases (overflow, x0 behavior, boundary values, etc.)
 
 The runner script (`tools/run_riscv_tests.sh`) automates all 37 tests and reports pass/fail.
+
+## FPGA Demo
+
+The default program embedded in the instruction ROM computes 20 Fibonacci numbers. When programmed onto the Basys 3:
+
+- The serial terminal (115200 baud) shows each Fibonacci number as it's computed
+- The LEDs display the lower 16 bits of the current value
+- After completion, the LEDs hold F(19) = 4181 = 0x1055 (LEDs 0, 2, 4, 6, 12 on)
+- Pressing the center button resets and reruns the program
 
 ## Building
 
@@ -105,7 +117,7 @@ make fibonacci
 
 Copy the `.hex` file to the sim directory as `program.hex` and relaunch.
 
-### riscv-tests
+### Running riscv-tests
 
 ```
 git clone https://github.com/riscv-software-src/riscv-tests
@@ -120,7 +132,8 @@ bash tools/run_riscv_tests.sh ./riscv-tests
 1. Set `fpga_top` as synthesis top
 2. Synthesize, implement, generate bitstream
 3. Program the Basys 3
-4. Open a terminal at 115200 baud on the FPGA's COM port
+4. Open a serial terminal at 115200 baud on the FPGA's COM port
+5. Press center button to reset and rerun
 
 ## Files
 
@@ -128,7 +141,7 @@ bash tools/run_riscv_tests.sh ./riscv-tests
 rtl/
   pkg_riscv.sv                opcodes and type definitions
   pc.sv                       program counter
-  imem.sv                     instruction ROM
+  imem.sv                     instruction ROM (dual read port)
   regfile.sv                  register file with write-through bypass
   alu.sv                      arithmetic/logic unit
   imm_gen.sv                  immediate extraction
@@ -146,7 +159,7 @@ rtl/
   rv32i_top.sv                single-cycle version (for debug)
   rv32i_pipeline_top.sv       pipelined version (simulation)
   rv32i_pipeline_mmio_top.sv  pipelined version with MMIO (FPGA)
-  mmio.sv                     memory-mapped I/O
+  mmio.sv                     memory-mapped I/O with IMEM read port
   uart_tx.sv                  UART transmitter
   fpga_top.sv                 FPGA top wrapper
 
@@ -185,4 +198,3 @@ tools/
 ## License
 
 MIT
-
