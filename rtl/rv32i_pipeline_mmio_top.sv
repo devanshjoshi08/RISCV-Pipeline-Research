@@ -70,6 +70,8 @@ module rv32i_pipeline_mmio_top (
     logic        mem_reg_write, mem_mem_read, mem_mem_write, mem_mem_to_reg;
     logic        mem_jal, mem_jalr;
 
+    logic [31:0] imem_data_addr, imem_data_out;
+
     // --- MEM stage ---
     logic [31:0] mem_read_data;
 
@@ -125,7 +127,9 @@ module rv32i_pipeline_mmio_top (
     // Instruction Memory (backing store)
     imem u_imem (
         .addr  (icache_mem_addr),
-        .instr (imem_raw_instr)
+        .instr (imem_raw_instr),
+        .data_addr (imem_data_addr),
+        .data_out  (imem_data_out)
     );
 
     // L1 Instruction Cache
@@ -391,7 +395,8 @@ module rv32i_pipeline_mmio_top (
         .funct3(mem_funct3), .addr(mem_alu_result),
         .write_data(mem_rs2_data), .read_data(mem_read_data),
         .switches(switches), .leds(leds),
-        .uart_start(uart_start), .uart_din(uart_din), .uart_busy(uart_busy)
+        .uart_start(uart_start), .uart_din(uart_din), .uart_busy(uart_busy),
+        .imem_data_addr(imem_data_addr), .imem_data_out(imem_data_out)
     );
 
     //

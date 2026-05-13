@@ -119,7 +119,9 @@ module rv32i_pipeline_top (
     // Instruction Memory (backing store)
     imem u_imem (
         .addr  (icache_mem_addr),
-        .instr (imem_raw_instr)
+        .instr (imem_raw_instr),
+        .data_addr (32'b0),
+        .data_out  ()
     );
 
     // L1 Instruction Cache

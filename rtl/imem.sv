@@ -1,6 +1,9 @@
 module imem #(parameter DEPTH = 1024) (
   input logic [31:0] addr,
-  output logic [31:0] instr
+  output logic [31:0] instr,
+  // second read port so loads can access .rodata stored in ROM
+  input logic [31:0] data_addr,
+  output logic [31:0] data_out
 );
 
   logic [31:0] mem [0:DEPTH-1];
@@ -163,5 +166,6 @@ module imem #(parameter DEPTH = 1024) (
   end
 
   assign instr = mem[addr[31:2]];
+  assign data_out = mem[data_addr[31:2]];
 
 endmodule

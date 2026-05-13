@@ -100,7 +100,9 @@ module rv32i_top (
     // Instruction Memory
     imem u_imem (
         .addr  (pc_current),
-        .instr (instr)
+        .instr (instr),
+        .data_addr (32'b0),
+        .data_out  ()
     );
 
     // Control Unit
