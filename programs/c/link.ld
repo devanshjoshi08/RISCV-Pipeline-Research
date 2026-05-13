@@ -1,14 +1,14 @@
 MEMORY
 {
     ROM (rx)  : ORIGIN = 0x00000000, LENGTH = 4K
-    RAM (rwx) : ORIGIN = 0x00001000, LENGTH = 3K
+    RAM (rwx) : ORIGIN = 0x00000000, LENGTH = 4K
 }
 
 SECTIONS
 {
     .text : { *(.text.init) *(.text*) } > ROM
     .rodata : { *(.rodata*) } > ROM
-    .data : { *(.data*) } > RAM
+    .data : { *(.data*) } > RAM AT> ROM
     .bss : {
         __bss_start = .;
         *(.bss*) *(COMMON)

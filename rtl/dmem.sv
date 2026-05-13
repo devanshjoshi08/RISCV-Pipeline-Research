@@ -11,9 +11,9 @@ module dmem #(parameter DEPTH = 1024) (
 
   logic [31:0] mem [0:DEPTH-1];
   logic [1:0] boff;
-  logic [31:0] waddr;
+  logic [9:0] waddr;
   assign boff = addr[1:0];
-  assign waddr = {2'b0, addr[31:2]};
+  assign waddr = addr[11:2];
 
   always_ff @(posedge clk) begin
     if (mem_write) begin

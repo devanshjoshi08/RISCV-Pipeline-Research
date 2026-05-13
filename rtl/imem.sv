@@ -9,9 +9,9 @@ module imem #(parameter DEPTH = 1024) (
     for (int i = 0; i < DEPTH; i++)
       mem[i] = 32'h00000013;
 
-    // fibonacci program (compiled from programs/c/fibonacci.c)
-    mem[0] = 32'h00002117;
-    mem[1] = 32'hC0010113;
+    // fibonacci (compiled from programs/c/fibonacci.c)
+    mem[0] = 32'h00001117;
+    mem[1] = 32'h00010113;
     mem[2] = 32'h00000097;
     mem[3] = 32'h120080E7;
     mem[4] = 32'h0000006F;
@@ -148,7 +148,6 @@ module imem #(parameter DEPTH = 1024) (
     mem[135] = 32'h00000513;
     mem[136] = 32'h03010113;
     mem[137] = 32'h00008067;
-    // string data
     mem[138] = 32'h6F626946;
     mem[139] = 32'h6363616E;
     mem[140] = 32'h000A0D69;
