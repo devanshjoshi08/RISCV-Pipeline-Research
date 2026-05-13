@@ -29,7 +29,7 @@ module rv32i_tb;
   endtask
 
   initial begin
-    $display("=== Single-Cycle TB ===");
+    $display("single-cycle tb");
     rst_n = 0;
     repeat (3) @(posedge clk);
     rst_n = 1;
@@ -44,7 +44,7 @@ module rv32i_tb;
       if (dut.u_regfile.regs[i] != 0)
         $display("  x%0d = %0d (0x%08h)", i, dut.u_regfile.regs[i], dut.u_regfile.regs[i]);
 
-    $display("=== Done ===");
+    $display("done");
     $finish;
   end
 

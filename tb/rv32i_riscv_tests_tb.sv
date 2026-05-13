@@ -39,7 +39,7 @@ module rv32i_riscv_tests_tb;
   end
 
   initial begin
-    $display("=== riscv-tests ===");
+    $display("riscv-tests");
     rst_n = 0;
     repeat (5) @(posedge clk);
     rst_n = 1;

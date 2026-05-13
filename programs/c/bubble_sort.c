@@ -16,7 +16,7 @@ int main(void) {
     int arr[] = {64, 25, 12, 22, 11, 90, 45, 3};
     int n = sizeof(arr) / sizeof(arr[0]);
 
-    uart_puts("=== Bubble Sort on RISC-V ===\r\n");
+    uart_puts("Bubble Sort\r\n");
 
     uart_puts("Before: ");
     for (int i = 0; i < n; i++) {

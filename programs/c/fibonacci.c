@@ -1,7 +1,7 @@
 #include "mmio.h"
 
 int main(void) {
-    uart_puts("=== Fibonacci on RISC-V ===\r\n");
+    uart_puts("Fibonacci\r\n");
 
     int a = 0, b = 1;
 

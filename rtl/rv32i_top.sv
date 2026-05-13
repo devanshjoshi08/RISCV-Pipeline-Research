@@ -86,9 +86,9 @@ module rv32i_top (
     assign debug_instr      = instr;
     assign debug_alu_result = alu_result;
 
-    // ========== Module Instantiations ==========
+    // modules
 
-    // Program Counter
+    //
     pc u_pc (
         .clk      (clk),
         .rst_n    (rst_n),
