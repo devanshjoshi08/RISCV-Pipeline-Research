@@ -23,7 +23,7 @@ module mmio (
   assign is_uart_data = (addr == 32'h10000008);
   assign is_uart_status = (addr == 32'h1000000C);
 
-  assign imem_data_addr = addr;
+  assign imem_data_addr = 32'b0;
 
   logic [31:0] dmem_rdata;
   dmem u_dmem (
@@ -50,31 +50,8 @@ module mmio (
     end
   end
 
-  // for memory reads, use DMEM result. if DMEM returns 0 and the address
-  // is in the code region, check IMEM instead (for .rodata like strings).
-  // IMEM word needs byte extraction since strings are read with lbu.
-  logic [31:0] imem_byte;
-  logic [1:0] boff;
-  assign boff = addr[1:0];
-
   always_comb begin
-    case (boff)
-      2'b00: imem_byte = {24'b0, imem_data_out[7:0]};
-      2'b01: imem_byte = {24'b0, imem_data_out[15:8]};
-      2'b10: imem_byte = {24'b0, imem_data_out[23:16]};
-      2'b11: imem_byte = {24'b0, imem_data_out[31:24]};
-    endcase
-  end
-
-  always_comb begin
-    if (is_mem) begin
-      if (dmem_rdata != 0)
-        read_data = dmem_rdata;
-      else if (funct3 == F3_BYTEU || funct3 == F3_BYTE)
-        read_data = imem_byte;
-      else
-        read_data = imem_data_out;
-    end
+    if (is_mem) read_data = dmem_rdata;
     else if (is_switch) read_data = {16'b0, switches};
     else if (is_uart_status) read_data = {31'b0, uart_busy};
     else read_data = 0;
