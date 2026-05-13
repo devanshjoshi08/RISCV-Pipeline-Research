@@ -44,5 +44,5 @@ set_property -dict { PACKAGE_PIN U1   IOSTANDARD LVCMOS33 } [get_ports {switches
 set_property -dict { PACKAGE_PIN T1   IOSTANDARD LVCMOS33 } [get_ports {switches[14]}]
 set_property -dict { PACKAGE_PIN R2   IOSTANDARD LVCMOS33 } [get_ports {switches[15]}]
 
-## USB-UART (for Phase 4 UART TX)
+## USB-UART
 set_property -dict { PACKAGE_PIN A18  IOSTANDARD LVCMOS33 } [get_ports serial_tx]

@@ -158,7 +158,9 @@ module imem #(parameter DEPTH = 1024) (
     mem[145] = 32'h656E6F44;
     mem[146] = 32'h000A0D2E;
 
+    // synthesis translate_off
     $readmemh("program.hex", mem);
+    // synthesis translate_on
   end
 
   assign instr = mem[addr[31:2]];
