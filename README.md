@@ -1,118 +1,256 @@
-# RISC-V RV32I Pipelined Processor
+# RISC-V RV32IM Pipelined Processor
 
-5-stage pipelined RISC-V processor in SystemVerilog targeting the Basys 3 FPGA. Executes all 40 RV32I base integer instructions, handles data hazards through forwarding and stalling, predicts branches with a 64-entry BHT, and includes a direct-mapped instruction cache. Runs C programs compiled with a standard RISC-V GCC toolchain with UART serial output and LED display on the FPGA.
+A 6-stage pipelined RISC-V processor in SystemVerilog, built from scratch and deployed on a Basys 3 FPGA at 100 MHz. Implements the full RV32IM instruction set (48 instructions), M-mode privileged architecture with trap handling, and a gshare branch predictor with BTB and return address stack. Runs C programs compiled with a standard RISC-V GCC toolchain, outputs over UART, and has been validated on real hardware.
 
-Validated against the official [riscv-tests](https://github.com/riscv-software-src/riscv-tests) suite (37 RV32I tests). Deployed and tested on real hardware.
+This started as a textbook 5-stage RV32I pipeline and evolved into something closer to what you'd find in a production embedded core: hardware multiply/divide, CSR access, exception handling, performance counters, and a pipeline deep enough to close timing at the full 100 MHz clock on Artix-7. Every module was written by hand in SystemVerilog, no IP blocks, no generated code.
 
 **Author:** Devansh Joshi
 
-## Synthesis (Artix-7 XC7A35T, Vivado 2025.2)
+## Results
 
-After place-and-route with the fibonacci demo program embedded:
+Post place-and-route on the Basys 3 (Artix-7 XC7A35T), Vivado 2025.2:
 
-- **~91 MHz** (WNS = -0.938 ns at 100 MHz constraint, critical path through forwarding mux -> branch comparator -> PC next)
-- **~2,500 LUTs** out of 20,800
-- **~3,300 flip-flops** out of 41,600
-- **512 LUTRAMs** for the data memory
-- No BRAM used
+| Metric | Value |
+|--------|-------|
+| Clock frequency | **100 MHz** (timing met, WNS = +0.135 ns) |
+| Slice LUTs | 6,805 / 20,800 (33%) |
+| Slice registers | 8,412 / 41,600 (20%) |
+| DSP48 blocks | 12 (pipelined 32x32 multiplier) |
+| LUTRAMs | 512 (4 KB data memory) |
+| BRAM | 0 |
+| Critical path | Branch predictor PHT read → PC next mux, 7 logic levels |
 
-The instruction cache takes up the most area (~700 LUTs, ~2,500 FFs for 64 tag+valid+data entries). The BHT is cheap at ~170 LUTs.
+The processor runs a fibonacci demo on the FPGA, printing F(0) through F(19) over UART at 115200 baud and displaying each value on the LEDs. Final output: F(19) = 4181 = 0x1055.
 
-## Architecture
+## Why 6 Stages
 
-The pipeline follows the textbook 5-stage split from Patterson & Hennessy: Fetch, Decode, Execute, Memory, Writeback. Each stage is separated by a pipeline register that latches the relevant signals on the clock edge.
+The processor was originally a 5-stage pipeline (IF/ID/EX/MEM/WB) running the base RV32I instruction set at 91 MHz. After adding the M extension, CSR unit, gshare predictor, and trap handling, the EX stage became the bottleneck. The critical path ran from the forwarding mux through the ALU carry chain to the EX/MEM register: 19 logic levels, 15.5 ns. Timing failed at 100 MHz with a WNS of -5.539 ns, capping the design at roughly 64 MHz.
 
-### Instruction fetch
+At 64 MHz, the processor is wasting almost 36% of each clock period waiting for combinational logic to settle. That's not acceptable. The fix was to split EX into two sub-stages:
 
-The PC feeds into a 64-line direct-mapped instruction cache. On a hit, the instruction comes back combinationally. On a miss, the cache pulls from the backing ROM and fills the line. A branch history table (64 entries, 2-bit saturating counters indexed by PC[7:2]) predicts whether the current instruction is a taken branch. If the BHT says "taken," the PC speculatively jumps to the branch target.
+- **EX1**: forwarding mux, operand selection, CSR write-data computation
+- **EX2**: ALU, branch resolution, MDU, CSR read/write, trap detection
 
-### Decode
+This cuts the longest combinational path roughly in half. EX1 handles the forwarding comparisons and mux selection (a few LUT levels), then registers the prepared operands. EX2 takes the registered operands, runs them through the ALU and branch unit, and registers the result. Neither half exceeds the 10 ns budget.
 
-The instruction gets cracked into its fields (opcode, funct3, funct7, rs1, rs2, rd). The control unit generates all the datapath signals. The immediate generator reassembles and sign-extends the immediate from whichever of the 5 RISC-V formats the instruction uses. Meanwhile, the register file reads rs1 and rs2.
+The tradeoff: branch mispredictions now flush 3 instructions instead of 2 (one extra pipeline stage to drain). The gshare predictor with BTB and RAS absorbs most of this penalty by predicting correctly on the common paths. The result is clean timing closure at 100 MHz with minimal IPC loss.
 
-The register file includes a write-through bypass. If writeback is writing to a register in the exact same cycle that decode is reading it, the regfile forwards the write data directly instead of returning the stale value. This was originally a bug where the third instruction in a dependent sequence would silently read a register that hadn't been committed yet, and the bypass turned out to be the cleanest fix.
+## Pipeline Architecture
 
-### Execute
+```
+IF ──► ID ──► EX1 ──► EX2 ──► MEM ──► WB
+         │      ▲       │       │       │
+         │      │  forwarding   │       │
+         │      └───────┴───────┘       │
+         │           register file      │
+         └──────────write-through───────┘
+```
 
-The forwarding muxes check whether either source register matches the destination of an instruction currently in the MEM or WB stage, and if so, grab the result directly instead of using the outdated register file output. Three forwarding paths:
+### IF (Instruction Fetch)
 
-- **EX-EX**: the instruction right ahead just computed the needed operand
-- **MEM-EX**: the instruction two ahead computed it
-- **WB-ID**: handled by the register file bypass described above
+The PC feeds a 64-line direct-mapped instruction cache. Hits return combinationally; misses pull from the backing ROM and fill the line in one cycle. A three-component branch predictor runs in parallel:
 
-The ALU does the computation (add, sub, shifts, comparisons, etc.), and the branch unit evaluates whether a branch should be taken. If the BHT predicted wrong, the hazard unit flushes the two instructions behind in the pipeline, a 2-cycle penalty.
+- **Gshare PHT** (64 entries, 2-bit saturating counters) predicts direction by indexing with PC[7:2] XOR a 6-bit global history register
+- **BTB** (32 entries, direct-mapped) supplies the predicted target address, storing tag + target + entry type (branch/JAL/call/return)
+- **RAS** (4-entry circular stack) predicts return targets for JALR instructions
 
-For load-use hazards (where the instruction right after a load needs the loaded value), forwarding can't help because the data hasn't come out of memory yet. The hazard unit detects this and stalls the pipeline for one cycle, inserting a bubble.
+If the BTB hits and the PHT says taken (or the entry is a JAL/call/return), the PC redirects speculatively to the predicted target. Mispredictions are detected in EX2 and cause a 3-cycle flush.
 
-### Memory
+### ID (Instruction Decode)
 
-Loads and stores hit the memory-mapped I/O controller, which routes accesses based on the address:
+The instruction is decoded into control signals for all RV32IM + SYSTEM instructions. The immediate generator reassembles sign-extended immediates from all 5 RISC-V formats (I/S/B/U/J). The register file (32x32 with write-through bypass from WB) reads both source operands.
 
-| Address | Peripheral |
-|---|---|
-| `0x00000000` - `0x00000FFF` | Data RAM |
-| `0x10000000` | LEDs |
-| `0x10000004` | Switches |
-| `0x10000008` | UART TX data |
+Call/return heuristics detect JAL/JALR instructions targeting link registers (x1 or x5) and push the return address onto the RAS.
+
+### EX1 (Forwarding + Operand Select)
+
+Three forwarding sources resolve RAW data hazards without stalling:
+
+| Source | Distance | Data |
+|--------|----------|------|
+| EX2 | 1 instruction ahead | ALU result, LUI immediate, or CSR read (combinational, gated by MDU valid) |
+| MEM | 2 instructions ahead | ALU result, CSR data, PC+4, or load data from dmem |
+| WB | 3 instructions ahead | Final write-back value |
+
+Priority: EX2 > MEM > WB (most recent result wins). Loads and in-progress MDU operations in EX2 are excluded from forwarding; the hazard unit stalls instead.
+
+The forwarding mux also has a fresh register file read path with WB bypass. This handles the edge case where an instruction is stalled in EX1 for many cycles (during a multi-cycle divide) and the pipelined register file value goes stale because the source register was written by an instruction that has since left WB. Without this path, the processor would silently read an outdated value after the stall releases. This took a while to find.
+
+After forwarding, the ALU input muxes select between the forwarded rs1/PC (for AUIPC) and forwarded rs2/immediate (for I-type). The CSR write data is also prepared here (either the forwarded rs1 value or the zero-extended zimm field for immediate CSR variants).
+
+### EX2 (Execute)
+
+The registered operands from EX1 feed directly into the ALU and branch unit with no preceding combinational logic, keeping this stage fast.
+
+**ALU**: 10 operations (ADD, SUB, AND, OR, XOR, SLT, SLTU, SLL, SRL, SRA).
+
+**MDU** (Multiply/Divide Unit): 2-cycle pipelined multiplier for MUL/MULH/MULHSU/MULHU (operands registered on cycle 1, multiplication on cycle 2, infers 12 DSP48 blocks on Artix-7). 32-cycle iterative restoring divider for DIV/DIVU/REM/REMU with pipeline stall. Handles all edge cases per the RISC-V spec: division by zero returns quotient = -1 and remainder = dividend; signed overflow (MIN_INT / -1) returns MIN_INT with remainder 0.
+
+**Branch unit**: evaluates all 6 branch conditions (BEQ, BNE, BLT, BGE, BLTU, BGEU). Branch target = PC + immediate. JALR target = (rs1 + immediate) & ~1. Misprediction detection compares actual outcome against the prediction carried through the pipeline.
+
+**CSR unit**: atomic read-modify-write for all 6 CSR instructions. Holds the M-mode register file (mstatus, mie, mtvec, mscratch, mepc, mcause, mtval, mip) plus 64-bit performance counters (mcycle, minstret, and two custom HPM counters for branch statistics).
+
+**Trap detection**: catches illegal instructions, ECALL, and EBREAK. On a trap: flush the pipeline (IF, ID, EX1), save PC to mepc, write cause to mcause, disable interrupts (MIE → MPIE), redirect PC to mtvec. MRET reverses the process: restore MIE from MPIE, redirect PC to mepc.
+
+### MEM (Memory Access)
+
+The MMIO controller routes accesses by address:
+
+| Address Range | Peripheral |
+|---------------|------------|
+| `0x00000000` - `0x00000FFF` | 4 KB data RAM (byte/half/word addressable with sign extension) |
+| `0x10000000` | 16-bit LED output |
+| `0x10000004` | 16-bit switch input |
+| `0x10000008` | UART TX data (write a byte to transmit) |
 | `0x1000000C` | UART TX busy flag |
 
-The UART runs at 115200 baud, 8N1. Writing a byte to the UART data register kicks off a transmission.
+The UART runs at 115200 baud, 8N1, implemented as a shift-register transmitter with a busy-wait interface.
 
-### Writeback
+### WB (Write Back)
 
-The write-back mux picks between the ALU result, memory read data, the upper immediate (for LUI), or PC+4 (for JAL/JALR return addresses), and writes it back to the register file.
+The write-back mux selects the final result for the register file:
 
-## Design Decisions
+| Condition | Source |
+|-----------|--------|
+| JAL / JALR | PC + 4 (return address) |
+| Load | Data memory read |
+| CSR instruction | CSR read value |
+| Everything else | ALU result (includes LUI) |
 
-**Forwarding over stalling**: Back-to-back dependent instructions are everywhere in compiled code. Stalling on every RAW dependency would waste 1-2 cycles each time. Forwarding eliminates the penalty for everything except load-use, which still needs a 1-cycle stall since the data isn't available until memory responds.
+The register file write port includes a write-through bypass: if WB writes a register in the same cycle that ID reads it, the new value is forwarded directly, avoiding a stale read.
 
-**BHT over static prediction**: With static predict-not-taken, a 10-iteration loop wastes 20 cycles (2 per taken branch). The BHT learns the pattern after a couple iterations and only mispredicts on entry and exit, dropping the penalty to ~4 cycles. It costs ~170 LUTs.
+## Hazard Handling
 
-**Branches resolve in EX, not ID**: Resolving in ID would cut the misprediction penalty to 1 cycle, but it means the branch operands need to be available in the decode stage. That would require adding forwarding paths to ID, complicating the critical path. Keeping resolution in EX is simpler and the BHT makes up for the extra cycle most of the time.
+The hazard unit manages three types of pipeline hazards:
 
-**Direct-mapped cache**: A set-associative cache would have better hit rates, but for the small programs running on this core, a direct-mapped cache with 64 lines covers the working set fine. It's already the most expensive module in the design.
+**Load-use**: if the instruction in EX2 is a load and the instruction in EX1 reads the same register, the data won't be available until after the memory read. The hazard unit stalls PC, IF/ID, and ID/EX1 for one cycle and flushes EX1/EX2, inserting a bubble. On the next cycle, the load data is available from MEM for forwarding.
+
+**MDU stall**: multiply takes 2 cycles, divide takes up to 33 cycles. While the MDU is computing, the entire pipeline from EX2 back is stalled (PC, IF/ID, ID/EX1, EX1/EX2 all hold). EX2/MEM receives bubbles (suppressed control signals) to prevent intermediate results from propagating. When the MDU signals valid, the stall releases and the result is forwarded.
+
+**Control hazards**: branch mispredictions, JAL, JALR, traps, and MRET all flush the three stages behind EX2 (IF, ID, EX1). The gshare predictor reduces misprediction frequency; the BTB eliminates the target computation penalty for correctly-predicted branches.
+
+## M Extension
+
+All 8 RV32M instructions are implemented in hardware:
+
+| Instruction | Latency | Implementation |
+|-------------|---------|----------------|
+| MUL | 2 cycles | Pipelined: register operands on cycle 1, DSP48 multiply on cycle 2 |
+| MULH | 2 cycles | Signed x signed, upper 32 bits of 64-bit product |
+| MULHSU | 2 cycles | Signed x unsigned, upper 32 bits |
+| MULHU | 2 cycles | Unsigned x unsigned, upper 32 bits |
+| DIV | 33 cycles | Iterative restoring divider, signed, pipeline stalls |
+| DIVU | 33 cycles | Iterative restoring divider, unsigned |
+| REM | 33 cycles | Remainder from signed division |
+| REMU | 33 cycles | Remainder from unsigned division |
+
+The multiplier is pipelined to enable clean DSP48 inference on Artix-7. Each DSP48E1 block handles a 25x18 signed multiply natively; a full 32x32 → 64-bit multiply is decomposed across multiple blocks. The divider uses a standard restoring algorithm: shift the dividend left one bit per cycle, trial-subtract the divisor, and build up the quotient bit by bit. Signed division takes absolute values of both operands, divides unsigned, then negates the result based on the original signs.
+
+Division by zero is handled per the RISC-V spec without trapping: quotient = all ones (-1 signed), remainder = the dividend. Signed overflow (0x80000000 / -1) returns 0x80000000 with remainder 0.
+
+## Privileged Architecture
+
+The processor implements M-mode (machine mode) from the RISC-V Privileged Specification:
+
+| CSR | Address | Function |
+|-----|---------|----------|
+| mstatus | 0x300 | Global interrupt enable (MIE), previous interrupt enable (MPIE) |
+| mie | 0x304 | Per-source interrupt enable mask |
+| mtvec | 0x305 | Trap vector base address |
+| mscratch | 0x340 | Scratch register for trap handler use |
+| mepc | 0x341 | PC of the instruction that caused the trap |
+| mcause | 0x342 | Trap cause code |
+| mtval | 0x343 | Additional trap information (faulting instruction/address) |
+| mip | 0x344 | Pending interrupts |
+
+All 6 CSR instructions are supported: CSRRW, CSRRS, CSRRC (register operand) and CSRRWI, CSRRSI, CSRRCI (5-bit zero-extended immediate). ECALL, EBREAK, and MRET are fully implemented with correct pipeline flushing and state save/restore.
+
+## Performance Counters
+
+Four 64-bit hardware counters tick automatically and are readable via CSR instructions:
+
+| Counter | CSR Address | What it counts |
+|---------|-------------|----------------|
+| mcycle | 0xB00 / 0xB80 | Clock cycles since reset |
+| minstret | 0xB02 / 0xB82 | Instructions retired (committed at MEM stage) |
+| mhpmcounter3 | 0xB03 / 0xB83 | Branch mispredictions |
+| mhpmcounter4 | 0xB04 / 0xB84 | Total branches executed |
+
+These enable IPC measurement and predictor tuning from software:
+
+```c
+unsigned int c0, c1, i0, i1;
+asm volatile("csrr %0, mcycle" : "=r"(c0));
+asm volatile("csrr %0, minstret" : "=r"(i0));
+// ... workload ...
+asm volatile("csrr %0, mcycle" : "=r"(c1));
+asm volatile("csrr %0, minstret" : "=r"(i1));
+// IPC = (i1 - i0) / (c1 - c0)
+```
 
 ## Verification
 
-Three levels of testing:
+The processor is tested at four levels, from unit to system:
 
-1. **Single-cycle testbench** (`rv32i_tb.sv`) -- runs each instruction without pipelining to verify correctness in isolation
-2. **Pipeline testbench** (`rv32i_pipeline_tb.sv`) -- runs a sum-1-to-10 program that exercises all hazard cases (forwarding, stalls, branch misprediction). Expected result: x1 = x5 = 55, mem[0] = 55
-3. **riscv-tests compliance** (`rv32i_riscv_tests_tb.sv`) -- runs all 37 official rv32ui-p-* tests covering every RV32I instruction with corner cases (overflow, x0 behavior, boundary values, etc.)
+| Level | Testbench | What it covers | Result |
+|-------|-----------|----------------|--------|
+| 1 | `rv32i_tb.sv` | Single-cycle reference: every instruction in isolation | PASS |
+| 2 | `rv32i_pipeline_tb.sv` | Pipeline correctness: sum 1-to-10, exercises forwarding, load-use stalls, branch misprediction. Expected: x1 = x5 = 55, mem[0] = 55 | PASS |
+| 3 | `rv32i_comprehensive_tb.sv` | 24-point test covering M-ext (all 8 ops + edge cases), all 6 CSR instructions, trap handling (ecall → handler → mret → resume), performance counters, and pipeline hazard forwarding from mul to dependent add. Automated PASS/FAIL with summary | **24/24 PASS** |
+| 4 | `rv32i_riscv_tests_tb.sv` | Official riscv-tests compliance suite: 37 rv32ui-p-* tests covering every RV32I instruction with corner cases | PASS |
 
-The runner script (`tools/run_riscv_tests.sh`) automates all 37 tests and reports pass/fail.
+The comprehensive test (level 3) is designed to catch the subtle bugs that simple tests miss:
+
+- **Divide-by-zero and signed overflow**: verifies the MDU returns spec-compliant results for 7/0, MIN_INT/-1
+- **CSR read-modify-write atomicity**: writes 0xDEADBEEF to mscratch, reads it back, then chains CSRRS → CSRRC → CSRRWI → CSRRSI → CSRRCI, verifying each intermediate value
+- **Trap round-trip**: sets mtvec, triggers ecall, handler reads mcause (expects 11), advances mepc past the ecall, executes mret, verifies execution resumes at the correct PC
+- **Forwarding under stall**: multiply followed by an immediately dependent add, verifying EX2 → EX1 forwarding produces the correct result even with MDU pipeline latency
+
+A GitHub Actions CI workflow runs the pipeline and comprehensive testbenches on every push using Icarus Verilog.
 
 ## FPGA Demo
 
-The default program embedded in the instruction ROM computes 20 Fibonacci numbers. When programmed onto the Basys 3:
+The instruction ROM ships with a precompiled Fibonacci program. When deployed on the Basys 3:
 
-- The serial terminal (115200 baud) outputs the computed values as they're calculated
-- The LEDs display the lower 16 bits of each Fibonacci number
-- After completion, the LEDs hold F(19) = 4181 = 0x1055 (LEDs 0, 2, 4, 6, 12 on)
-- Pressing the center button resets and reruns the program
+- The serial terminal (115200 baud) prints F(0) through F(19) as each value is computed
+- The LEDs show the lower 16 bits of the current Fibonacci number
+- After completion, LEDs hold F(19) = 4181 = 0x1055 (LEDs 0, 2, 4, 6, 12 lit)
+- Pressing the center button resets the processor and reruns the program
+
+A separate `perf_report.c` program (compilable with the RISC-V toolchain) runs the same Fibonacci workload and then prints cycle count, instruction count, IPC, total branches, mispredictions, and mispredict rate over UART.
 
 ## Building
 
-### Simulation
+### Vivado Simulation
 
 ```
 cd <project-dir>
 source create_project.tcl
+set_property top rv32i_comprehensive_tb [get_filesets sim_1]
 launch_simulation
-run 200us
+run 2ms
 ```
 
-### Compiling C programs
+### Compiling C Programs
 
-Requires `riscv32-unknown-elf-gcc` ([xpack toolchain](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases)).
+Requires the xPack RISC-V GCC toolchain ([download](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases)).
 
 ```
 cd programs/c
-make bubble_sort
 make fibonacci
+make perf_report
 ```
 
-Copy the `.hex` file to the sim directory as `program.hex` and relaunch.
+Programs compile with `-march=rv32im_zicsr`, generating hardware multiply/divide and CSR instructions.
+
+### FPGA Deployment
+
+1. Open the project in Vivado (`source create_project.tcl`)
+2. Ensure `fpga_top` is the synthesis top
+3. Run synthesis, implementation, and generate bitstream
+4. Program the Basys 3 over JTAG
+5. Open a serial terminal at 115200 baud on the FPGA's COM port
+6. Press the center button to reset and run
 
 ### Running riscv-tests
 
@@ -124,73 +262,77 @@ cd <project-dir>
 bash tools/run_riscv_tests.sh ./riscv-tests
 ```
 
-### FPGA deployment
-
-1. Set `fpga_top` as synthesis top
-2. Synthesize, implement, generate bitstream
-3. Program the Basys 3
-4. Open a serial terminal at 115200 baud on the FPGA's COM port
-5. Press center button to reset and rerun
-
-## Files
+## File Structure
 
 ```
 rtl/
-  pkg_riscv.sv                opcodes and type definitions
-  pc.sv                       program counter
-  imem.sv                     instruction ROM
-  regfile.sv                  register file with write-through bypass
-  alu.sv                      arithmetic/logic unit
-  imm_gen.sv                  immediate extraction
-  control.sv                  main decoder
-  branch_unit.sv              branch condition evaluation
-  branch_predictor.sv         64-entry BHT
-  icache.sv                   direct-mapped instruction cache
-  dmem.sv                     data memory (byte/half/word)
-  pipe_if_id.sv               IF/ID pipeline register
-  pipe_id_ex.sv               ID/EX pipeline register
-  pipe_ex_mem.sv              EX/MEM pipeline register
+  pkg_riscv.sv                type definitions, opcodes, CSR addresses, exception codes
+  pc.sv                       program counter with write enable
+  imem.sv                     instruction ROM (1024 x 32, preloaded with fibonacci)
+  icache.sv                   64-line direct-mapped instruction cache
+  regfile.sv                  32x32 register file with write-through bypass
+  control.sv                  main decoder for RV32IM + SYSTEM instructions
+  imm_gen.sv                  immediate extraction for all 5 RISC-V formats
+  alu.sv                      10-operation arithmetic/logic unit
+  mdu.sv                      pipelined multiplier + iterative divider (RV32M)
+  csr_unit.sv                 M-mode CSR register file with performance counters
+  branch_unit.sv              6-condition branch evaluator
+  branch_predictor.sv         gshare PHT + direct-mapped BTB + return address stack
+  forwarding_unit.sv          3-source RAW hazard forwarding (EX2, MEM, WB)
+  hazard_unit.sv              stall/flush control for 6-stage pipeline
+  pipe_if_id.sv               IF/ID pipeline register (with stall + flush)
+  pipe_id_ex.sv               ID/EX1 pipeline register (with stall + flush)
+  pipe_ex1_ex2.sv             EX1/EX2 pipeline register (with stall + flush)
+  pipe_ex_mem.sv              EX2/MEM pipeline register
   pipe_mem_wb.sv              MEM/WB pipeline register
-  forwarding_unit.sv          RAW hazard forwarding
-  hazard_unit.sv              stall and flush control
-  rv32i_top.sv                single-cycle version (for debug)
-  rv32i_pipeline_top.sv       pipelined version (simulation)
-  rv32i_pipeline_mmio_top.sv  pipelined version with MMIO (FPGA)
-  mmio.sv                     memory-mapped I/O
-  uart_tx.sv                  UART transmitter
-  fpga_top.sv                 FPGA top wrapper
+  mmio.sv                     memory-mapped I/O controller (RAM + LEDs + switches + UART)
+  dmem.sv                     4 KB data memory (byte/half/word with sign extension)
+  uart_tx.sv                  115200 baud 8N1 UART transmitter
+  rv32i_top.sv                single-cycle reference implementation
+  rv32i_pipeline_top.sv       6-stage pipelined processor (simulation)
+  rv32i_pipeline_mmio_top.sv  6-stage pipelined processor with MMIO (FPGA)
+  fpga_top.sv                 FPGA wrapper with reset synchronizer
 
 tb/
   rv32i_tb.sv                 single-cycle testbench
-  rv32i_pipeline_tb.sv        pipeline testbench
-  rv32i_riscv_tests_tb.sv     riscv-tests testbench
+  rv32i_pipeline_tb.sv        pipeline testbench (sum 1-to-10)
+  rv32i_comprehensive_tb.sv   24-point comprehensive test (M-ext, CSR, traps, hazards)
+  rv32i_mext_csr_tb.sv        targeted M-extension + CSR test
+  rv32i_riscv_tests_tb.sv     riscv-tests compliance harness
 
 programs/asm/
-  sum_1_to_10.s               validation program
-  sum_1_to_10.hex             pre-assembled hex
+  sum_1_to_10.s               forwarding + branch validation program
+  test_mext_csr.s             M-extension + CSR test program
+  test_comprehensive.s        full-coverage test (hand-encoded with verified hex)
 
 programs/c/
-  Makefile                    builds C to hex
-  link.ld                     linker script
-  start.s                     startup code
-  mmio.h                      hardware register definitions
-  bubble_sort.c               sorts an array, prints over UART
-  fibonacci.c                 Fibonacci sequence on UART + LEDs
+  Makefile                    cross-compilation for rv32im_zicsr
+  link.ld                     linker script (ROM 0x0000-0x0FFF, stack at top)
+  start.s                     bare-metal startup (set SP, call main, halt)
+  mmio.h                      hardware register definitions and UART drivers
+  fibonacci.c                 Fibonacci sequence with UART + LED output
+  bubble_sort.c               array sort with UART output
+  perf_report.c               runs fibonacci then prints IPC and branch stats
 
 constraints/
-  basys3.xdc                  FPGA pin assignments
+  basys3.xdc                  Basys 3 pin assignments (100 MHz clock, LEDs, switches, UART TX)
 
 tools/
   hex_disasm.py               hex-to-assembly disassembler
-  run_riscv_tests.sh          riscv-tests runner
+  run_riscv_tests.sh          automated riscv-tests runner
+
+.github/workflows/
+  sim.yml                     CI: runs pipeline + comprehensive testbenches on every push
 ```
 
 ## References
 
 - Patterson & Hennessy, *Computer Organization and Design: RISC-V Edition*
-- [RISC-V ISA spec](https://riscv.org/specifications/)
-- [riscv-tests](https://github.com/riscv-software-src/riscv-tests)
-- [Bruno Levy's learn-fpga](https://github.com/BrunoLevy/learn-fpga)
+- [The RISC-V Instruction Set Manual, Volume I: Unprivileged ISA](https://riscv.org/specifications/)
+- [The RISC-V Instruction Set Manual, Volume II: Privileged Architecture](https://riscv.org/specifications/privileged-isa/)
+- [riscv-tests](https://github.com/riscv-software-src/riscv-tests) (official ISA compliance suite)
+- McFarling, "Combining Branch Predictors" (WRL Technical Note TN-36, 1993)
+- Hennessy & Patterson, *Computer Architecture: A Quantitative Approach* (forwarding and hazard analysis)
 
 ## License
 
