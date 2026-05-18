@@ -4,6 +4,8 @@ A 6-stage pipelined RISC-V processor implementing the RV32IM instruction set in 
 
 The processor supports all 48 RV32IM instructions with a pipelined hardware multiplier and iterative divider, M-mode privileged architecture (CSR access, trap handling, MRET), a gshare branch predictor with branch target buffer and return address stack, a direct-mapped instruction cache, 3-source data forwarding, and 64-bit hardware performance counters for cycle-accurate IPC measurement. Runs bare-metal C programs compiled with a standard RISC-V GCC toolchain, communicating over UART at 115200 baud with LED output on the FPGA. Validated through a 24-point comprehensive test suite, 37-test riscv-tests ISA compliance, and hardware deployment.
 
+This project was built independently, outside of any course requirement.
+
 **Author:** Devansh Joshi
 
 ## Synthesis Results (Artix-7 XC7A35T, Vivado 2025.2)
@@ -128,6 +130,16 @@ The hazard unit manages three types of pipeline hazards:
 **MDU stall**: multiply takes 2 cycles, divide takes up to 33 cycles. While the MDU is computing, the entire pipeline from EX2 back is stalled (PC, IF/ID, ID/EX1, EX1/EX2 all hold). EX2/MEM receives bubbles (suppressed control signals) to prevent intermediate results from propagating. When the MDU signals valid, the stall releases and the result is forwarded.
 
 **Control hazards**: branch mispredictions, JAL, JALR, traps, and MRET all flush the three stages behind EX2 (IF, ID, EX1). The gshare predictor reduces misprediction frequency; the BTB eliminates the target computation penalty for correctly-predicted branches.
+
+## Bugs Found and Fixed
+
+Three non-obvious bugs came up during development that are worth documenting because they're the kind of thing that passes basic tests and only shows up under specific pipeline conditions.
+
+**Register file write-through bypass.** Early in the 5-stage design, the third instruction in a dependent sequence would silently read a stale register value. Instructions A and B had forwarding coverage, but instruction C read from the register file in the same cycle that A's result was being written back. The register file wasn't bypassing the write data to the read port, so C got the old value. The fix was a combinational write-through: if WB is writing the same register that ID is reading on the same cycle, forward the write data directly. This bug never showed up in isolated instruction tests because it required three back-to-back dependencies with specific pipeline timing.
+
+**Stale forwarding after multi-cycle stalls.** After adding the 6-stage pipeline, the divider stall (up to 33 cycles) would cause an instruction waiting in EX1 to lose its forwarded operand. The value was correct on the first cycle of the stall (forwarded from WB), but by the time the stall released, the source instruction had long since left WB and the pipelined register file value in ID/EX1 was captured before the write happened. The fix was to add a fresh register file read path in EX1 with WB bypass, so the default (no-forward) case always gets the current value rather than the stale pipelined one.
+
+**MDU result forwarding timing.** The pipelined multiplier takes 2 cycles, but the EX2→EX1 forwarding path was providing the MDU result combinationally on the first cycle, before the multiplication had completed. This meant an instruction immediately following a MUL would forward garbage. The fix was to gate the EX2 forwarding on `mdu_valid`: only forward from EX2 for M-extension instructions when the MDU has actually produced a result. When the result isn't ready, the hazard unit stalls instead.
 
 ## M Extension
 
