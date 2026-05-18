@@ -35,7 +35,7 @@ To fix this, I split the execute stage into two stages, similar to the approach 
 - **EX1 (Forwarding + Operand Select)**: 3-source forwarding comparison and mux, ALU operand selection (rs1/PC, rs2/immediate), CSR write-data preparation. Output registered into the EX1/EX2 pipeline register.
 - **EX2 (ALU + Branch + CSR + MDU)**: registered operands feed directly into the ALU, branch unit, MDU, and CSR unit with no preceding combinational logic.
 
-This reduced the critical path from 19 logic levels to 7, closing timing at 100 MHz with +0.135 ns of slack. The tradeoff is that mispredictions now flush 3 stages instead of 2, but the gshare predictor with BTB and RAS predicts both direction and target in the fetch stage, keeping the IPC penalty well below the 56% frequency gain.
+This reduced the critical path from 19 logic levels to 7, closing timing at 100 MHz with +0.135 ns of slack. The tradeoff is that mispredictions now flush 3 stages instead of 2, adding one cycle of branch latency. But a pipelined processor's performance is determined by throughput, not single-instruction latency. Throughput = IPC × frequency, and the 56% frequency gain (64 → 101 MHz) far exceeds the minor IPC reduction from the occasional extra flush cycle. The gshare predictor with BTB and RAS further minimizes the IPC impact by predicting both direction and target in the fetch stage, so the deeper pipeline rarely pays the full 3-cycle penalty in practice.
 
 ## Pipeline Architecture
 
