@@ -12,7 +12,7 @@ This project was built independently, outside of any course requirement.
 
 | Metric | Value |
 |--------|-------|
-| Clock | **100 MHz** - timing met, WNS = +0.135 ns |
+| Clock | **100 MHz** constraint, timing met with WNS = +0.135 ns (critical path = 9.87 ns → f_max ≈ 101.4 MHz) |
 | Slice LUTs | 6,805 / 20,800 (33%) |
 | Slice Registers | 8,412 / 41,600 (20%) |
 | DSP48E1 | 12 (pipelined 32x32 → 64-bit multiplier) |
