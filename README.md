@@ -338,7 +338,3 @@ tools/
 - [riscv-tests](https://github.com/riscv-software-src/riscv-tests) (official ISA compliance suite)
 - McFarling, "Combining Branch Predictors" (WRL Technical Note TN-36, 1993)
 - Hennessy & Patterson, *Computer Architecture: A Quantitative Approach* (forwarding and hazard analysis)
-
-## License
-
-MIT
