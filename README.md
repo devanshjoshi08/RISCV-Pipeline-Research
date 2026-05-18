@@ -2,9 +2,7 @@
 
 A 6-stage pipelined RISC-V processor implementing the RV32IM instruction set in SystemVerilog, deployed on a Digilent Basys 3 FPGA (Xilinx Artix-7 XC7A35T) with clean timing closure at **100 MHz**.
 
-The design began as a 5-stage RV32I pipeline running at 91 MHz. However, after extending the ISA with hardware multiply/divide, M-mode privileged CSRs, trap handling, and a gshare branch predictor, the execute stage became the critical bottleneck, accumulating 19 logic levels and a 15.5 ns combinational path that resulted in a WNS of -5.539 ns, effectively capping the design at 64 MHz. To resolve this, I split the execute stage into separate forwarding (EX1) and computation (EX2) stages, which reduced the critical path to 7 logic levels and achieved clean timing closure at 100 MHz. As a consequence, the deeper pipeline increases the branch misprediction penalty from 2 to 3 cycles; nevertheless, the gshare predictor with BTB and return address stack mitigates this sufficiently that the 56% frequency improvement far outweighs the added latency.
-
-In addition to the pipeline restructuring, the processor supports all 48 RV32IM instructions, includes 64-bit hardware performance counters for cycle-accurate IPC measurement, and runs bare-metal C programs compiled with a standard RISC-V GCC toolchain with output over UART. The design has been validated through a 24-point comprehensive test suite, the 37-test riscv-tests ISA compliance suite, and deployment on physical hardware.
+The processor supports all 48 RV32IM instructions with a pipelined hardware multiplier and iterative divider, M-mode privileged architecture (CSR access, trap handling, MRET), a gshare branch predictor with branch target buffer and return address stack, a direct-mapped instruction cache, 3-source data forwarding, and 64-bit hardware performance counters for cycle-accurate IPC measurement. Runs bare-metal C programs compiled with a standard RISC-V GCC toolchain, communicating over UART at 115200 baud with LED output on the FPGA. Validated through a 24-point comprehensive test suite, 37-test riscv-tests ISA compliance, and hardware deployment.
 
 **Author:** Devansh Joshi
 
@@ -20,22 +18,22 @@ In addition to the pipeline restructuring, the processor supports all 48 RV32IM 
 | BRAM | 0 |
 | Critical path | Gshare PHT read → PC next mux (7 logic levels, 9.87 ns) |
 | Verification | **24/24** comprehensive test, 37/37 riscv-tests compliance |
-| FPGA validation | Fibonacci demo over UART + LEDs at 115200 baud |
+| FPGA validation | Fibonacci demo running on hardware, UART + LEDs |
 
-## Motivation: From 5-Stage to 6-Stage
+## Design Evolution: 5-Stage → 6-Stage Pipeline
 
-The standard Patterson & Hennessy 5-stage pipeline (IF/ID/EX/MEM/WB) served as the starting point for this design. With the base RV32I instruction set alone, the 5-stage implementation met timing at approximately 91 MHz on the target Artix-7 fabric, with a worst negative slack of -0.938 ns at the 100 MHz constraint.
+I started with the standard Patterson & Hennessy 5-stage pipeline (IF/ID/EX/MEM/WB). With just the base RV32I instruction set, the design ran at approximately 91 MHz on Artix-7, with a WNS of -0.938 ns against the 100 MHz target.
 
-The problem emerged when extending the processor to support the M extension (hardware multiply/divide), M-mode privileged CSRs, trap handling, and a gshare branch predictor. These features converge in the execute stage: the forwarding unit must compare source register addresses against three pipeline stages, select through a multi-level mux, then feed the result into the ALU carry chain, branch comparator, CSR read path, and result selection mux, all within a single clock cycle. After place-and-route, the critical path through this logic measured **15.5 ns across 19 logic levels**, from the forwarding address comparison in the ID/EX register through the ALU output to the EX/MEM register. Timing failed with a WNS of **-5.539 ns**, limiting the design to approximately **64 MHz**.
+That changed when I extended the processor with the M extension, M-mode privileged CSRs, trap handling, and a gshare branch predictor. All of these features converge in the execute stage: the forwarding unit compares source addresses against three pipeline stages and selects through a multi-level mux, which then feeds into the ALU carry chain, branch comparator, CSR read path, and result selection logic, all within a single cycle. After place-and-route, this path measured **15.5 ns across 19 logic levels**, failing timing with a WNS of **-5.539 ns** and capping the design at roughly **64 MHz**.
 
-At 64 MHz with a 100 MHz constraint, 36% of each clock period is wasted slack where the combinational logic has already settled but the clock edge hasn't arrived. More critically, the design cannot meet its own timing specification, meaning hold-time violations could cause functional failures on hardware under certain PVT (process/voltage/temperature) conditions.
+A 64 MHz processor on a 100 MHz target wastes 36% of every clock period in dead slack. Worse, shipping a design that doesn't meet its own timing constraint means risking functional failures under PVT variation on real hardware.
 
-The solution was to split the execute stage into two pipeline stages, following the approach used in production cores like ARM Cortex-M4 and RISC-V Ibex when targeting higher clock frequencies:
+To fix this, I split the execute stage into two stages, similar to the approach used in ARM Cortex-M4 and RISC-V Ibex:
 
-- **EX1 (Forwarding + Operand Select)**: performs the 3-source forwarding comparison and mux, selects ALU operands (rs1/PC for AUIPC, rs2/immediate for I-type), and prepares CSR write data. The output is registered into the EX1/EX2 pipeline register.
-- **EX2 (ALU + Branch + CSR + MDU)**: takes the registered operands and feeds them directly into the ALU, branch unit, multiply/divide unit, and CSR unit with no preceding combinational logic.
+- **EX1 (Forwarding + Operand Select)**: 3-source forwarding comparison and mux, ALU operand selection (rs1/PC, rs2/immediate), CSR write-data preparation. Output registered into the EX1/EX2 pipeline register.
+- **EX2 (ALU + Branch + CSR + MDU)**: registered operands feed directly into the ALU, branch unit, MDU, and CSR unit with no preceding combinational logic.
 
-This partitioning reduces the longest combinational path from 19 logic levels to 7, bringing the critical path delay under the 10 ns budget with 0.135 ns of positive slack. The architectural tradeoff is a deeper pipeline: branch mispredictions now incur a 3-cycle penalty (flushing IF, ID, and EX1) compared to 2 cycles in the 5-stage design. The gshare predictor with BTB and return address stack mitigates this by predicting both direction and target in the fetch stage, keeping the effective misprediction rate low enough that the IPC impact is minimal relative to the 56% frequency improvement.
+This reduced the critical path from 19 logic levels to 7, closing timing at 100 MHz with +0.135 ns of slack. The tradeoff is that mispredictions now flush 3 stages instead of 2, but the gshare predictor with BTB and RAS predicts both direction and target in the fetch stage, keeping the IPC penalty well below the 56% frequency gain.
 
 ## Pipeline Architecture
 
