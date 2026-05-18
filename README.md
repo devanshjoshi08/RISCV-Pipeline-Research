@@ -1,6 +1,12 @@
 # RISC-V RV32IM Pipelined Processor
 
-6-stage pipelined RV32IM processor in SystemVerilog, targeting the Basys 3 FPGA. Closes timing at **100 MHz** on Artix-7 with the full RV32IM instruction set (48 instructions), M-mode privileged architecture, gshare branch prediction, and hardware performance counters. Validated with a 24-point test suite and deployed on real hardware.
+A 6-stage pipelined RISC-V processor implementing the RV32IM instruction set in SystemVerilog, deployed on a Digilent Basys 3 FPGA (Xilinx Artix-7 XC7A35T) with clean timing closure at **100 MHz**.
+
+The design supports all 48 RV32IM instructions with hardware multiply/divide, M-mode privileged architecture (CSR access, trap handling, MRET), a gshare branch predictor with branch target buffer and return address stack, a direct-mapped instruction cache, 3-source data forwarding across the 6-stage pipeline, and 64-bit hardware performance counters for cycle-accurate IPC measurement. The processor runs bare-metal C programs compiled with a standard RISC-V GCC toolchain, communicating over UART at 115200 baud with LED output on the FPGA.
+
+The architecture evolved from a conventional 5-stage pipeline that failed to meet timing after the addition of the M extension and privileged features. Timing analysis revealed a 19-level combinational critical path through the execute stage at 15.5 ns, capping the design at 64 MHz. Splitting the execute stage into separate forwarding and computation stages reduced the critical path to 7 logic levels at 9.87 ns, achieving a 56% frequency improvement and full timing closure at the 100 MHz target. The design rationale, timing data, and architectural tradeoffs are documented in detail below.
+
+Functionally validated through a 24-point comprehensive test suite, 37-test riscv-tests ISA compliance suite, and hardware deployment running a Fibonacci demo with verified UART output and LED display.
 
 **Author:** Devansh Joshi
 
