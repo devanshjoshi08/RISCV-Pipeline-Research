@@ -1,0 +1,53 @@
+name: RTL Simulation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog
+        run: sudo apt-get update && sudo apt-get install -y iverilog
+
+      - name: Compile pipeline testbench
+        run: |
+          iverilog -g2012 -o sim_pipeline \
+            rtl/pkg_riscv.sv \
+            rtl/pc.sv rtl/alu.sv rtl/mdu.sv rtl/csr_unit.sv \
+            rtl/branch_unit.sv rtl/branch_predictor.sv \
+            rtl/control.sv rtl/imm_gen.sv rtl/regfile.sv \
+            rtl/forwarding_unit.sv rtl/hazard_unit.sv \
+            rtl/imem.sv rtl/icache.sv rtl/dmem.sv \
+            rtl/pipe_if_id.sv rtl/pipe_id_ex.sv \
+            rtl/pipe_ex_mem.sv rtl/pipe_mem_wb.sv \
+            rtl/rv32i_pipeline_top.sv \
+            tb/rv32i_pipeline_tb.sv
+
+      - name: Run pipeline test (sum 1-to-10)
+        run: vvp sim_pipeline
+
+      - name: Compile comprehensive testbench
+        run: |
+          iverilog -g2012 -o sim_comprehensive \
+            rtl/pkg_riscv.sv \
+            rtl/pc.sv rtl/alu.sv rtl/mdu.sv rtl/csr_unit.sv \
+            rtl/branch_unit.sv rtl/branch_predictor.sv \
+            rtl/control.sv rtl/imm_gen.sv rtl/regfile.sv \
+            rtl/forwarding_unit.sv rtl/hazard_unit.sv \
+            rtl/imem.sv rtl/icache.sv rtl/dmem.sv \
+            rtl/pipe_if_id.sv rtl/pipe_id_ex.sv \
+            rtl/pipe_ex_mem.sv rtl/pipe_mem_wb.sv \
+            rtl/rv32i_pipeline_top.sv \
+            tb/rv32i_comprehensive_tb.sv
+
+      - name: Run comprehensive test (M-ext, CSR, traps, hazards)
+        run: |
+          cp programs/asm/test_comprehensive.hex .
+          vvp sim_comprehensive | tee results.txt
+          grep -q "ALL TESTS PASSED" results.txt

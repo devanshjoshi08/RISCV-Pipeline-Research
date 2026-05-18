@@ -24,9 +24,12 @@ set_property file_type SystemVerilog [get_files [glob $tb_dir/*.sv]]
 # Add constraints
 add_files -fileset constrs_1 -norecurse "$constr_dir/basys3.xdc"
 
-# Set top modules (pipelined version)
+# Set top modules
 set_property top rv32i_pipeline_top [current_fileset]
 set_property top rv32i_pipeline_tb [get_filesets sim_1]
+
+# FPGA synthesis top is fpga_top
+set_property top fpga_top [current_fileset -quiet]
 
 # Copy hex program to simulation directory so $readmemh can find it
 set sim_dir "$project_dir/vivado/$project_name.sim/sim_1/behav/xsim"
@@ -37,12 +40,9 @@ file copy -force "$prog_dir/sum_1_to_10.hex" "$sim_dir/program.hex"
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
 
-puts "============================================"
-puts "Project created: vivado/$project_name.xpr"
-puts "Top module:      rv32i_pipeline_top"
-puts "Testbench:       rv32i_pipeline_tb"
-puts "Target part:     xc7a35tcpg236-1 (Basys 3)"
-puts "program.hex copied to sim directory"
 puts ""
-puts "Next: Run Simulation -> Run Behavioral Simulation"
-puts "============================================"
+puts "Project created: vivado/$project_name.xpr"
+puts "Sim top:     rv32i_pipeline_tb"
+puts "Synth top:   fpga_top"
+puts "Target:      xc7a35tcpg236-1 (Basys 3)"
+puts ""
