@@ -48,7 +48,7 @@ This paper addresses these questions through a controlled experiment spanning fi
 The contributions of this work are:
 \begin{enumerate}
     \item A controlled experimental methodology in which pipeline depth is the sole independent variable across five design points (4 through 8 stages), with all other microarchitectural modules shared from a common RTL codebase (Section~\ref{sec:invariants}).
-    \item Multi-seed post-place-and-route synthesis on Artix-7, providing $F_{\max}$ and area measurements with error bars that quantify placement-dependent variance and reveal a two-tier frequency structure: the 4- and 5-stage designs cluster near 75\,MHz, while the 6-, 7-, and 8-stage designs cluster near 117--120\,MHz (Section~\ref{sec:synth}).
+    \item Multi-seed post-place-and-route synthesis on Artix-7, providing $F_{\max}$ and area measurements with error bars that quantify placement-dependent variance and show a two-tier frequency structure: the 4- and 5-stage designs cluster near 75\,MHz, while the 6-, 7-, and 8-stage designs cluster near 117--120\,MHz (Section~\ref{sec:synth}).
     \item Validated CPI measurements across 35 workload-depth combinations (7 benchmarks $\times$ 5 depths), all with matching instruction counts, showing that each additional pipeline stage costs approximately 0.12 CPI on average. Official CoreMark/MHz scores range from 2.23 (4-stage) to 1.58 (8-stage) (Section~\ref{sec:model}).
     \item Measurements showing that the official EEMBC CoreMark benchmark produces 5.7\% more mispredictions on a 6-stage pipeline than on a 4-stage, and the Embench statemate benchmark shows a 10\% misprediction increase from 4-stage to 7/8-stage, despite identical predictor hardware in all cases (Section~\ref{sec:cpi}).
 \end{enumerate}
@@ -75,7 +75,7 @@ Xilinx 7-series FPGAs implement combinational logic in 6-input LUTs grouped into
 
 Table~\ref{tab:prior} summarizes the experimental scope of prior RISC-V FPGA implementations relative to this work. SERV \cite{serv2019}, PicoRV32 \cite{picorv32}, VexRiscv \cite{vexriscv}, Ibex \cite{schiavone2017slow}, CVA6 \cite{zaruba2019ariane}, and SweRV EH1 \cite{swerv2019} each present a single pipeline organization optimized for a particular design goal. Frequency and area numbers reported by these projects are useful contextual references, but they cannot be compared directly because ISA support, predictor design, memory architecture, forwarding strategy, and Vivado version differ across all of them. Prior surveys have cataloged pipelining techniques across RISC processor families \cite{biglari2019pipelining} and documented the Rocket Chip generator's configurable pipeline \cite{asanovic2016rocket}, but neither isolates pipeline depth as a controlled variable.
 
-The key gap in the existing literature is not the absence of pipeline-depth variation per se, but the absence of a controlled experiment in which \emph{only} pipeline depth varies while all other microarchitectural variables are held constant on the same FPGA device. Without such control, performance differences between published cores cannot be attributed to pipeline depth rather than to the many other variables that differ simultaneously.
+The gap in the existing literature is not the absence of pipeline-depth variation per se, but the absence of a controlled experiment in which \emph{only} pipeline depth varies while all other microarchitectural variables are held constant on the same FPGA device. Without such control, performance differences between published cores cannot be attributed to pipeline depth rather than to the many other variables that differ simultaneously.
 
 \begin{table}[t]
 \centering
@@ -113,7 +113,7 @@ All five pipeline variants share the following modules, instantiated from identi
 
 \textbf{Multiply-Divide Unit (MDU).} A 2-cycle pipelined multiplier with registered input and output stages, designed to infer DSP48E1 blocks. The divider uses a 32-cycle restoring algorithm. Supported operations are MUL, MULH, MULHSU, MULHU, DIV, DIVU, REM, and REMU. Division by zero and signed overflow follow the RISC-V specification \cite{waterman2019riscv}.
 
-\textbf{Branch Predictor.} A gshare predictor \cite{mcfarling1993combining} with a 64-entry pattern history table (PHT) of 2-bit saturating counters, a 6-bit global history register (GHR), a 32-entry direct-mapped branch target buffer (BTB), and a 4-entry return address stack (RAS). The PHT is indexed by XORing the lower PC bits with the GHR. The predictor hardware is identical in all five variants. However, the number of pipeline stages between the fetch stage (where predictions are made) and the execute stage (where predictions are resolved and the PHT is updated) differs across variants. This update latency is a key variable in our analysis.
+\textbf{Branch Predictor.} A gshare predictor \cite{mcfarling1993combining} with a 64-entry pattern history table (PHT) of 2-bit saturating counters, a 6-bit global history register (GHR), a 32-entry direct-mapped branch target buffer (BTB), and a 4-entry return address stack (RAS). The PHT is indexed by XORing the lower PC bits with the GHR. The predictor hardware is identical in all five variants. However, the number of pipeline stages between the fetch stage (where predictions are made) and the execute stage (where predictions are resolved and the PHT is updated) differs across variants. This update latency is the central variable in our analysis.
 
 \textbf{CSR Unit.} Machine-mode control and status registers including \texttt{mstatus}, \texttt{mtvec}, \texttt{mepc}, \texttt{mcause}, \texttt{mscratch}, and 64-bit hardware performance counters for cycles (\texttt{mcycle}), retired instructions (\texttt{minstret}), total branches, and branch mispredictions. The performance counters are read by each benchmark to obtain cycle counts, instruction counts, branch counts, and misprediction counts.
 
@@ -255,7 +255,7 @@ DSP48E1           & 12    & 12     & 12     & 12     & 12 \\
 \label{fig:fmax}
 \end{figure}
 
-The synthesis results reveal a two-tier frequency structure. The 4- and 5-stage designs achieve nearly identical frequencies (75.2 $\pm$ 1.8 and 75.8 $\pm$ 1.7\,MHz, respectively), while the 6-, 7-, and 8-stage designs cluster in the 116--120\,MHz range. The 6-stage achieves 117.2 $\pm$ 1.5\,MHz, a 56\% improvement over the 4-stage. The 7-stage achieves 116.3 $\pm$ 2.3\,MHz, essentially matching the 6-stage. The 8-stage achieves 120.3 $\pm$ 3.8\,MHz, the highest mean frequency, though the larger standard deviation means the difference from the 6-stage is not statistically significant (overlapping error bars).
+The synthesis results show a two-tier frequency structure. The 4- and 5-stage designs achieve nearly identical frequencies (75.2 $\pm$ 1.8 and 75.8 $\pm$ 1.7\,MHz, respectively), while the 6-, 7-, and 8-stage designs cluster in the 116--120\,MHz range. The 6-stage achieves 117.2 $\pm$ 1.5\,MHz, a 56\% improvement over the 4-stage. The 7-stage achieves 116.3 $\pm$ 2.3\,MHz, essentially matching the 6-stage. The 8-stage achieves 120.3 $\pm$ 3.8\,MHz, the highest mean frequency, though the larger standard deviation means the difference from the 6-stage is not statistically significant (overlapping error bars).
 
 The frequency jump from 5 to 6 stages is explained by the execute-stage split. In the 4- and 5-stage designs, the critical path runs through the forwarding multiplexer, ALU, and branch comparator in a single EX stage. Splitting this into EX1 (forwarding) and EX2 (computation) approximately halves the critical-path combinational depth, producing the observed 54--56\% frequency improvement. Further pipeline stages beyond 6 do not yield additional frequency gains because the EX1/EX2 split already addresses the dominant timing bottleneck. On FPGA fabric, where routing delay is a significant fraction of total path delay and is not eliminated by register insertion \cite{boutros2020fpga}, additional pipeline registers provide diminishing returns.
 
@@ -307,7 +307,7 @@ Table~\ref{tab:benchmark} presents the benchmark results for the two workloads v
 \label{fig:cpi}
 \end{figure}
 
-Several observations emerge from the CPI data. First, CPI increases monotonically with pipeline depth for both workloads. The average CPI increase per additional stage is 0.145 for Dhrystone and 0.182 for Diagnostic. Second, both workloads produce \emph{identical} misprediction counts across all five depths: 203 out of 400 branches for Dhrystone (50.8\%) and 69 out of 360 for Diagnostic (19.2\%). This indicates that these workloads' branch patterns are sufficiently spaced in the instruction stream that the predictor update latency does not cause additional mispredictions, even at the deepest pipeline. Third, the CPI increase is not solely attributable to branch misprediction penalty differences. The 4- and 5-stage designs both have a 2-cycle branch penalty, yet the 5-stage CPI is 0.07 higher on Dhrystone and 0.22 higher on Diagnostic. The latter difference reflects the 5-stage's 1-cycle load-use stall, which the 4-stage avoids due to its merged MEM/WB stage.
+CPI increases monotonically with pipeline depth for both workloads. The average CPI increase per additional stage is 0.145 for Dhrystone and 0.182 for Diagnostic. Both workloads produce \emph{identical} misprediction counts across all five depths: 203 out of 400 branches for Dhrystone (50.8\%) and 69 out of 360 for Diagnostic (19.2\%). These workloads' branch patterns are sufficiently spaced in the instruction stream that predictor update latency does not cause additional mispredictions, even at the deepest pipeline. The CPI increase is not solely attributable to branch misprediction penalty differences, either. The 4- and 5-stage designs both have a 2-cycle branch penalty, yet the 5-stage CPI is 0.07 higher on Dhrystone and 0.22 higher on Diagnostic. The latter difference reflects the 5-stage's 1-cycle load-use stall, which the 4-stage avoids due to its merged MEM/WB stage.
 
 \subsubsection{Official CoreMark Results}
 
@@ -357,7 +357,7 @@ edn (11.4\%)        & 1.48 & 1.51 & 1.66 & 1.78 & 1.95 \\
 \end{tabular}
 \end{table}
 
-The Embench results reveal important workload-dependent trends. The multiply-heavy aha-mont64 has the lowest CPI (1.21--1.32) because its long multiply sequences have few branches and benefit from the MDU pipeline. The crc32 benchmark shows almost zero mispredictions (344 across all depths, 0.19\%) because its inner loop is highly predictable. The statemate benchmark (FSM simulation) shows the strongest depth-dependent misprediction effect: 66{,}603 mispredictions at 4/5-stage vs.\ 73{,}263 at 7/8-stage (10.0\% increase), driven by its data-dependent state transitions. The edn benchmark has moderate CPI (1.48--1.95) with very low misprediction rates (3.1\%).
+The Embench results show workload-dependent trends. The multiply-heavy aha-mont64 has the lowest CPI (1.21--1.32) because its long multiply sequences have few branches and benefit from the MDU pipeline. The crc32 benchmark shows almost zero mispredictions (344 across all depths, 0.19\%) because its inner loop is highly predictable. The statemate benchmark (FSM simulation) shows the strongest depth-dependent misprediction effect: 66{,}603 mispredictions at 4/5-stage vs.\ 73{,}263 at 7/8-stage (10.0\% increase), driven by its data-dependent state transitions. The edn benchmark has moderate CPI (1.48--1.95) with very low misprediction rates (3.1\%).
 
 \subsection{Branch Misprediction Analysis}
 
@@ -370,7 +370,7 @@ Fig.~\ref{fig:mispred} compares misprediction rates for CoreMark and statemate--
 \label{fig:mispred}
 \end{figure}
 
-The pattern that emerges from all seven workloads is that the misprediction-count increase requires two conditions simultaneously: (1) branches spaced closely enough that a new branch is fetched before the previous one's outcome updates the PHT, and (2) branch patterns that are sensitive to stale global history. Dhrystone, aha-mont64, crc32, and edn show zero misprediction increase across depths because their branch patterns are either widely spaced or highly predictable. CoreMark and statemate, with denser and more data-dependent branching, show the effect.
+Across all seven workloads, the misprediction-count increase requires two conditions simultaneously: (1) branches spaced closely enough that a new branch is fetched before the previous one's outcome updates the PHT, and (2) branch patterns that are sensitive to stale global history. Dhrystone, aha-mont64, crc32, and edn show zero misprediction increase across depths because their branch patterns are either widely spaced or highly predictable. CoreMark and statemate, with denser and more data-dependent branching, show the effect.
 
 \subsection{Analytical CPI Model}
 \label{sec:model}
@@ -402,7 +402,7 @@ The 8-stage design pays the largest CPI overhead despite sharing the same 4-cycl
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{sensitivity_spacing.png}
-\caption{CPI overhead relative to the 4-stage baseline for Dhrystone and Diagnostic workloads.}
+\caption{CPI overhead relative to the 4-stage baseline for four representative workloads.}
 \label{fig:sensitivity}
 \end{figure}
 
@@ -513,7 +513,7 @@ Fig.~\ref{fig:published} places our five variants in context with published RISC
 
 \subsection{Two-Tier Frequency Structure}
 
-The most striking feature of the synthesis results is the sharp frequency transition at the 5-to-6-stage boundary. The 4- and 5-stage designs are frequency-limited by the same combinational path through the monolithic execute stage. The 6-, 7-, and 8-stage designs all break this path, producing similar frequencies despite different total depths. This two-tier structure suggests that on Artix-7, the critical question is not ``how deep should the pipeline be?'' but rather ``does the pipeline split the execute stage?'' Once the execute split is made, additional stages provide marginal frequency benefit on this fabric.
+The dominant feature of the synthesis results is the sharp frequency transition at the 5-to-6-stage boundary. The 4- and 5-stage designs are frequency-limited by the same combinational path through the monolithic execute stage. The 6-, 7-, and 8-stage designs all break this path, producing similar frequencies despite different total depths. This two-tier structure suggests that on Artix-7, the critical question is not ``how deep should the pipeline be?'' but rather ``does the pipeline split the execute stage?'' Once the execute split is made, additional stages provide marginal frequency benefit on this fabric.
 
 The 8-stage design shows a slightly higher mean $F_{\max}$ than the 6- and 7-stage (120.3 vs.\ 117.2 and 116.3\,MHz), but the difference is within placement variance ($\pm$3.8\,MHz for the 8-stage). Multi-seed synthesis is essential for distinguishing genuine architectural improvements from placement noise.
 
@@ -533,13 +533,13 @@ The critical factor is the interaction between branch density and pattern predic
 
 \subsection{Why Six Stages Is Optimal on This Fabric}
 
-The 6-stage design achieves the best throughput because it sits at the knee of the frequency curve (capturing the full benefit of the execute-stage split) while incurring only moderate CPI overhead. Deeper pipelines (7, 8 stages) achieve similar or slightly higher frequencies but pay progressively higher CPI costs that outweigh any frequency advantage. Shallower pipelines (4, 5 stages) have better CPI but are frequency-limited by the monolithic execute stage.
+The 6-stage design achieves the best throughput because it sits at the knee of the frequency curve---capturing the full benefit of the execute-stage split---while incurring only moderate CPI overhead. Deeper pipelines (7, 8 stages) achieve similar or slightly higher frequencies but pay progressively higher CPI costs that outweigh any frequency advantage. Shallower pipelines (4, 5 stages) have better CPI but are frequency-limited by the monolithic execute stage. For designers, the practical implication is clear: on LUT-based FPGA fabric, the first pipeline split that matters is separating the forwarding multiplexer from the ALU. Splits beyond that point buy little frequency and cost measurable CPI.
 
-The 4-stage design is an interesting case: it has the lowest CPI (1.38--1.41) due to its merged MEM/WB stage eliminating load-use stalls, but its 75\,MHz frequency limits throughput to 53--55\,MIPS. The 5-stage design fares worst in throughput: it adds load-use stalls (raising CPI) without gaining frequency. On this fabric, the classic 5-stage RISC pipeline appears to be a poor design point relative to both shallower (4-stage) and deeper (6-stage) alternatives.
+The 4-stage design has the lowest CPI (1.38--1.41) thanks to its merged MEM/WB stage eliminating load-use stalls, but its 75\,MHz frequency limits throughput to 48--55\,MIPS. The 5-stage design fares worst in throughput: it adds load-use stalls (raising CPI) without gaining frequency. On this fabric, the classic 5-stage RISC pipeline is a dominated design point---worse than both the shallower 4-stage and the deeper 6-stage.
 
 \subsection{Decomposition of the 7-Stage CPI Overhead}
 
-The 7-stage CPI penalty relative to the 6-stage merits a closer examination because it is larger than the branch penalty alone would predict. On the diagnostic workload, CPI increases from 1.66 (6-stage) to 1.89 (7-stage), a delta of 0.23\,CPI. Decomposing this delta reveals three sources:
+The 7-stage CPI penalty relative to the 6-stage merits a closer examination because it is larger than the branch penalty alone would predict. On the diagnostic workload, CPI increases from 1.66 (6-stage) to 1.89 (7-stage), a delta of 0.23\,CPI. Decomposing this delta identifies three sources:
 
 \begin{enumerate}
 \item \textbf{Longer misprediction penalty} (4 vs.\ 3 cycles). With 69 mispredictions over 1{,}367 instructions, the additional cycle per misprediction accounts for $69 \times 1 / 1{,}367 = 0.050$\,CPI (22\% of the delta).
@@ -555,7 +555,7 @@ On ASIC processes, deeper pipelines generally increase $F_{\max}$ monotonically 
 
 \subsection{Applicability to Other FPGA Families}
 
-Although this study targets Artix-7, we observe that the mechanisms driving the pipeline-depth tradeoff depend on three fabric properties: (1) LUT-based combinational logic with near-constant propagation delay independent of function complexity, (2) routing-dominated critical paths where register insertion does not eliminate interconnect delay, and (3) synchronous BRAM with registered output requiring at least one cycle of read latency. These properties are present in other Xilinx families (UltraScale, UltraScale+) and Intel FPGA devices (Cyclone, Stratix) \cite{kuon2007measuring}, which leads us to expect that the qualitative trends---the two-tier frequency structure, the CPI linearity, the predictor-latency misprediction effect---would hold on those platforms as well. However, we have not verified this empirically, and the specific $F_{\max}$ values, area costs, and optimal pipeline depth could differ on other fabrics due to differences in LUT architecture, routing topology, and hard-block placement.
+Although this study targets Artix-7, the mechanisms driving the pipeline-depth tradeoff depend on three fabric properties: (1) LUT-based combinational logic with near-constant propagation delay independent of function complexity, (2) routing-dominated critical paths where register insertion does not eliminate interconnect delay, and (3) synchronous BRAM with registered output requiring at least one cycle of read latency. These properties are present in other Xilinx families (UltraScale, UltraScale+) and Intel FPGA devices (Cyclone, Stratix) \cite{kuon2007measuring}, so the qualitative trends---the two-tier frequency structure, the CPI linearity, the predictor-latency misprediction effect---should hold on those platforms as well. However, we have not verified this empirically, and the specific $F_{\max}$ values, area costs, and optimal pipeline depth could differ on other fabrics due to differences in LUT architecture, routing topology, and hard-block placement.
 
 The CPI model (Eq.~\ref{eq:cpi_model}) is parameterized by workload properties (branch frequency) and pipeline properties (depth), neither of which depends on the FPGA fabric. We therefore expect the CPI trend to hold on other LUT-based FPGA families, while the specific $F_{\max}$ and throughput values reported here are Artix-7-specific and should not be extrapolated without device-specific validation.
 
@@ -567,7 +567,7 @@ This study has several limitations. First, the CPI model ($R^2 = 0.67$, 35 data 
 \section{Conclusion}
 % ====================================================================
 
-This work presents a controlled comparison of 4- through 8-stage RV32IM pipelined processors on a Xilinx Artix-7 FPGA, with all non-pipeline microarchitectural variables held constant. Multi-seed post-place-and-route synthesis reveals a two-tier frequency structure: the 4- and 5-stage designs cluster near 75\,MHz, while the 6-, 7-, and 8-stage designs cluster near 117--120\,MHz. The frequency transition at the 5-to-6-stage boundary corresponds to the execute-stage split that breaks the dominant critical path.
+This work presents a controlled comparison of 4- through 8-stage RV32IM pipelined processors on a Xilinx Artix-7 FPGA, with all non-pipeline microarchitectural variables held constant. Multi-seed post-place-and-route synthesis shows a two-tier frequency structure: the 4- and 5-stage designs cluster near 75\,MHz, while the 6-, 7-, and 8-stage designs cluster near 117--120\,MHz. The frequency transition at the 5-to-6-stage boundary corresponds to the execute-stage split that breaks the dominant critical path.
 
 CPI increases at approximately 0.12 per additional pipeline stage across seven workloads, with the per-stage cost consistent from multiply-heavy crypto (aha-mont64, 0.03/stage) through mixed-workload CoreMark (0.16/stage) to load-heavy signal processing (edn, 0.12/stage). On the official EEMBC CoreMark benchmark, the 4-stage processor achieves 2.23 CoreMark/MHz, decreasing to 1.58 at 8 stages. The 6-stage achieves the highest absolute throughput (64.1\,MIPS on CoreMark, 1.88 CoreMark/MHz) by capturing the full frequency benefit of the execute-stage split while paying only a moderate CPI penalty.
 
