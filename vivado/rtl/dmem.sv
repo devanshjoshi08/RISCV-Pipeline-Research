@@ -10,11 +10,10 @@ module dmem #(parameter DEPTH = 1024) (
 );
 
   logic [31:0] mem [0:DEPTH-1];
-  localparam ADDR_BITS = $clog2(DEPTH);
   logic [1:0] boff;
-  logic [ADDR_BITS-1:0] waddr;
+  logic [9:0] waddr;
   assign boff = addr[1:0];
-  assign waddr = addr[ADDR_BITS+1:2];
+  assign waddr = addr[11:2];
 
   always_ff @(posedge clk) begin
     if (mem_write) begin

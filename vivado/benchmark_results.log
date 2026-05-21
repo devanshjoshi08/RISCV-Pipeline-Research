@@ -1,0 +1,93 @@
+=== RISCV Pipeline Benchmark Results ===
+=== Mon May 18 19:31:52 -0500 2026 ===
+
+================================================================
+  bench_5s_bench_branch_heavy - bench_branch_heavy.hex
+================================================================
+Time resolution is 1 ps
+=== Benchmark: bench_branch_heavy.hex on rv32i_pipeline_5stage_top ===
+  Cycles:         12176
+  Instructions:   7106
+  Branches:       2013
+  Mispredictions: 572
+  Checksum:       0x00000361
+  CPI:            1.71
+  Mispredict%:    28.41%
+=== Done ===
+$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_5s_tb.sv" Line 41
+
+================================================================
+  bench_6s_bench_branch_heavy - bench_branch_heavy.hex
+================================================================
+Time resolution is 1 ps
+=== Benchmark: bench_branch_heavy.hex on rv32i_pipeline_top ===
+  Cycles:         13520
+  Instructions:   7106
+  Branches:       2013
+  Mispredictions: 686
+  Checksum:       0x00000361
+  CPI:            1.90
+  Mispredict%:    34.07%
+=== Done ===
+$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_6s_tb.sv" Line 41
+
+================================================================
+  bench_7s_bench_branch_heavy - bench_branch_heavy.hex
+================================================================
+Time resolution is 1 ps
+=== Benchmark: bench_branch_heavy.hex on rv32i_pipeline_7stage_top ===
+  Cycles:         8275
+  Instructions:   4085
+  Branches:       1175
+  Mispredictions: 276
+  Checksum:       0x000001af
+  CPI:            2.02
+  Mispredict%:    23.48%
+=== Done ===
+$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_7s_tb.sv" Line 41
+
+================================================================
+  bench_5s_bench_compute_heavy - bench_compute_heavy.hex
+================================================================
+Time resolution is 1 ps
+=== Benchmark: bench_compute_heavy.hex on rv32i_pipeline_5stage_top ===
+  Cycles:         13341
+  Instructions:   9913
+  Branches:       1158
+  Mispredictions: 126
+  Checksum:       0xe466f391
+  CPI:            1.34
+  Mispredict%:    10.88%
+=== Done ===
+$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_5s_tb.sv" Line 41
+
+================================================================
+  bench_6s_bench_compute_heavy - bench_compute_heavy.hex
+================================================================
+Time resolution is 1 ps
+=== Benchmark: bench_compute_heavy.hex on rv32i_pipeline_top ===
+  Cycles:         14143
+  Instructions:   9913
+  Branches:       1158
+  Mispredictions: 126
+  Checksum:       0xe466f391
+  CPI:            1.42
+  Mispredict%:    10.88%
+=== Done ===
+$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_6s_tb.sv" Line 41
+
+================================================================
+  bench_7s_bench_compute_heavy - bench_compute_heavy.hex
+================================================================
+Time resolution is 1 ps
+=== Benchmark: bench_compute_heavy.hex on rv32i_pipeline_7stage_top ===
+  Cycles:         8017
+  Instructions:   5283
+  Branches:       535
+  Mispredictions: 92
+  Checksum:       0x31da65ef
+  CPI:            1.51
+  Mispredict%:    17.19%
+=== Done ===
+$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_7s_tb.sv" Line 41
+

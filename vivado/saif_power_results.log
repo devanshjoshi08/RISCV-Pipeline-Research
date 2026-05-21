@@ -1,0 +1,42 @@
+=== SAIF-Based Power Analysis Results ===
+=== Tue May 19 11:53:10 -0500 2026 ===
+
+------------------------------------------------------------
+  saif_5s (rv32i_pipeline_5stage_top)
+------------------------------------------------------------
+  | Total On-Chip Power (W)  | 0.299        |
+  | Dynamic (W)              | 0.230        |
+  | Device Static (W)        | 0.069        |
+  | Clocks                   |     0.066 |        3 |       --- |             --- |
+  | Slice Logic              |     0.056 |    17398 |       --- |             --- |
+  |   LUT as Logic           |     0.048 |     6251 |     20800 |           30.05 |
+  | Signals                  |     0.090 |    13388 |       --- |             --- |
+  | DSPs                     |     0.017 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+
+------------------------------------------------------------
+  saif_6s (rv32i_pipeline_top)
+------------------------------------------------------------
+  | Total On-Chip Power (W)  | 0.298        |
+  | Dynamic (W)              | 0.230        |
+  | Device Static (W)        | 0.069        |
+  | Clocks                   |     0.069 |        3 |       --- |             --- |
+  | Slice Logic              |     0.054 |    17975 |       --- |             --- |
+  |   LUT as Logic           |     0.046 |     6457 |     20800 |           31.04 |
+  | Signals                  |     0.089 |    13831 |       --- |             --- |
+  | DSPs                     |     0.018 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+
+------------------------------------------------------------
+  saif_7s (rv32i_pipeline_7stage_top)
+------------------------------------------------------------
+  | Total On-Chip Power (W)  | 0.300        |
+  | Dynamic (W)              | 0.231        |
+  | Device Static (W)        | 0.069        |
+  | Clocks                   |     0.069 |        3 |       --- |             --- |
+  | Slice Logic              |     0.055 |    18162 |       --- |             --- |
+  |   LUT as Logic           |     0.046 |     6502 |     20800 |           31.26 |
+  | Signals                  |     0.089 |    13888 |       --- |             --- |
+  | DSPs                     |     0.018 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+

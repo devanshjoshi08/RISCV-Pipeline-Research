@@ -1,6 +1,5 @@
 # Vivado project files
 *.jou
-*.log
 *.str
 *.xpr
 *.runs/
@@ -19,6 +18,19 @@
 *.bin
 *.ltx
 
+# Compiled benchmark intermediates
+programs/coremark/*.elf
+programs/coremark/*_raw.hex
+programs/coremark/*.full
+programs/coremark/*.dump
+programs/embench/*.elf
+programs/embench/*_raw.hex
+programs/embench/*.full
+programs/embench/*.dump
+
 # OS files
 .DS_Store
 Thumbs.db
+
+# Keep result logs and Vivado TCL logs
+!vivado/*.log

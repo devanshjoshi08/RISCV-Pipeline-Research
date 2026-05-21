@@ -1,0 +1,9 @@
+=== Official EEMBC CoreMark Benchmark Results ===
+=== Thu May 21 00:29:04 -0500 2026 ===
+
+--- cm_4s ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_4stage_top ===
+TIMEOUT
+$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_coremark/cm_4s_tb.sv" Line 50
+

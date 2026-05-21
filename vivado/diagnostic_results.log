@@ -1,0 +1,34 @@
+=== Diagnostic Benchmark ===
+=== Mon May 18 19:29:49 -0500 2026 ===
+Expected: identical instruction count and checksum across all variants
+
+Time resolution is 1 ps
+=== Diagnostic: rv32i_pipeline_5stage_top ===
+  Cycles:         2187
+  Instructions:   1367
+  Branches:       360
+  Mispredictions: 69
+  Checksum:       9884351 (expect 24587)
+
+$finish called at time : 500145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_diag/diag_5s_tb.sv" Line 30
+
+Time resolution is 1 ps
+=== Diagnostic: rv32i_pipeline_top ===
+  Cycles:         2267
+  Instructions:   1367
+  Branches:       360
+  Mispredictions: 69
+  Checksum:       9884351 (expect 24587)
+
+$finish called at time : 500145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_diag/diag_6s_tb.sv" Line 30
+
+Time resolution is 1 ps
+=== Diagnostic: rv32i_pipeline_7stage_top ===
+  Cycles:         2579
+  Instructions:   1367
+  Branches:       360
+  Mispredictions: 69
+  Checksum:       9884351 (expect 24587)
+
+$finish called at time : 500145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_diag/diag_7s_tb.sv" Line 30
+
