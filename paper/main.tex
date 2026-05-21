@@ -255,7 +255,9 @@ DSP48E1           & 12    & 12     & 12     & 12     & 12 \\
 \label{fig:fmax}
 \end{figure}
 
-The synthesis results show a two-tier frequency structure. The 4- and 5-stage designs achieve nearly identical frequencies (75.2 $\pm$ 1.8 and 75.8 $\pm$ 1.7\,MHz, respectively), while the 6-, 7-, and 8-stage designs cluster in the 116--120\,MHz range. The 6-stage achieves 117.2 $\pm$ 1.5\,MHz, a 56\% improvement over the 4-stage. The 7-stage achieves 116.3 $\pm$ 2.3\,MHz, essentially matching the 6-stage. The 8-stage achieves 120.3 $\pm$ 3.8\,MHz, the highest mean frequency, though the larger standard deviation means the difference from the 6-stage is not statistically significant (overlapping error bars).
+The synthesis results show a two-tier frequency structure. The 4- and 5-stage designs achieve nearly identical frequencies (75.2 $\pm$ 1.8 and 75.8 $\pm$ 1.7\,MHz, respectively), while the 6-, 7-, and 8-stage designs cluster in the 116--120\,MHz range. The 6-stage achieves 117.2 $\pm$ 1.5\,MHz, a 56\% improvement over the 4-stage. The 7-stage achieves 116.3 $\pm$ 2.3\,MHz, and the 8-stage achieves 120.3 $\pm$ 3.8\,MHz.
+
+A note on statistical confidence: with only three placement seeds per variant, the reported standard deviations should be interpreted as indicators of placement sensitivity rather than as tight confidence intervals. The 8-stage's higher mean $F_{\max}$ (120.3\,MHz) compared to the 6-stage (117.2\,MHz) amounts to a difference of 3.1\,MHz, which is smaller than the 8-stage's own standard deviation ($\pm$3.8\,MHz). A two-sample $t$-test on these three-point samples yields $p > 0.3$, confirming that the frequency difference between the 6-, 7-, and 8-stage variants is not statistically significant at conventional thresholds. The frequency gap between the shallow tier (4/5-stage, $\sim$75\,MHz) and the deep tier (6/7/8-stage, $\sim$117\,MHz) is unambiguous---the means differ by more than $20\times$ their standard deviations. Additional placement seeds would narrow the confidence intervals within each tier but would not change the tier structure itself.
 
 The frequency jump from 5 to 6 stages is explained by the execute-stage split. In the 4- and 5-stage designs, the critical path runs through the forwarding multiplexer, ALU, and branch comparator in a single EX stage. Splitting this into EX1 (forwarding) and EX2 (computation) approximately halves the critical-path combinational depth, producing the observed 54--56\% frequency improvement. Further pipeline stages beyond 6 do not yield additional frequency gains because the EX1/EX2 split already addresses the dominant timing bottleneck. On FPGA fabric, where routing delay is a significant fraction of total path delay and is not eliminated by register insertion \cite{boutros2020fpga}, additional pipeline registers provide diminishing returns.
 
@@ -380,7 +382,9 @@ To provide a quantitative design heuristic, we fit a linear model across all 35 
 \text{CPI} = 0.572 + 0.120 \cdot D + 1.903 \cdot f_b
 \label{eq:cpi_model}
 \end{equation}
-where $D$ is the pipeline depth in stages (4 through 8) and $f_b$ is the workload's branch frequency (fraction of instructions that are branches). This model achieves $R^2 = 0.67$ with 32 degrees of freedom, a mean absolute error of 0.127\,CPI, and a maximum residual magnitude of 0.43\,CPI. Fig.~\ref{fig:cpi_vs_depth} shows the data points and fitted model lines for all seven workloads.
+where $D$ is the pipeline depth in stages (4 through 8) and $f_b$ is the workload's branch frequency (fraction of instructions that are branches). This model achieves $R^2 = 0.67$ with 32 degrees of freedom, a mean absolute error of 0.127\,CPI, and a maximum residual of 0.43\,CPI. Fig.~\ref{fig:cpi_vs_depth} shows the data points and fitted model lines.
+
+We present this model as a design \emph{heuristic} rather than a predictive law. The $R^2$ of 0.67 means roughly one-third of the CPI variance is driven by workload-specific factors---base instruction mix, MDU stall frequency, load-use hazard density---that two parameters cannot capture. The model's value is directional: it correctly predicts that CPI rises with depth and with branch density, and the coefficients give order-of-magnitude guidance for design tradeoffs. For precise CPI prediction on a specific workload, cycle-accurate simulation remains necessary.
 
 \begin{figure}[t]
 \centering
@@ -539,12 +543,33 @@ The 4-stage design has the lowest CPI (1.38--1.41) thanks to its merged MEM/WB s
 
 \subsection{Decomposition of the 7-Stage CPI Overhead}
 
-The 7-stage CPI penalty relative to the 6-stage merits a closer examination because it is larger than the branch penalty alone would predict. On the diagnostic workload, CPI increases from 1.66 (6-stage) to 1.89 (7-stage), a delta of 0.23\,CPI. Decomposing this delta identifies three sources:
+The 7-stage CPI penalty relative to the 6-stage is larger than the branch penalty alone would predict. On the diagnostic workload, CPI increases from 1.66 (6-stage) to 1.89 (7-stage), a delta of 0.23\,CPI. Table~\ref{tab:hazard_cost} summarizes the per-event cycle costs across all five variants, providing the analytical basis for decomposing this delta.
+
+\begin{table}[t]
+\centering
+\caption{Per-event cycle costs across pipeline variants. ``Update latency'' is the number of stages between prediction and resolution.}
+\label{tab:hazard_cost}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Event} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} \\
+\midrule
+Branch mispredict flush    & 2\,cy & 2\,cy & 3\,cy & 4\,cy & 4\,cy \\
+Load-use stall             & 0\,cy & 1\,cy & 1\,cy & 1\,cy & 1--2\,cy \\
+IF2 taken-prediction bubble & --   & --    & --    & 1\,cy & 1\,cy \\
+MDU multiply stall         & 2\,cy & 2\,cy & 2\,cy & 2\,cy & 2\,cy \\
+MDU divide stall           & 32\,cy & 32\,cy & 32\,cy & 32\,cy & 32\,cy \\
+Predictor update latency   & 2\,stg & 2\,stg & 3\,stg & 4\,stg & 4\,stg \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Using these costs, the 6-to-7-stage CPI delta decomposes into three sources:
 
 \begin{enumerate}
-\item \textbf{Longer misprediction penalty} (4 vs.\ 3 cycles). With 69 mispredictions over 1{,}367 instructions, the additional cycle per misprediction accounts for $69 \times 1 / 1{,}367 = 0.050$\,CPI (22\% of the delta).
-\item \textbf{IF2 prediction bubble.} When IF2 predicts a taken branch, the instruction already fetched by IF1 in the same cycle must be squashed, costing 1 cycle per correctly predicted taken branch. Assuming approximately 70\% of correctly predicted branches are taken, this accounts for an estimated 0.15\,CPI (65\% of the delta).
-\item \textbf{Indirect depth effects} such as load-use stall propagation and forwarding latency account for the remainder ($\sim$13\% of the delta).
+\item \textbf{Longer misprediction penalty} (4 vs.\ 3 cycles). With 69 mispredictions over 1{,}367 instructions, the additional cycle per misprediction accounts for $69 / 1{,}367 = 0.050$\,CPI (22\% of the delta).
+\item \textbf{IF2 prediction bubble.} When IF2 predicts a taken branch, IF1's speculative sequential fetch is discarded, costing 1 cycle per correctly predicted taken branch. With approximately 70\% of correctly predicted branches being taken, this accounts for an estimated 0.15\,CPI (65\% of the delta).
+\item \textbf{Indirect depth effects}---increased forwarding latency and pipeline drain overhead on function calls---account for the remaining $\sim$0.03\,CPI (13\%).
 \end{enumerate}
 
 The IF2 bubble is thus the dominant cost of the 7-stage design. This cost is inherent to any two-stage fetch split: IF1 fetches sequentially while IF2 predicts, and a taken prediction always discards the speculative IF1 fetch. It cannot be eliminated without speculative fetch cancellation or a zero-cycle predictor. Even with BRAM-competitive frequency, this CPI overhead means the 7-stage would need workloads with very low branch density to match the 6-stage's throughput. The 8-stage design inherits this same IF2 bubble cost and adds the dual load-use stall overhead, explaining its even higher CPI despite sharing the 7-stage's 4-cycle branch penalty.
@@ -555,9 +580,11 @@ On ASIC processes, deeper pipelines generally increase $F_{\max}$ monotonically 
 
 \subsection{Applicability to Other FPGA Families}
 
-Although this study targets Artix-7, the mechanisms driving the pipeline-depth tradeoff depend on three fabric properties: (1) LUT-based combinational logic with near-constant propagation delay independent of function complexity, (2) routing-dominated critical paths where register insertion does not eliminate interconnect delay, and (3) synchronous BRAM with registered output requiring at least one cycle of read latency. These properties are present in other Xilinx families (UltraScale, UltraScale+) and Intel FPGA devices (Cyclone, Stratix) \cite{kuon2007measuring}, so the qualitative trends---the two-tier frequency structure, the CPI linearity, the predictor-latency misprediction effect---should hold on those platforms as well. However, we have not verified this empirically, and the specific $F_{\max}$ values, area costs, and optimal pipeline depth could differ on other fabrics due to differences in LUT architecture, routing topology, and hard-block placement.
+This study targets Artix-7 exclusively. We identify three fabric properties that drive the observed tradeoffs: (1) LUT-based combinational logic with near-constant propagation delay, (2) routing-dominated critical paths where register insertion does not eliminate interconnect delay, and (3) synchronous BRAM with registered output requiring at least one cycle of read latency. These properties are shared by other Xilinx families (UltraScale, UltraScale+) and Intel FPGA devices (Cyclone, Stratix) \cite{kuon2007measuring}.
 
-The CPI model (Eq.~\ref{eq:cpi_model}) is parameterized by workload properties (branch frequency) and pipeline properties (depth), neither of which depends on the FPGA fabric. We therefore expect the CPI trend to hold on other LUT-based FPGA families, while the specific $F_{\max}$ and throughput values reported here are Artix-7-specific and should not be extrapolated without device-specific validation.
+We \emph{hypothesize}---but have not validated---that the qualitative trends (two-tier frequency structure, monotonic CPI increase, predictor-latency misprediction effect) would appear on those platforms as well. The hypothesis rests on architectural reasoning, not empirical data from other fabrics. Quantitative differences are expected: UltraScale's faster routing fabric may shift the frequency tier boundary, and Intel's ALM-based logic may change the critical-path composition. The specific $F_{\max}$ values, area costs, and optimal pipeline depth reported here are Artix-7-specific and should not be extrapolated without device-specific validation.
+
+The CPI model (Eq.~\ref{eq:cpi_model}) depends on pipeline depth and branch frequency, neither of which is fabric-dependent. The per-stage CPI cost of 0.12 should transfer across FPGA families because it is driven by pipeline hazard structure, not by timing. The absolute throughput ($F_{\max} / \text{CPI}$), however, is fabric-specific because $F_{\max}$ varies with the target device.
 
 \subsection{Limitations}
 
