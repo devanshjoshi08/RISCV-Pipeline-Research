@@ -287,7 +287,7 @@ Table~\ref{tab:benchmark} presents the benchmark results for the two workloads v
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{cpi_comparison.png}
-\caption{CPI across five pipeline depths and seven workloads. All benchmarks show monotonically increasing CPI with depth.}
+\caption{CPI across five pipeline depths and seven workloads.}
 \label{fig:cpi}
 \end{figure}
 
@@ -318,7 +318,7 @@ CoreMark/MHz   & 2.23      & 2.12      & 1.88      & 1.71      & 1.58 \\
 \end{tabular}
 \end{table}
 
-The CoreMark/MHz score decreases monotonically with pipeline depth (2.23 to 1.58) because the CPI increase outweighs any frequency advantage. This metric is frequency-independent: CoreMark/MHz = iterations $\times$ 10$^6$ / total\_cycles.
+The CoreMark/MHz score decreases with pipeline depth (2.23 to 1.58) because the CPI increase outweighs any frequency advantage. This metric is frequency-independent: CoreMark/MHz = iterations $\times$ 10$^6$ / total\_cycles.
 
 \subsubsection{Embench-IoT Results}
 
@@ -413,7 +413,7 @@ Effective throughput in millions of instructions per second (MIPS) is computed a
 
 The 4-stage design achieves 48.8\,MIPS (CoreMark) despite its low frequency, because its low CPI partially compensates for the 75\,MHz clock. The 5-stage achieves the lowest throughput (46.5\,MIPS) because it has essentially the same frequency as the 4-stage but higher CPI due to load-use stalls.
 
-Fig.~\ref{fig:coremark_mhz} shows the official CoreMark/MHz scores. The 4-stage achieves the highest per-MHz efficiency (2.23 CoreMark/MHz), decreasing monotonically to 1.58 for the 8-stage. These scores are directly comparable with published RISC-V cores: PicoRV32 achieves $\sim$0.5 CoreMark/MHz, Ibex $\sim$2.5, and VexRiscv $\sim$1.6--2.4.
+Fig.~\ref{fig:coremark_mhz} shows the official CoreMark/MHz scores, ranging from 2.23 (4-stage) to 1.58 (8-stage). For context, PicoRV32 achieves $\sim$0.5 CoreMark/MHz, Ibex $\sim$2.5, and VexRiscv $\sim$1.6--2.4.
 
 \begin{figure}[t]
 \centering
@@ -492,7 +492,7 @@ Fig.~\ref{fig:fmax_vs_depth} shows the $F_{\max}$ trend across all five depths. 
 
 \subsection{Comparison with Published Cores}
 
-Fig.~\ref{fig:published} places our five variants in context with published RISC-V soft cores on Artix-7. This comparison serves as a \emph{sanity check}---confirming that our research vehicle occupies a realistic region of the design space---not as a performance claim against production-optimized cores. Our variants sit in the mid-range of reported frequencies, which is expected given our design priorities: we include a full gshare branch predictor, instruction cache, CSR performance counters, and M-extension hardware that minimalist cores omit. SERV \cite{serv2019} and PicoRV32 \cite{picorv32} achieve higher frequencies (300 and 250\,MHz) through bit-serial or multi-cycle execution that eliminates the forwarding and branch-resolution paths our pipelined variants must include. VexRiscv \cite{vexriscv} achieves higher frequency through aggressive configuration options and a different forwarding architecture. These cores are not directly comparable to ours because they differ in ISA support, predictor design, and forwarding philosophy---precisely the confounding variables our experiment holds constant. CVA6 \cite{zaruba2019ariane}, implementing the full RV64GC ISA with a 6-stage pipeline, operates at approximately 80\,MHz on Artix-7, comparable to our 4-stage despite its richer feature set.
+Fig.~\ref{fig:published} places our five variants alongside published RISC-V soft cores on Artix-7 as a \emph{sanity check}---confirming that the research vehicle occupies a realistic region of the design space. Our variants sit in the mid-range. Higher-frequency cores (SERV at 300\,MHz \cite{serv2019}, PicoRV32 at 250\,MHz \cite{picorv32}) use bit-serial or multi-cycle execution that eliminates pipelined forwarding paths. These cores are not directly comparable because they differ in ISA support, predictor design, and forwarding philosophy---the confounding variables our experiment controls.
 
 \begin{figure}[t]
 \centering
@@ -546,7 +546,7 @@ Using these costs, the 6-to-7-stage CPI delta decomposes into three sources:
 \item \textbf{Indirect depth effects}---increased forwarding latency and pipeline drain overhead on function calls---account for the remaining $\sim$0.03\,CPI (13\%).
 \end{enumerate}
 
-The IF2 bubble is thus the dominant cost of the 7-stage design. This cost is inherent to any two-stage fetch split: IF1 fetches sequentially while IF2 predicts, and a taken prediction always discards the speculative IF1 fetch. It cannot be eliminated without speculative fetch cancellation or a zero-cycle predictor. Even with BRAM-competitive frequency, this CPI overhead means the 7-stage would need workloads with very low branch density to match the 6-stage's throughput. The 8-stage design inherits this same IF2 bubble cost and adds the dual load-use stall overhead, explaining its even higher CPI despite sharing the 7-stage's 4-cycle branch penalty.
+The IF2 bubble is the dominant cost of the 7-stage design in this microarchitecture. In our implementation, IF1 fetches sequentially while IF2 predicts, so a taken prediction discards IF1's speculative fetch. This cost could be reduced by a design that speculatively cancels IF1 fetches or uses a zero-cycle predictor, but such techniques were not implemented because they would break the shared-RTL invariant across variants. The 8-stage design inherits the IF2 bubble and adds the dual load-use stall, explaining its higher CPI despite sharing the 7-stage's 4-cycle branch penalty.
 
 \subsection{FPGA vs.\ ASIC Pipeline Depth}
 
