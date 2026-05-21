@@ -1,6 +1,6 @@
 import pkg_riscv::*;
 
-module dmem #(parameter DEPTH = 1024) (
+module dmem #(parameter DEPTH = 2048) (
   input logic clk,
   input logic mem_read, mem_write,
   input logic [2:0] funct3,
@@ -10,10 +10,11 @@ module dmem #(parameter DEPTH = 1024) (
 );
 
   logic [31:0] mem [0:DEPTH-1];
+  localparam ADDR_BITS = $clog2(DEPTH);
   logic [1:0] boff;
-  logic [9:0] waddr;
+  logic [ADDR_BITS-1:0] waddr;
   assign boff = addr[1:0];
-  assign waddr = addr[11:2];
+  assign waddr = addr[ADDR_BITS+1:2];
 
   always_ff @(posedge clk) begin
     if (mem_write) begin

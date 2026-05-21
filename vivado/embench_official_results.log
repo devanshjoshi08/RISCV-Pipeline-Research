@@ -1,0 +1,195 @@
+=== Official Embench-IoT Benchmark Results ===
+=== Thu May 21 11:59:32 -0500 2026 ===
+
+--- 4s_aha-mont64: aha-mont64 ---
+Time resolution is 1 ps
+=== aha-mont64: rv32i_pipeline_4stage_top ===
+  Cycles:         5417748
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 140683
+  Correct:        1
+  CPI:            1.21
+  Mispredict%:    27.44%
+$finish called at time : 54305025 ns : File "D:/RISCV-Vivado/vivado_embench_official/4s_aha-mont64_tb.sv" Line 52
+
+--- 5s_aha-mont64: aha-mont64 ---
+Time resolution is 1 ps
+=== aha-mont64: rv32i_pipeline_5stage_top ===
+  Cycles:         5427188
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 140683
+  Correct:        1
+  CPI:            1.21
+  Mispredict%:    27.44%
+$finish called at time : 54399675 ns : File "D:/RISCV-Vivado/vivado_embench_official/5s_aha-mont64_tb.sv" Line 52
+
+--- 6s_aha-mont64: aha-mont64 ---
+Time resolution is 1 ps
+=== aha-mont64: rv32i_pipeline_top ===
+  Cycles:         5606583
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 139739
+  Correct:        1
+  CPI:            1.25
+  Mispredict%:    27.26%
+$finish called at time : 56197945 ns : File "D:/RISCV-Vivado/vivado_embench_official/6s_aha-mont64_tb.sv" Line 52
+
+--- 7s_aha-mont64: aha-mont64 ---
+Time resolution is 1 ps
+=== aha-mont64: rv32i_pipeline_7stage_top ===
+TIMEOUT
+$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_embench_official/7s_aha-mont64_tb.sv" Line 55
+
+--- 8s_aha-mont64: aha-mont64 ---
+Time resolution is 1 ps
+=== aha-mont64: rv32i_pipeline_8stage_top ===
+TIMEOUT
+$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_embench_official/8s_aha-mont64_tb.sv" Line 55
+
+--- 4s_crc32: crc32 ---
+Time resolution is 1 ps
+=== crc32: rv32i_pipeline_4stage_top ===
+  Cycles:         5229778
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 344
+  Correct:        1
+  CPI:            1.30
+  Mispredict%:    0.19%
+$finish called at time : 52617525 ns : File "D:/RISCV-Vivado/vivado_embench_official/4s_crc32_tb.sv" Line 52
+
+--- 5s_crc32: crc32 ---
+Time resolution is 1 ps
+=== crc32: rv32i_pipeline_5stage_top ===
+  Cycles:         5229778
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 344
+  Correct:        1
+  CPI:            1.30
+  Mispredict%:    0.19%
+$finish called at time : 52617565 ns : File "D:/RISCV-Vivado/vivado_embench_official/5s_crc32_tb.sv" Line 52
+
+--- 6s_crc32: crc32 ---
+Time resolution is 1 ps
+=== crc32: rv32i_pipeline_top ===
+  Cycles:         5578969
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 344
+  Correct:        1
+  CPI:            1.39
+  Mispredict%:    0.19%
+$finish called at time : 56130345 ns : File "D:/RISCV-Vivado/vivado_embench_official/6s_crc32_tb.sv" Line 52
+
+--- 7s_crc32: crc32 ---
+Time resolution is 1 ps
+=== crc32: rv32i_pipeline_7stage_top ===
+TIMEOUT
+$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_embench_official/7s_crc32_tb.sv" Line 55
+
+--- 8s_crc32: crc32 ---
+Time resolution is 1 ps
+=== crc32: rv32i_pipeline_8stage_top ===
+TIMEOUT
+$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_embench_official/8s_crc32_tb.sv" Line 55
+
+--- 4s_statemate: statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_4stage_top ===
+  Cycles:         3842893
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 66603
+  Correct:        0
+  CPI:            1.21
+  Mispredict%:    17.69%
+$finish called at time : 38456495 ns : File "D:/RISCV-Vivado/vivado_embench_official/4s_statemate_tb.sv" Line 52
+
+--- 5s_statemate: statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_5stage_top ===
+  Cycles:         4125943
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 66603
+  Correct:        0
+  CPI:            1.30
+  Mispredict%:    17.69%
+$finish called at time : 41287825 ns : File "D:/RISCV-Vivado/vivado_embench_official/5s_statemate_tb.sv" Line 52
+
+--- 6s_statemate: statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_top ===
+  Cycles:         4335743
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 69933
+  Correct:        0
+  CPI:            1.37
+  Mispredict%:    18.58%
+$finish called at time : 43387505 ns : File "D:/RISCV-Vivado/vivado_embench_official/6s_statemate_tb.sv" Line 52
+
+--- 7s_statemate: statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_7stage_top ===
+TIMEOUT
+$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_embench_official/7s_statemate_tb.sv" Line 55
+
+--- 8s_statemate: statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_8stage_top ===
+TIMEOUT
+$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_embench_official/8s_statemate_tb.sv" Line 55
+
+--- 4s_edn: edn ---
+Time resolution is 1 ps
+=== edn: rv32i_pipeline_4stage_top ===
+  Cycles:         4426900
+  Instructions:   2972527
+  Branches:       338986
+  Mispredictions: 10452
+  Correct:        1
+  CPI:            1.48
+  Mispredict%:    3.08%
+$finish called at time : 44906345 ns : File "D:/RISCV-Vivado/vivado_embench_official/4s_edn_tb.sv" Line 52
+
+--- 5s_edn: edn ---
+Time resolution is 1 ps
+=== edn: rv32i_pipeline_5stage_top ===
+  Cycles:         4491135
+  Instructions:   2972527
+  Branches:       338986
+  Mispredictions: 10452
+  Correct:        1
+  CPI:            1.51
+  Mispredict%:    3.08%
+$finish called at time : 45565175 ns : File "D:/RISCV-Vivado/vivado_embench_official/5s_edn_tb.sv" Line 52
+
+--- 6s_edn: edn ---
+Time resolution is 1 ps
+=== edn: rv32i_pipeline_top ===
+  Cycles:         4961349
+  Instructions:   2972527
+  Branches:       338986
+  Mispredictions: 10452
+  Correct:        1
+  CPI:            1.66
+  Mispredict%:    3.08%
+$finish called at time : 50330015 ns : File "D:/RISCV-Vivado/vivado_embench_official/6s_edn_tb.sv" Line 52
+
+--- 7s_edn: edn ---
+Time resolution is 1 ps
+=== edn: rv32i_pipeline_7stage_top ===
+TIMEOUT
+$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_embench_official/7s_edn_tb.sv" Line 55
+
+--- 8s_edn: edn ---
+Time resolution is 1 ps
+=== edn: rv32i_pipeline_8stage_top ===
+TIMEOUT
+$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_embench_official/8s_edn_tb.sv" Line 55
+

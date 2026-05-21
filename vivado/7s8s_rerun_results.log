@@ -1,0 +1,113 @@
+=== 7-stage & 8-stage Re-run (fixed hex: NOPs in unused imem) ===
+=== Thu May 21 15:10:37 -0500 2026 ===
+
+--- 7s_CoreMark_rerun: CoreMark ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_7stage_top ===
+  Cycles:         5856929
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 147760
+  Iterations:     10
+  CPI:            2.02
+$finish called at time : 58621435 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_CoreMark_rerun_tb.sv" Line 49
+
+--- 8s_CoreMark_rerun: CoreMark ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_8stage_top ===
+  Cycles:         6323069
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 147760
+  Iterations:     10
+  CPI:            2.18
+$finish called at time : 63282875 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_CoreMark_rerun_tb.sv" Line 49
+
+--- 7s_aha-mont64_rerun: aha-mont64 ---
+Time resolution is 1 ps
+=== aha-mont64: rv32i_pipeline_7stage_top ===
+  Cycles:         5905364
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 139739
+  Correct:        1
+  CPI:            1.32
+$finish called at time : 59192295 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_aha-mont64_rerun_tb.sv" Line 49
+
+--- 8s_aha-mont64_rerun: aha-mont64 ---
+Time resolution is 1 ps
+=== aha-mont64: rv32i_pipeline_8stage_top ===
+  Cycles:         5917639
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 139739
+  Correct:        1
+  CPI:            1.32
+$finish called at time : 59315415 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_aha-mont64_rerun_tb.sv" Line 49
+
+--- 7s_crc32_rerun: crc32 ---
+Time resolution is 1 ps
+=== crc32: rv32i_pipeline_7stage_top ===
+  Cycles:         6102235
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 344
+  Correct:        1
+  CPI:            1.52
+$finish called at time : 61394055 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_crc32_rerun_tb.sv" Line 49
+
+--- 8s_crc32_rerun: crc32 ---
+Time resolution is 1 ps
+=== crc32: rv32i_pipeline_8stage_top ===
+  Cycles:         6276316
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 344
+  Correct:        1
+  CPI:            1.56
+$finish called at time : 63145155 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_crc32_rerun_tb.sv" Line 49
+
+--- 7s_statemate_rerun: statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_7stage_top ===
+  Cycles:         4742011
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 73263
+  Correct:        0
+  CPI:            1.50
+$finish called at time : 47452245 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_statemate_rerun_tb.sv" Line 49
+
+--- 8s_statemate_rerun: statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_8stage_top ===
+  Cycles:         5371382
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 73263
+  Correct:        0
+  CPI:            1.69
+$finish called at time : 53747905 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_statemate_rerun_tb.sv" Line 49
+
+--- 7s_edn_rerun: edn ---
+Time resolution is 1 ps
+=== edn: rv32i_pipeline_7stage_top ===
+  Cycles:         5300503
+  Instructions:   2972527
+  Branches:       338986
+  Mispredictions: 10452
+  Correct:        1
+  CPI:            1.78
+$finish called at time : 53776215 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_edn_rerun_tb.sv" Line 49
+
+--- 8s_edn_rerun: edn ---
+Time resolution is 1 ps
+=== edn: rv32i_pipeline_8stage_top ===
+  Cycles:         5823604
+  Instructions:   2972527
+  Branches:       338986
+  Mispredictions: 10452
+  Correct:        1
+  CPI:            1.95
+$finish called at time : 59080385 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_edn_rerun_tb.sv" Line 49
+

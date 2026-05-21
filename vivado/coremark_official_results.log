@@ -1,9 +1,63 @@
 === Official EEMBC CoreMark Benchmark Results ===
-=== Thu May 21 00:29:04 -0500 2026 ===
+=== Thu May 21 11:33:35 -0500 2026 ===
 
 --- cm_4s ---
 Time resolution is 1 ps
 === CoreMark: rv32i_pipeline_4stage_top ===
-TIMEOUT
-$finish called at time : 500 ms : File "D:/RISCV-Vivado/vivado_coremark/cm_4s_tb.sv" Line 50
+  Cycles:         4481534
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 145735
+  Iterations:     10
+  CPI:            1.54
+  CoreMark/MHz:   2.23
+$finish called at time : 44857085 ns : File "D:/RISCV-Vivado/vivado_coremark/cm_4s_tb.sv" Line 57
+
+--- cm_5s ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_5stage_top ===
+  Cycles:         4724937
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 145735
+  Iterations:     10
+  CPI:            1.63
+  CoreMark/MHz:   2.11
+$finish called at time : 47291155 ns : File "D:/RISCV-Vivado/vivado_coremark/cm_5s_tb.sv" Line 57
+
+--- cm_6s ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_top ===
+  Cycles:         5310372
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 154077
+  Iterations:     10
+  CPI:            1.83
+  CoreMark/MHz:   1.88
+$finish called at time : 53150685 ns : File "D:/RISCV-Vivado/vivado_coremark/cm_6s_tb.sv" Line 57
+
+--- cm_7s ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_7stage_top ===
+  Cycles:         5194902
+  Instructions:   2625367
+  Branches:       615316
+  Mispredictions: 132935
+  Iterations:     10
+  CPI:            1.97
+  CoreMark/MHz:   1.92
+$finish called at time : 500000145 ns : File "D:/RISCV-Vivado/vivado_coremark/cm_7s_tb.sv" Line 57
+
+--- cm_8s ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_8stage_top ===
+  Cycles:         5526853
+  Instructions:   2625367
+  Branches:       615316
+  Mispredictions: 132935
+  Iterations:     10
+  CPI:            2.10
+  CoreMark/MHz:   1.80
+$finish called at time : 500000145 ns : File "D:/RISCV-Vivado/vivado_coremark/cm_8s_tb.sv" Line 57
 

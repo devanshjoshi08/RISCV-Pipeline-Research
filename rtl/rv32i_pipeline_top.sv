@@ -123,7 +123,8 @@ module rv32i_pipeline_top (
     // WB stage
     logic [31:0] wb_rd_data;
     logic mem_retire;
-    assign mem_retire = mem_reg_write || mem_mem_write || mem_mem_read ||
+    assign mem_retire = (mem_reg_write && mem_rd_addr != 5'b0) ||
+                        mem_mem_write || mem_mem_read ||
                         mem_jal || mem_jalr;
 
     //

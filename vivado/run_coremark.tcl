@@ -37,17 +37,22 @@ proc write_coremark_tb {filepath top_module} {
     puts $fd "  // Override dmem depth to 2048 words (8KB) for CoreMark stack"
     puts $fd "  defparam dut.u_dmem.DEPTH = 2048;"
     puts $fd ""
-    puts $fd "  // Pre-load .rodata into DMEM (Harvard arch: loads go to dmem, not imem)"
-    puts $fd "  initial \$readmemh(\"data.hex\", dut.u_dmem.mem);"
+    puts $fd "  // Zero all DMEM then load .rodata (prevents X-propagation)"
+    puts $fd "  initial begin"
+    puts $fd "    for (int i = 0; i < 2048; i++) dut.u_dmem.mem\[i\] = 32'h0;"
+    puts $fd "    \$readmemh(\"data.hex\", dut.u_dmem.mem);"
+    puts $fd "  end"
     puts $fd ""
     puts $fd "  initial clk = 0;"
     puts $fd "  always #5 clk = ~clk;"
     puts $fd ""
-    puts $fd "  // Halt detection: j halt = 0x0000006F"
+    puts $fd "  // Halt detection: PC stuck at same address for >10 cycles"
     puts $fd "  int halt_count;"
+    puts $fd "  logic \[31:0\] prev_pc;"
     puts $fd "  always_ff @(posedge clk) begin"
+    puts $fd "    prev_pc <= debug_pc;"
     puts $fd "    if (!rst_n) halt_count <= 0;"
-    puts $fd "    else if (debug_instr == 32'h0000006F) halt_count <= halt_count + 1;"
+    puts $fd "    else if (debug_pc == prev_pc) halt_count <= halt_count + 1;"
     puts $fd "    else halt_count <= 0;"
     puts $fd "  end"
     puts $fd ""
@@ -57,7 +62,7 @@ proc write_coremark_tb {filepath top_module} {
     puts $fd "    repeat (5) @(posedge clk);"
     puts $fd "    rst_n = 1;"
     puts $fd "    fork"
-    puts $fd "      wait (halt_count > 10);"
+    puts $fd "      wait (halt_count > 1000);"
     puts $fd "      repeat (50000000) @(posedge clk);"
     puts $fd "    join_any"
     puts $fd "    repeat (10) @(posedge clk);"
@@ -80,13 +85,13 @@ proc write_coremark_tb {filepath top_module} {
     puts $fd "    \$finish;"
     puts $fd "  end"
     puts $fd ""
-    puts $fd "  initial begin #500000000; \$display(\"TIMEOUT\"); \$finish; end"
+    puts $fd "  initial begin repeat(500000000) @(posedge clk); \$display(\"TIMEOUT\"); \$finish; end"
     puts $fd "endmodule"
     close $fd
 }
 
 proc run_coremark {proj_name work_dir rtl_files top_module} {
-    global part tb_dir log_file hex_file
+    global part tb_dir log_file hex_file github_dir
 
     puts "\n  $proj_name..."
 

@@ -1,6 +1,6 @@
 import pkg_riscv::*;
 
-module dmem #(parameter DEPTH = 1024) (
+module dmem #(parameter DEPTH = 2048) (
   input logic clk,
   input logic mem_read, mem_write,
   input logic [2:0] funct3,

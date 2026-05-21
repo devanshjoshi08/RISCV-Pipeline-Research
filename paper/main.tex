@@ -311,65 +311,53 @@ Table~\ref{tab:benchmark} presents the benchmark results for the two workloads v
 
 Several observations emerge from the CPI data. First, CPI increases monotonically with pipeline depth for both workloads. The average CPI increase per additional stage is 0.145 for Dhrystone and 0.182 for Diagnostic. Second, both workloads produce \emph{identical} misprediction counts across all five depths: 203 out of 400 branches for Dhrystone (50.8\%) and 69 out of 360 for Diagnostic (19.2\%). This indicates that these workloads' branch patterns are sufficiently spaced in the instruction stream that the predictor update latency does not cause additional mispredictions, even at the deepest pipeline. Third, the CPI increase is not solely attributable to branch misprediction penalty differences. The 4- and 5-stage designs both have a 2-cycle branch penalty, yet the 5-stage CPI is 0.07 higher on Dhrystone and 0.22 higher on Diagnostic. The latter difference reflects the 5-stage's 1-cycle load-use stall, which the 4-stage avoids due to its merged MEM/WB stage.
 
-\subsubsection{CoreMark-Inspired Results}
+\subsubsection{Official CoreMark Results}
 
-Table~\ref{tab:coremark} shows the CoreMark-inspired benchmark results for the three validated depths. Unlike Dhrystone and Diagnostic, this workload exhibits a depth-dependent increase in misprediction count: the 6-stage pipeline produces 766 mispredictions (20.4\%) versus 687 (18.3\%) for both the 4- and 5-stage pipelines. This 11.5\% increase in misprediction count occurs despite identical predictor hardware and represents the effect of increased predictor update latency on a workload with moderate branch density (one branch every 4.7 instructions). The 4- and 5-stage variants, which share the same 2-stage update latency, produce identical misprediction counts.
+Table~\ref{tab:coremark} shows the official EEMBC CoreMark benchmark results across all five pipeline depths. The benchmark was compiled from the official EEMBC source code (github.com/eembc/coremark) using riscv-none-elf-gcc~15.2.0 with -O1 optimization for 10 iterations in PERFORMANCE\_RUN mode. All five variants execute identical instruction counts (2{,}893{,}145) and branch counts (719{,}810), confirming functional correctness across all pipeline depths.
+
+Unlike Dhrystone and Diagnostic, CoreMark exhibits a depth-dependent increase in misprediction count. The 6-stage pipeline produces 154{,}077 mispredictions (21.4\%) versus 145{,}735 (20.2\%) for the 4- and 5-stage, a 5.7\% increase caused by the longer predictor update latency. The 7- and 8-stage variants show 147{,}760 mispredictions (20.5\%), between the shallow and deep extremes, reflecting the interaction between update latency and the IF2 prediction suppression during pipeline stalls.
 
 \begin{table}[t]
 \centering
-\caption{CoreMark-inspired benchmark results (validated depths only).}
+\caption{Official EEMBC CoreMark results across five pipeline depths (10 iterations, PERFORMANCE\_RUN).}
 \label{tab:coremark}
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lccccc@{}}
 \toprule
-\textbf{Metric} & \textbf{4-stg} & \textbf{5-stg} & \textbf{6-stg} \\
+\textbf{Metric} & \textbf{4-stg} & \textbf{5-stg} & \textbf{6-stg} & \textbf{7-stg} & \textbf{8-stg} \\
 \midrule
-Cycles         & 26{,}109  & 26{,}767  & 29{,}467 \\
-Instructions   & \multicolumn{3}{c}{17{,}712} \\
-Branches       & \multicolumn{3}{c}{3{,}763} \\
-Mispredictions & 687       & 687       & 766 \\
-Mispredict rate & 18.3\%   & 18.3\%    & 20.4\% \\
-CPI            & 1.47      & 1.51      & 1.66 \\
+Cycles         & 4{,}481{,}534  & 4{,}724{,}937  & 5{,}310{,}372  & 5{,}856{,}929  & 6{,}323{,}069 \\
+Instructions   & \multicolumn{5}{c}{2{,}893{,}145} \\
+Branches       & \multicolumn{5}{c}{719{,}810 (24.9\%)} \\
+Mispredictions & 145{,}735 & 145{,}735 & 154{,}077 & 147{,}760 & 147{,}760 \\
+Mispredict rate & 20.2\%   & 20.2\%    & 21.4\%    & 20.5\%    & 20.5\% \\
+CPI            & 1.54      & 1.63      & 1.83      & 2.02      & 2.18 \\
+CoreMark/MHz   & 2.23      & 2.12      & 1.88      & 1.71      & 1.58 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsubsection{Supplementary Workload Results}
+The CoreMark/MHz score decreases monotonically with pipeline depth (2.23 to 1.58) because the CPI increase outweighs any frequency advantage. This metric is frequency-independent: CoreMark/MHz = iterations $\times$ 10$^6$ / total\_cycles.
 
-Table~\ref{tab:supplementary} presents the results for the four additional workloads validated on the 5- and 6-stage variants.
+\subsubsection{Embench-IoT Results}
+
+Table~\ref{tab:embench} presents four official Embench-IoT benchmarks validated across all five depths. Each benchmark was compiled from the official Embench-IoT source (github.com/embench/embench-iot) with our bare-metal porting layer. All four produce identical instruction and branch counts across pipeline depths, confirming functional correctness.
 
 \begin{table}[t]
 \centering
-\caption{Supplementary benchmark results (5- and 6-stage variants).}
-\label{tab:supplementary}
+\caption{Embench-IoT benchmark CPI across five pipeline depths. All depths execute identical instruction counts for each benchmark.}
+\label{tab:embench}
 \small
-\begin{tabular}{@{}llcc@{}}
+\begin{tabular}{@{}lccccc@{}}
 \toprule
-\textbf{Workload} & \textbf{Metric} & \textbf{5-stg} & \textbf{6-stg} \\
+\textbf{Benchmark ($f_b$)} & \textbf{4-stg} & \textbf{5-stg} & \textbf{6-stg} & \textbf{7-stg} & \textbf{8-stg} \\
 \midrule
-\multirow{5}{*}{\shortstack[l]{Branch-\\heavy}}
-  & Instructions   & \multicolumn{2}{c}{7{,}106} \\
-  & Branches       & \multicolumn{2}{c}{2{,}013 (28.3\%)} \\
-  & Mispredictions & 572 (28.4\%) & 686 (34.1\%) \\
-  & Cycles         & 12{,}176     & 13{,}520 \\
-  & CPI            & 1.71         & 1.90 \\
-\midrule
-\multirow{5}{*}{\shortstack[l]{Compute-\\heavy}}
-  & Instructions   & \multicolumn{2}{c}{9{,}913} \\
-  & Branches       & \multicolumn{2}{c}{1{,}158 (11.7\%)} \\
-  & Mispredictions & 126 (10.9\%) & 126 (10.9\%) \\
-  & Cycles         & 13{,}341     & 14{,}143 \\
-  & CPI            & 1.34         & 1.42 \\
-\midrule
-\multirow{5}{*}{CRC-32}
-  & Instructions   & \multicolumn{2}{c}{238{,}121} \\
-  & Branches       & \multicolumn{2}{c}{108{,}850 (45.7\%)} \\
-  & Mispredictions & 33{,}950 (31.2\%) & 33{,}785 (31.0\%) \\
-  & Cycles         & 485{,}885    & 551{,}622 \\
-  & CPI            & 2.04         & 2.31 \\
-\midrule
-\multirow{5}{*}{Sort}
-  & Instructions   & \multicolumn{2}{c}{191{,}882} \\
-  & Branches       & \multicolumn{2}{c}{51{,}635 (26.9\%)} \\
+aha-mont64 (11.5\%) & 1.21 & 1.21 & 1.25 & 1.32 & 1.32 \\
+crc32 (4.4\%)       & 1.30 & 1.30 & 1.39 & 1.52 & 1.56 \\
+statemate (11.9\%)  & 1.21 & 1.30 & 1.37 & 1.50 & 1.69 \\
+edn (11.4\%)        & 1.48 & 1.51 & 1.66 & 1.78 & 1.95 \\
+\bottomrule
+\end{tabular}
+\end{table}
   & Mispredictions & 2{,}464 (4.8\%) & 2{,}635 (5.1\%) \\
   & Cycles         & 296{,}781    & 302{,}536 \\
   & CPI            & 1.54         & 1.57 \\
@@ -377,49 +365,41 @@ Table~\ref{tab:supplementary} presents the results for the four additional workl
 \end{tabular}
 \end{table}
 
-The branch-heavy workload reveals a strong depth-dependent misprediction effect: the 6-stage pipeline experiences 686 mispredictions (34.1\%) versus 572 (28.4\%) for the 5-stage, a 20\% increase in absolute misprediction count. With branches occurring every 3.5 instructions on average, the 6-stage's 3-stage update latency means that a new branch is often fetched before the previous branch's resolution has updated the PHT. The CPI increase from 1.71 to 1.90 (11.1\%) is driven by both the higher per-misprediction penalty (3 vs.\ 2 cycles) and the increased misprediction count.
-
-The compute-heavy workload shows the contrasting pattern. The 5- and 6-stage variants produce identical misprediction counts (126 out of 1{,}158, 10.9\%), because branches occur only every 8.6 instructions---wide enough spacing for the predictor to update between consecutive branches even with the 6-stage's longer latency. The CPI difference (1.34 vs.\ 1.42, 6.0\%) is attributable solely to the higher per-misprediction penalty.
-
-CRC-32 has the highest branch density of all workloads (45.7\%) but shows nearly identical misprediction rates at both depths (31.2\% vs.\ 31.0\%). This counterintuitive result occurs because CRC-32's inner loop generates a highly repetitive branch pattern (the bit-test conditional) that the gshare predictor tracks effectively even with stale history. The CPI increase (2.04 to 2.31, 13.2\%) reflects the per-misprediction penalty difference amplified by the high absolute misprediction count (33{,}950).
-
-Sort shows very low misprediction rates (4.8\% and 5.1\%) and the smallest CPI delta of any workload (1.54 to 1.57, 1.9\%). Insertion sort's inner loop branches are highly predictable (the ``already sorted'' case produces a strongly biased branch), and the low misprediction count means the penalty-per-misprediction difference has minimal impact on total CPI.
+The Embench results reveal important workload-dependent trends. The multiply-heavy aha-mont64 has the lowest CPI (1.21--1.32) because its long multiply sequences have few branches and benefit from the MDU pipeline. The crc32 benchmark shows almost zero mispredictions (344 across all depths, 0.19\%) because its inner loop is highly predictable. The statemate benchmark (FSM simulation) shows the strongest depth-dependent misprediction effect: 66{,}603 mispredictions at 4/5-stage vs.\ 73{,}263 at 7/8-stage (10.0\% increase), driven by its data-dependent state transitions. The edn benchmark has moderate CPI (1.48--1.95) with very low misprediction rates (3.1\%).
 
 \subsection{Branch Misprediction Analysis}
 
-Fig.~\ref{fig:mispred} compares misprediction rates across the three pipeline depths for which CoreMark data is validated. The key observation is that pipeline depth increases the effective misprediction rate only when branches are closely spaced in the instruction stream relative to the predictor update latency. The branch-heavy workload (5s vs.\ 6s) shows the strongest effect: a 20\% increase in absolute misprediction count when update latency increases by one stage. The CoreMark-inspired workload shows a moderate effect (11.5\% increase). The diagnostic, compute-heavy, CRC-32, and sort workloads show no significant misprediction increase.
+Fig.~\ref{fig:mispred} compares misprediction rates for CoreMark and statemate---the two benchmarks that exhibit depth-dependent misprediction increases---across all five pipeline depths. On CoreMark, the 6-stage pipeline shows a 5.7\% increase in misprediction count relative to the 4- and 5-stage (154{,}077 vs.\ 145{,}735). On statemate, the effect is stronger: the 7- and 8-stage pipelines show 10.0\% more mispredictions than the 4- and 5-stage (73{,}263 vs.\ 66{,}603).
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{mispred_comparison.png}
-\caption{Branch misprediction rates on the CoreMark-inspired workload across three validated pipeline depths. The 6-stage pipeline shows 11.5\% more mispredictions than the 4- and 5-stage despite identical predictor hardware.}
+\caption{Branch misprediction rates on CoreMark and statemate across five pipeline depths. Both benchmarks show depth-dependent misprediction increases, with statemate exhibiting a 10\% increase from 4-stage to 7/8-stage despite identical predictor hardware.}
 \label{fig:mispred}
 \end{figure}
 
-The pattern that emerges from these seven workloads is that the misprediction-count increase requires two conditions simultaneously: (1) branches spaced closely enough that a new branch is fetched before the previous one's outcome updates the PHT, and (2) branch patterns that are sensitive to stale global history---i.e., data-dependent branches rather than highly biased loop exits. When either condition is absent, the misprediction count is invariant to pipeline depth and the CPI overhead is driven solely by the per-misprediction penalty.
+The pattern that emerges from all seven workloads is that the misprediction-count increase requires two conditions simultaneously: (1) branches spaced closely enough that a new branch is fetched before the previous one's outcome updates the PHT, and (2) branch patterns that are sensitive to stale global history. Dhrystone, aha-mont64, crc32, and edn show zero misprediction increase across depths because their branch patterns are either widely spaced or highly predictable. CoreMark and statemate, with denser and more data-dependent branching, show the effect.
 
 \subsection{Analytical CPI Model}
 \label{sec:model}
 
-To provide a quantitative design heuristic, we fit a linear model across all 10 validated data points (2 workloads $\times$ 5 pipeline depths) simultaneously:
+To provide a quantitative design heuristic, we fit a linear model across all 35 validated data points (7 workloads $\times$ 5 pipeline depths) simultaneously:
 \begin{equation}
-\text{CPI} = 0.648 + 0.164 \cdot D + 0.363 \cdot f_b
+\text{CPI} = 0.572 + 0.120 \cdot D + 1.903 \cdot f_b
 \label{eq:cpi_model}
 \end{equation}
-where $D$ is the pipeline depth in stages (4 through 8) and $f_b$ is the workload's branch frequency (fraction of instructions that are branches). This model achieves $R^2 = 0.97$ with 7 degrees of freedom, a mean absolute error of 0.030\,CPI, and a maximum residual magnitude of 0.068\,CPI. Fig.~\ref{fig:cpi_vs_depth} shows the data points and fitted model lines.
+where $D$ is the pipeline depth in stages (4 through 8) and $f_b$ is the workload's branch frequency (fraction of instructions that are branches). This model achieves $R^2 = 0.67$ with 32 degrees of freedom, a mean absolute error of 0.127\,CPI, and a maximum residual magnitude of 0.43\,CPI. Fig.~\ref{fig:cpi_vs_depth} shows the data points and fitted model lines for all seven workloads.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{cpi_vs_depth.png}
-\caption{CPI vs.\ pipeline depth for Dhrystone and Diagnostic workloads, with fitted model lines ($R^2 = 0.97$).}
+\caption{CPI vs.\ pipeline depth for all seven workloads, with fitted model lines ($R^2 = 0.67$, 35 observations).}
 \label{fig:cpi_vs_depth}
 \end{figure}
 
-The coefficient of $D$ (0.164) represents the average CPI cost per additional pipeline stage across these workloads. The coefficient of $f_b$ (0.363) captures the CPI sensitivity to branch density at any given pipeline depth: workloads with higher branch frequency pay a proportionally higher CPI cost across all depths.
+The coefficient of $D$ (0.120) represents the average CPI cost per additional pipeline stage across all workloads: each stage added beyond the 4-stage baseline costs approximately 0.12 CPI. The coefficient of $f_b$ (1.903) captures the strong CPI sensitivity to branch density: workloads with 10\% higher branch frequency pay approximately 0.19 more CPI at any given depth.
 
-We compared four candidate models using the Akaike Information Criterion (AIC): (1) linear (Eq.~\ref{eq:cpi_model}), (2) interaction ($\alpha + \beta_1 D + \beta_2 D \cdot f_b$), (3) quadratic ($\alpha + \beta_1 D + \beta_2 D^2 + \beta_3 f_b$), and (4) full ($\alpha + \beta_1 D + \beta_2 f_b + \beta_3 D \cdot f_b$). AIC values are $-59.5$, $-60.6$, $-59.7$, and $-59.4$, respectively. The differences are small (within 1.2), indicating that no model is decisively preferred over the others. We report the linear model because it achieves the best AIC among the 3-parameter models, has the simplest interpretation, and the additional terms in the quadratic and full models do not improve the fit meaningfully.
-
-The residuals are distributed approximately symmetrically around zero with no systematic pattern across pipeline depths, indicating that the linear relationship is an adequate description of the data within the observed range. The remaining 3\% of unexplained variance is attributable to workload-specific factors such as load-use hazard frequency and MDU stall patterns.
+We compared four candidate models using the Akaike Information Criterion (AIC): (1) linear (Eq.~\ref{eq:cpi_model}, AIC~$= -124.6$), (2) interaction ($\alpha + \beta_1 D + \beta_2 D \cdot f_b$, AIC~$= -128.2$), (3) quadratic ($\alpha + \beta_1 D + \beta_2 D^2 + \beta_3 f_b$, AIC~$= -123.1$), and (4) full ($\alpha + \beta_1 D + \beta_2 f_b + \beta_3 D \cdot f_b$, AIC~$= -126.7$). The interaction model achieves the best AIC, suggesting that the CPI cost of pipeline depth is amplified by branch frequency. The 33\% of unexplained variance is attributable to workload-specific factors such as base CPI (which varies from 1.21 for multiply-heavy aha-mont64 to 1.48 for data-processing edn at the same pipeline depth), load-use hazard frequency, and MDU stall patterns that the two-parameter model does not capture.
 
 \subsection{CPI Overhead Analysis}
 
@@ -436,18 +416,25 @@ The 8-stage design pays the largest CPI overhead despite sharing the same 4-cycl
 
 \subsection{Throughput}
 
-Effective throughput in millions of instructions per second (MIPS) is computed as $F_{\max} / \text{CPI}$. Fig.~\ref{fig:throughput} compares throughput across variants. On both workloads, the 6-stage design achieves the highest throughput: 69.8\,MIPS on Dhrystone and 70.6\,MIPS on Diagnostic. The 6-stage's 56\% frequency advantage over the 4- and 5-stage designs more than compensates for its 19--20\% higher CPI. The 7-stage achieves 62.9\,MIPS (Dhrystone) and 61.5\,MIPS (Diagnostic), approximately 10\% below the 6-stage. The 8-stage achieves 60.5 and 57.0\,MIPS respectively, further confirming that the additional pipeline stages beyond 6 degrade net throughput on this fabric.
+Effective throughput in millions of instructions per second (MIPS) is computed as $F_{\max} / \text{CPI}$. Fig.~\ref{fig:throughput} compares throughput using CoreMark CPI values. The 6-stage design achieves the highest throughput: 64.1\,MIPS on CoreMark and 70.6\,MIPS on Diagnostic. The 6-stage's 56\% frequency advantage over the 4- and 5-stage designs more than compensates for its higher CPI. The 7-stage achieves 57.6\,MIPS (CoreMark) and 61.5\,MIPS (Diagnostic), approximately 10\% below the 6-stage. The 8-stage achieves 55.2 and 57.0\,MIPS respectively, confirming that additional pipeline stages beyond 6 degrade net throughput on this fabric.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{throughput_comparison.png}
-\caption{Throughput (MIPS) comparison using post-place-and-route $F_{\max}$ and measured CPI.}
+\caption{Throughput (MIPS) comparison using post-place-and-route $F_{\max}$ and CoreMark CPI.}
 \label{fig:throughput}
 \end{figure}
 
-The 4-stage design achieves 53.3--54.5\,MIPS despite its low frequency, because its low CPI (1.38--1.41) partially compensates for the 75\,MHz clock. The 5-stage achieves the lowest throughput (47.4--51.2\,MIPS) because it has essentially the same frequency as the 4-stage but higher CPI due to load-use stalls.
+The 4-stage design achieves 48.8\,MIPS (CoreMark) despite its low frequency, because its low CPI partially compensates for the 75\,MHz clock. The 5-stage achieves the lowest throughput (46.5\,MIPS) because it has essentially the same frequency as the 4-stage but higher CPI due to load-use stalls.
 
-On the Dhrystone benchmark, the DMIPS values at mean $F_{\max}$ are 1{,}035 (4-stage), 995 (5-stage), 1{,}351 (6-stage), 1{,}217 (7-stage), and 1{,}173 (8-stage). The 6-stage delivers the highest absolute Dhrystone throughput, 30\% above the 4-stage baseline.
+Fig.~\ref{fig:coremark_mhz} shows the official CoreMark/MHz scores. The 4-stage achieves the highest per-MHz efficiency (2.23 CoreMark/MHz), decreasing monotonically to 1.58 for the 8-stage. These scores are directly comparable with published RISC-V cores: PicoRV32 achieves $\sim$0.5 CoreMark/MHz, Ibex $\sim$2.5, and VexRiscv $\sim$1.6--2.4.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{coremark_mhz.png}
+\caption{Official EEMBC CoreMark/MHz scores across five pipeline depths.}
+\label{fig:coremark_mhz}
+\end{figure}
 
 \subsection{Predictor Configuration Sensitivity}
 

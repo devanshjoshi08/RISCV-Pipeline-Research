@@ -1,0 +1,240 @@
+{
+  "synthesis": {
+    "5-stage": {
+      "Fmax_MHz": 77.8,
+      "LUTs": 6793,
+      "FFs": 8129,
+      "DSPs": 12,
+      "Power_W": 0.299,
+      "Dynamic_W": 0.23,
+      "Static_W": 0.069,
+      "CPI_diag": 1.6,
+      "CPI_avg": 1.55,
+      "Throughput_MIPS": 50.1,
+      "Efficiency_MIPS_W": 167.6
+    },
+    "6-stage": {
+      "Fmax_MHz": 121.1,
+      "LUTs": 7015,
+      "FFs": 8403,
+      "DSPs": 12,
+      "Power_W": 0.298,
+      "Dynamic_W": 0.23,
+      "Static_W": 0.068,
+      "CPI_diag": 1.66,
+      "CPI_avg": 1.66,
+      "Throughput_MIPS": 72.8,
+      "Efficiency_MIPS_W": 244.3
+    },
+    "7-stage": {
+      "Fmax_MHz": 115.3,
+      "LUTs": 7069,
+      "FFs": 8489,
+      "DSPs": 12,
+      "Power_W": 0.3,
+      "Dynamic_W": 0.231,
+      "Static_W": 0.069,
+      "CPI_diag": 1.89,
+      "CPI_avg": 1.87,
+      "Throughput_MIPS": 61.8,
+      "Efficiency_MIPS_W": 206.0
+    }
+  },
+  "diagnostic": {
+    "5-stage": {
+      "cycles": 2187,
+      "instrs": 1367,
+      "branches": 360,
+      "mispred": 69,
+      "CPI": 1.6,
+      "mispred_rate": 19.2
+    },
+    "6-stage": {
+      "cycles": 2267,
+      "instrs": 1367,
+      "branches": 360,
+      "mispred": 69,
+      "CPI": 1.66,
+      "mispred_rate": 19.2
+    },
+    "7-stage": {
+      "cycles": 2579,
+      "instrs": 1367,
+      "branches": 360,
+      "mispred": 69,
+      "CPI": 1.89,
+      "mispred_rate": 19.2
+    }
+  },
+  "dhrystone": {
+    "5-stage": {
+      "cycles": 4334,
+      "instrs": 2926,
+      "branches": 400,
+      "mispred": 203,
+      "dhrystones": 100,
+      "CPI": 1.48,
+      "mispred_rate": 50.7,
+      "dhry_per_sec": 1795108,
+      "DMIPS": 1021.7,
+      "DMIPS_per_MHz": 13.1324
+    },
+    "6-stage": {
+      "cycles": 4938,
+      "instrs": 2926,
+      "branches": 400,
+      "mispred": 203,
+      "dhrystones": 100,
+      "CPI": 1.69,
+      "mispred_rate": 50.7,
+      "dhry_per_sec": 2452410,
+      "DMIPS": 1395.8,
+      "DMIPS_per_MHz": 11.526
+    },
+    "7-stage": {
+      "cycles": 5440,
+      "instrs": 2926,
+      "branches": 400,
+      "mispred": 203,
+      "dhrystones": 100,
+      "CPI": 1.86,
+      "mispred_rate": 50.7,
+      "dhry_per_sec": 2119485,
+      "DMIPS": 1206.3,
+      "DMIPS_per_MHz": 10.4623
+    }
+  },
+  "coremark": {
+    "5-stage": {
+      "cycles": 26767,
+      "instrs": 17712,
+      "branches": 3763,
+      "mispred": 687,
+      "iterations": 10,
+      "CPI": 1.51,
+      "mispred_rate": 18.3
+    },
+    "6-stage": {
+      "cycles": 29467,
+      "instrs": 17712,
+      "branches": 3763,
+      "mispred": 766,
+      "iterations": 10,
+      "CPI": 1.66,
+      "mispred_rate": 20.4
+    },
+    "7-stage": {
+      "cycles": 32476,
+      "instrs": 17712,
+      "branches": 3763,
+      "mispred": 838,
+      "iterations": 10,
+      "CPI": 1.83,
+      "mispred_rate": 22.3
+    }
+  },
+  "crc32": {
+    "5-stage": {
+      "cycles": 485885,
+      "instrs": 238121,
+      "branches": 108850,
+      "mispred": 33950,
+      "CPI": 2.04,
+      "mispred_rate": 31.2
+    },
+    "6-stage": {
+      "cycles": 551622,
+      "instrs": 238121,
+      "branches": 108850,
+      "mispred": 33785,
+      "CPI": 2.32,
+      "mispred_rate": 31.0
+    },
+    "7-stage": {
+      "cycles": 614352,
+      "instrs": 238121,
+      "branches": 108850,
+      "mispred": 33650,
+      "CPI": 2.58,
+      "mispred_rate": 30.9
+    }
+  },
+  "sort": {
+    "5-stage": {
+      "cycles": 296781,
+      "instrs": 191882,
+      "branches": 51635,
+      "mispred": 2464,
+      "CPI": 1.55,
+      "mispred_rate": 4.8
+    },
+    "6-stage": {
+      "cycles": 302536,
+      "instrs": 191882,
+      "branches": 51635,
+      "mispred": 2635,
+      "CPI": 1.58,
+      "mispred_rate": 5.1
+    },
+    "7-stage": {
+      "cycles": 326199,
+      "instrs": 191882,
+      "branches": 51635,
+      "mispred": 2790,
+      "CPI": 1.7,
+      "mispred_rate": 5.4
+    }
+  },
+  "branch_heavy": {
+    "5-stage": {
+      "cycles": 12176,
+      "instrs": 7106,
+      "branches": 2013,
+      "mispred": 572,
+      "CPI": 1.71,
+      "mispred_rate": 28.4
+    },
+    "6-stage": {
+      "cycles": 13520,
+      "instrs": 7106,
+      "branches": 2013,
+      "mispred": 686,
+      "CPI": 1.9,
+      "mispred_rate": 34.1
+    },
+    "7-stage": {
+      "cycles": 15302,
+      "instrs": 7106,
+      "branches": 2013,
+      "mispred": 781,
+      "CPI": 2.15,
+      "mispred_rate": 38.8
+    }
+  },
+  "compute_heavy": {
+    "5-stage": {
+      "cycles": 13341,
+      "instrs": 9913,
+      "branches": 1158,
+      "mispred": 126,
+      "CPI": 1.35,
+      "mispred_rate": 10.9
+    },
+    "6-stage": {
+      "cycles": 14143,
+      "instrs": 9913,
+      "branches": 1158,
+      "mispred": 126,
+      "CPI": 1.43,
+      "mispred_rate": 10.9
+    },
+    "7-stage": {
+      "cycles": 15478,
+      "instrs": 9913,
+      "branches": 1158,
+      "mispred": 139,
+      "CPI": 1.56,
+      "mispred_rate": 12.0
+    }
+  }
+}
