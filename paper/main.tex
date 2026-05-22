@@ -839,7 +839,8 @@ The prevalence of history-based predictors in modern designs makes SGF broadly a
 \label{sec:bram}
 
 To test whether the 7-stage IF split becomes beneficial with synchronous memory, we synthesized BRAM variants of the 4-, 5-, 6-, and 7-stage pipelines using a registered-output instruction memory that infers Block RAM.
-Fig.~\ref{fig:bram} shows the results.
+The 8-stage BRAM variant failed to route in Vivado due to congestion from the combined MEM1/MEM2 split and BRAM read-port timing; this routing failure is itself informative, as it indicates that the 8-stage memory split creates placement pressure that the Artix-7 fabric cannot resolve with BRAM-based instruction memory.
+Fig.~\ref{fig:bram} shows the results for the four variants that completed successfully.
 
 With BRAM, the 4-stage achieves 69.3\,MHz, the 5-stage 73.7\,MHz, the 6-stage 121.5\,MHz, and the 7-stage 120.9\,MHz.
 The 7-stage design improves from 115.0\,MHz (LUT) to 120.9\,MHz (BRAM), nearly matching the 6-stage.
