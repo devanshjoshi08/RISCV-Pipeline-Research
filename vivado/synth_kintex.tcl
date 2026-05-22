@@ -1,15 +1,15 @@
-# synth_kintex.tcl - Kintex-7 synthesis for all 5 pipeline variants, 3 seeds each.
-# Same structure as synth_seeds.tcl but targeting xc7k70tfbv676-1.
+# synth_ultrascale.tcl - Kintex UltraScale synthesis for all 5 pipeline variants, 3 seeds each.
+# Same structure as synth_seeds.tcl but targeting xcku035 (Kintex UltraScale).
 
 set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
 set github_dir  "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
-set log_file    "$project_dir/kintex_results.log"
-set part        "xc7k70tfbv676-1"
+set log_file    "$project_dir/ultrascale_results.log"
+set part        "xcku035-fbva676-1-c"
 set clk_xdc     "$project_dir/synth_clk_only.xdc"
 
 set fd [open $log_file w]
-puts $fd "=== Kintex-7 Multi-Run Synthesis Results ==="
+puts $fd "=== Kintex UltraScale (xcku035) Multi-Run Synthesis Results ==="
 puts $fd "=== [clock format [clock seconds]] ==="
 puts $fd "variant,run,Fmax_MHz,WNS_ns,LUTs,FFs"
 close $fd
