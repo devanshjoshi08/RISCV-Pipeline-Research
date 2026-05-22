@@ -517,7 +517,9 @@ The results demonstrate three distinct SGF behaviors:
 
 \textbf{No effect on sparse-branch workloads.} Dhrystone, Diagnostic, and edn show identical misprediction counts with and without SGF. These workloads have branch spacing wide enough that the committed GHR is already current by the time the next branch is predicted; speculative forwarding provides no additional information.
 
-\textbf{Marginal increase on crc32.} The crc32 benchmark shows an increase from 344 to 511 mispredictions (+48.5\% relative), but the absolute magnitude is trivial: 167 additional mispredictions out of 174{,}591 total branches. The CPI is unchanged at 1.52. This occurs because crc32's inner loop has an extremely biased branch (99.8\% taken) where the speculative GHR occasionally shifts in a mispredicted direction that persists long enough to pollute a subsequent prediction before rollback corrects it. The effect is negligible in practice.
+\textbf{Marginal increase on crc32.} The crc32 benchmark shows an increase from 344 to 511 mispredictions (+48.5\% relative). The absolute magnitude is 167 additional mispredictions out of 174{,}591 total branches (0.096\% of branches affected), and CPI is unchanged at 1.52. The mechanism is specific and traceable: crc32's inner loop contains a 99.8\% biased branch (the bit-test conditional). When this branch is rarely mispredicted, SGF shifts the wrong direction into \texttt{spec\_ghr}. Because the branch is so biased, the speculative GHR remains polluted for several subsequent predictions until either a correct prediction restores the pattern or an EX2 rollback corrects the state. In a tightly biased loop with one dominant branch, this creates a brief window of GHR contamination.
+
+\textbf{Mitigation path.} This pathology could be addressed by a \emph{speculative update confidence filter}: a mechanism that suppresses speculative GHR updates for branches whose PHT counter is saturated at the extreme (11 or 00), since these branches are unlikely to change direction and their speculative contribution is redundant. We do not implement this filter in the current design to maintain architectural simplicity, but note that it would add only a 2-bit comparator per prediction cycle. The key architectural insight is that SGF's worst case (crc32: +0.096\% branch impact, 0\% CPI impact) is negligible compared to its best case (CoreMark: $-$31.4\% misprediction reduction).
 
 \subsection{Key Finding: SGF Exceeds Shallow-Pipeline Accuracy}
 
@@ -583,13 +585,43 @@ Using these costs, the 6-to-7-stage CPI delta decomposes into three sources:
 \item \textbf{Indirect depth effects}---increased forwarding latency and pipeline drain overhead on function calls---account for the remaining $\sim$0.03\,CPI (13\%).
 \end{enumerate}
 
-The IF2 bubble is the dominant cost of the 7-stage design in this microarchitecture. In our implementation, IF1 fetches sequentially while IF2 predicts, so a taken prediction discards IF1's speculative fetch. This cost could be reduced by a design that speculatively cancels IF1 fetches or uses a zero-cycle predictor, but such techniques were not implemented because they would break the shared-RTL invariant across variants. The 8-stage design inherits the IF2 bubble and adds the dual load-use stall, explaining its higher CPI despite sharing the 7-stage's 4-cycle branch penalty.
+The IF2 bubble is the dominant cost of the 7-stage design in this microarchitecture. In our implementation, IF1 fetches sequentially while IF2 predicts, so a taken prediction discards IF1's speculative fetch. This cost could be reduced by placing a zero-delay BTB in IF1 (a next-line predictor) that steers the fetch before IF2 refines the prediction. Such a mechanism was not implemented because it would break the shared-RTL invariant across variants---the predictor must remain identical in all five designs for the experiment to isolate depth effects.
+
+\textbf{Counterfactual: what if the IF2 bubble were eliminated?} Using the analytical model (Eq.~\ref{eq:cpi_model}), setting $B(D) = 0$ for the 7-stage removes $\beta \cdot f_b = 1.12 \times 0.263 = 0.29$\,CPI on Diagnostic (reducing CPI from 1.89 to an estimated 1.60) and $1.12 \times 0.249 = 0.28$\,CPI on CoreMark (reducing CPI from 2.02 to an estimated 1.74). Even with the bubble eliminated, the 7-stage CPI remains above the 6-stage (1.66 on Diagnostic, 1.83 on CoreMark) because Mechanism~A still operates. SGF addresses the remaining Mechanism~B component: the 7-stage SGF CPI of 1.96 on CoreMark falls between the bubble-present baseline (2.02) and the hypothetical bubble-free design (1.74). In a pipeline that eliminates both the IF2 bubble (via a next-line predictor) and Mechanism~B (via SGF), the 7-stage CPI would approach 1.68 on CoreMark---within 8\% of the 6-stage. This analysis confirms that SGF and IF2 bubble elimination address orthogonal CPI components.
 
 \subsection{FPGA vs.\ ASIC Pipeline Depth}
 
 On ASIC processes, deeper pipelines generally increase $F_{\max}$ monotonically because gate delay scales with the amount of logic per stage \cite{hrishikesh2002optimal, sprangle2002increasing}. On FPGAs, LUT delay is relatively constant regardless of function complexity, and routing delay is a significant fraction of total path delay. Inserting a pipeline register does not eliminate routing delay on either side of the register, limiting the frequency benefit of deeper pipelining. The two-tier frequency structure observed in our data---flat below 6 stages, flat above---is a consequence of this FPGA-specific property. ASIC implementations would likely show a more gradual frequency increase across the same depth range.
 
 The CPI model (Eq.~\ref{eq:cpi_model}) depends on pipeline depth and branch frequency, neither of which is fabric-dependent. The per-stage CPI cost of 0.12 should transfer across FPGA families because it is driven by pipeline hazard structure, not by timing. The absolute throughput ($F_{\max} / \text{CPI}$), however, is fabric-specific because $F_{\max}$ varies with the target device.
+
+\subsection{Cache Miss Sensitivity}
+\label{sec:cache_miss}
+
+All benchmarks in this study execute from a small instruction memory with near-100\% cache hit rates. In production systems, cache misses add a depth-independent CPI component that reduces the relative impact of branch-prediction improvements. To quantify this boundary, we model the CPI under cache misses as:
+\begin{equation}
+\text{CPI}_{\text{total}} = \text{CPI}_{\text{core}} + r_{\text{miss}} \times p_{\text{miss}}
+\end{equation}
+where $r_{\text{miss}}$ is the miss rate and $p_{\text{miss}}$ is the miss penalty in cycles. Table~\ref{tab:cache_sensitivity} shows the impact on SGF's relative throughput improvement for the 7-stage CoreMark case.
+
+\begin{table*}[t]
+\centering
+\caption{SGF throughput improvement under modeled cache miss rates. The absolute cycle savings from SGF (159{,}932 cycles on 7-stage CoreMark) are constant; the relative improvement decreases as memory stalls dominate CPI.}
+\label{tab:cache_sensitivity}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Miss scenario} & \textbf{Miss CPI} & \textbf{Total CPI (base)} & \textbf{Total CPI (SGF)} & \textbf{$\Delta$CPI} & \textbf{Relative improvement} \\
+\midrule
+No misses (this study)       & 0     & 2.02 & 1.96 & $-$0.06 & 3.0\% \\
+1\% miss, 20-cycle penalty   & 0.20  & 2.22 & 2.16 & $-$0.06 & 2.7\% \\
+2\% miss, 50-cycle penalty   & 1.00  & 3.02 & 2.96 & $-$0.06 & 2.0\% \\
+5\% miss, 100-cycle penalty  & 5.00  & 7.02 & 6.96 & $-$0.06 & 0.9\% \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The absolute cycle savings from SGF (159{,}932 fewer flush cycles on 7-stage CoreMark) are independent of cache miss rate---SGF eliminates the same stale-GHR mispredictions regardless of memory stall behavior. The relative throughput improvement decreases as memory stalls dominate total CPI, which is a boundary inherent to all branch-prediction research. The practical implication: SGF is most valuable in embedded systems with tightly coupled memories (the primary use case for FPGA soft cores) and least valuable in systems dominated by cache miss penalties.
 
 \subsection{Design Guidance for Practitioners}
 
@@ -717,7 +749,7 @@ The boundaries of this study must be stated precisely, because they constrain ev
 
 \textbf{Single microarchitecture.} The processor is a research vehicle, not a production-competitive core. It lacks compressed-instruction support, out-of-order execution, cache hierarchy beyond a single L1, and I/O subsystems. Results characterize how \emph{this particular} microarchitecture responds to pipeline-depth changes. A core with a different forwarding topology, a tournament predictor, or a deeper memory hierarchy could produce a different optimal depth.
 
-\textbf{Non-production benchmarks.} The seven workloads span three standard sources (Dhrystone, EEMBC CoreMark, Embench-IoT), but all fit within 16\,KB of instruction memory with near-100\% cache hit rates. At realistic application scales where caches genuinely miss, memory stall cycles would dominate branch misprediction penalties, potentially shifting the CPI-versus-depth tradeoff. SPEC-class workloads are absent.
+\textbf{Memory hierarchy scope.} All workloads fit within 16\,KB of instruction memory with near-100\% cache hit rates. A sensitivity analysis of cache miss impact is provided in Section~\ref{sec:discussion} (``Cache Miss Sensitivity'').
 
 \textbf{Placement variance.} Ten placement/routing directive combinations per variant provide standard deviations and 95\% confidence intervals. The two-tier structure ($p < 10^{-48}$) and within-tier rankings are statistically robust at this sample size. However, 10 seeds still represent a finite subset of Vivado's placement search space; a different synthesis tool or constraint flow could produce different absolute frequencies.
 
