@@ -33,7 +33,7 @@ set place_directives [list \
     "SpreadLogic_high" \
     "ExtraPostPlacementOpt" \
     "AltSpreadLogic_high" \
-    "SSI_SpreadLogic_high" \
+    "ExtraNetDelay_low" \
     "Default" \
     "Explore" \
 ]
