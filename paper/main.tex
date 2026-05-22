@@ -1,4 +1,4 @@
-\documentclass[conference]{IEEEtran}
+\documentclass[journal]{IEEEtran}
 
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -99,7 +99,7 @@ Rocket \cite{asanovic2016rocket} & \checkmark & \checkmark & \checkmark & \check
 \vspace{2pt}
 
 \footnotesize{``Controlled'' = only the indicated variable changes; all others are held constant from shared RTL.}
-\end{table}
+\end{table*}
 
 % ====================================================================
 \section{Processor Design}
@@ -155,7 +155,7 @@ IF2 prediction bubble     & -- & -- & -- & 1\,cy & 1\,cy \\
 Predictor update latency  & 2 & 2 & 3 & 4 & 4 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 % ====================================================================
 \section{Implementation and Verification}
@@ -229,7 +229,7 @@ Slice Regs (FFs)  & 8{,}040 & 8{,}190 & 8{,}501 & 8{,}550 & 8{,}678 \\
 DSP48E1           & 12    & 12     & 12     & 12     & 12 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 \begin{figure}[t]
 \centering
@@ -283,7 +283,7 @@ Table~\ref{tab:benchmark} presents the benchmark results for the two workloads v
   & CPI            & 1.38     & 1.60     & 1.66     & 1.89     & 2.11 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 \begin{figure}[t]
 \centering
@@ -317,7 +317,7 @@ CPI            & 1.54      & 1.63      & 1.83      & 2.02      & 2.18 \\
 CoreMark/MHz   & 2.23      & 2.12      & 1.88      & 1.71      & 1.58 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 The CoreMark/MHz score decreases with pipeline depth (2.23 to 1.58) because the CPI increase outweighs any frequency advantage. This metric is frequency-independent: CoreMark/MHz = iterations $\times$ 10$^6$ / total\_cycles.
 
@@ -340,7 +340,7 @@ statemate (11.9\%)  & 1.21 & 1.30 & 1.37 & 1.50 & 1.69 \\
 edn (11.4\%)        & 1.48 & 1.51 & 1.66 & 1.78 & 1.95 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 The Embench results show workload-dependent trends. The multiply-heavy aha-mont64 has the lowest CPI (1.21--1.32) because its long multiply sequences have few branches and benefit from the MDU pipeline. The crc32 benchmark shows almost zero mispredictions (344 across all depths, 0.19\%) because its inner loop is highly predictable. The statemate benchmark (FSM simulation) shows the strongest depth-dependent misprediction effect: 66{,}603 mispredictions at 4/5-stage vs.\ 73{,}263 at 7/8-stage (10.0\% increase), driven by its data-dependent state transitions. The edn benchmark has moderate CPI (1.48--1.95) with very low misprediction rates (3.1\%).
 
@@ -537,7 +537,7 @@ MDU divide stall           & 32\,cy & 32\,cy & 32\,cy & 32\,cy & 32\,cy \\
 Predictor update latency   & 2\,stg & 2\,stg & 3\,stg & 4\,stg & 4\,stg \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 Using these costs, the 6-to-7-stage CPI delta decomposes into three sources:
 
