@@ -47,7 +47,7 @@ RISC-V, pipeline depth, FPGA, Artix-7, RV32IM, branch prediction, gshare, specul
 How deep should an FPGA pipeline be?
 On ASIC processes the answer is well studied: partition the datapath until gate delay per stage reaches 6--8 FO4 inverter delays, then stop because branch-misprediction penalties and power begin to dominate \cite{hrishikesh2002optimal, sprangle2002increasing}.
 On FPGAs, where LUT delay is largely function-independent and routing delay dominates timing \cite{xilinx_7series, boutros2020fpga, kuon2007measuring}, that answer does not transfer.
-Yet no published study isolates pipeline depth as the sole independent variable on a common FPGA target.
+To our knowledge, no published study isolates pipeline depth as the sole independent variable on a common FPGA target while holding all other microarchitectural modules constant at the RTL level.
 Prior RISC-V soft cores differ in ISA support, predictor design, memory architecture, and forwarding strategy, making performance differences across projects unattributable to any single factor.
 
 As soft cores increasingly replace fixed-function IP in edge computing, embedded signal processing, and domain-specific accelerator control paths, understanding the limits of deep in-order pipelining on FPGAs becomes a systems-level question, not a niche academic exercise.
@@ -71,12 +71,13 @@ Second, we separate the CPI cost of deeper pipelining into two mechanisms and el
 \end{itemize}
 
 The key finding is a two-tier $F_{\max}$ structure on Artix-7: shallow pipelines (4/5-stage) cluster at 70--74\,MHz, while deep pipelines (6/7/8-stage) cluster at 115--118\,MHz ($p < 10^{-48}$, Cohen's $d = 18.5$).
-The execute-stage split at depth~6 is the sole partitioning boundary that matters on this fabric.
+On this Artix-7 fabric, the execute-stage split at depth~6 is the only statistically significant frequency knee observed ($p < 10^{-48}$).
 Within each tier, additional stages buy no frequency.
 
 Mechanism~A is inherent to pipeline depth and cannot be eliminated without reducing the pipeline.
 Mechanism~B is a correctable deficiency in the predictor's update path.
-While speculative history updates exist in complex ASIC out-of-order processors, we present the first lightweight, dual-GHR checkpointing architecture designed for resource-constrained, in-order soft-core processors on FPGA fabric.
+Speculative history updates are well established in complex ASIC out-of-order processors (e.g., Alpha~21264, MIPS~R10000), but those mechanisms rely on deep reorder buffers and aggressive clock trees impractical on FPGA fabric.
+SGF is, to our knowledge, the first dual-GHR checkpointing architecture designed for resource-constrained, in-order soft-core processors on LUT-based FPGA.
 Speculative GHR Forwarding (SGF) balances the rigid routing constraints of LUT-based interconnects without inducing frequency degradation.
 Measured results on Artix-7 show that SGF reduces mispredictions by 31.4\% on CoreMark and 22.7\% on statemate in 7-stage pipelines, at a cost of 55 LUTs and 63 flip-flops (0.7\% area) with no $F_{\max}$ loss.
 
@@ -134,10 +135,23 @@ The frequency benefit of deeper pipelining on FPGA depends on whether the split 
 
 \subsection{Related RISC-V Soft Cores}
 
-Table~\ref{tab:prior} summarizes the experimental scope of prior RISC-V FPGA implementations relative to this work.
-SERV \cite{serv2019}, PicoRV32 \cite{picorv32}, VexRiscv \cite{vexriscv}, Ibex \cite{schiavone2017slow}, CVA6 \cite{zaruba2019ariane}, and SweRV EH1 \cite{swerv2019} each present a single pipeline organization optimized for a particular design goal.
-Frequency and area numbers reported by these projects are useful contextual references, but cannot be compared directly because ISA support, predictor design, memory architecture, forwarding strategy, and Vivado version differ across all of them.
-Prior surveys have cataloged pipelining techniques across RISC processor families \cite{biglari2019pipelining}, and the Rocket Chip generator offers a configurable pipeline \cite{asanovic2016rocket}, but neither isolates pipeline depth as a controlled variable.
+Table~\ref{tab:prior} summarizes the experimental scope of prior RISC-V FPGA implementations.
+SERV \cite{serv2019} uses bit-serial execution (one stage, $\sim$300\,MHz on Artix-7).
+PicoRV32 \cite{picorv32} uses multi-cycle execution without pipelining ($\sim$250\,MHz).
+VexRiscv \cite{vexriscv} offers a highly configurable pipeline with optional branch prediction, caches, and MMU, but its pipeline depth cannot be varied independently of other features.
+Ibex \cite{schiavone2017slow} is a 2-stage design targeting ultra-low power.
+CVA6 \cite{zaruba2019ariane} implements RV64GC with a 6-stage pipeline and out-of-order commit.
+SweRV EH1 \cite{swerv2019} is a commercial-grade 2-wide superscalar.
+None of these projects provides a controlled comparison across pipeline depths with invariant predictor, MDU, and memory hardware.
+
+The branch-prediction update-latency problem is well characterized in the ASIC literature.
+Gonzalez and Horowitz \cite{gonzalez1999power} showed that deeper ASIC pipelines degrade predictor accuracy through increased feedback delay.
+Seznec and Michaud studied the interaction between predictor update latency and table aliasing in tournament and TAGE predictors.
+Speculative history update mechanisms are standard in high-performance ASIC out-of-order processors (Alpha~21264, MIPS~R10000), where deep reorder buffers provide checkpoint storage.
+On FPGA soft cores, where area and routing constraints preclude reorder buffers, these techniques have not been adapted.
+Our SGF mechanism addresses this gap with a lightweight, in-order-compatible design.
+
+Prior surveys have cataloged pipelining techniques across RISC families \cite{biglari2019pipelining}, and the Rocket Chip generator \cite{asanovic2016rocket} offers a configurable pipeline, but neither isolates pipeline depth as a controlled variable or addresses the stale-GHR effect on FPGA fabric.
 
 \begin{table*}[t]
 \centering
@@ -236,6 +250,13 @@ The target device is Xilinx Artix-7 XC7A35TCPG236-1.
 All syntheses use Vivado 2025.2 in out-of-context (OOC) mode with a 5\,ns clock constraint (200\,MHz target) to drive the tools toward maximum optimization effort.
 The reported $F_{\max}$ values are means with standard deviations and 95\% confidence intervals computed via Student's $t$-distribution with 9 degrees of freedom.
 $F_{\max}$ for each run is derived from the worst negative slack (WNS) as $F_{\max} = 1000/(5 - \text{WNS})$.
+
+\textbf{Reproducibility.}
+All benchmarks are compiled with \texttt{riscv-none-elf-gcc}~15.2.0 (xPack) using \texttt{-march=rv32im\_zicsr -mabi=ilp32 -O1 -nostdlib -ffreestanding}.
+CoreMark uses the official EEMBC source (\texttt{github.com/eembc/coremark}) with a bare-metal porting layer; Embench-IoT uses the official source (\texttt{github.com/embench/embench-iot}).
+Linker scripts place code at address 0 (IMEM) and data at 0x10000 (DMEM); the startup routine clears BSS and initializes seed variables before calling \texttt{main}.
+The 10 placement/routing directive pairings are: (1)~Default/Default, (2)~Explore/Explore, (3)~Default/NoTimingRelaxation, (4)~ExtraNetDelay\_high/Explore, (5)~Default/Default, (6)~ExtraPostPlacementOpt/AggressiveExplore, (7)~Explore/NoTimingRelaxation, (8)~ExtraNetDelay\_low/Explore, (9)~Default/AggressiveExplore, (10)~Explore/NoTimingRelaxation.
+Complete RTL, synthesis TCL scripts, benchmark hex files, and result logs are archived at \texttt{github.com/devanshjoshi08/RISCV-Pipeline-Research}.
 
 \subsection{Benchmark Suite}
 \label{sec:benchmarks}
@@ -571,6 +592,19 @@ The BTB, RAS, and PHT structures are unchanged; only the GHR management logic is
 The total overhead is 24 additional flip-flops for checkpoint forwarding, plus combinational logic for the speculative shift and misprediction rollback multiplexer.
 This amounts to 0.28\% area overhead on the 7-stage design, well within the noise floor of placement-dependent area variation.
 
+\textbf{Correctness invariant.}
+SGF maintains the following architectural contract: the PHT is always trained on \emph{actual} branch outcomes, never on speculative ones.
+Three state elements interact:
+\begin{itemize}
+\item \texttt{spec\_ghr}: speculative state, updated at prediction time with the predicted direction. Used for PHT \emph{read} indexing only.
+\item \texttt{committed\_ghr}: architectural state, updated at resolution time with the actual outcome. Serves as the rollback target.
+\item \texttt{ghr\_checkpoint}: a per-branch snapshot of \texttt{spec\_ghr} at prediction time, forwarded through the pipeline and used for PHT \emph{write} indexing at resolution.
+\end{itemize}
+On correct prediction, \texttt{spec\_ghr} already contains the correct bit and no action is needed.
+On misprediction, \texttt{spec\_ghr} is restored from \texttt{committed\_ghr} (incorporating the actual outcome of the mispredicted branch), and the PHT counter at the \emph{checkpointed} index is updated with the actual direction.
+This guarantees that (1)~the PHT never learns from speculative outcomes, (2)~the PHT index used for training exactly matches the index used for the original prediction, and (3)~the speculative GHR converges to the committed GHR after every misprediction recovery.
+The only state that is ever ``wrong'' is \texttt{spec\_ghr} between a misprediction and its rollback---a window during which the pipeline is being flushed and no predictions are consumed.
+
 \subsection{Synthesis Results}
 \label{sec:sgf_synth}
 
@@ -755,7 +789,7 @@ The absolute throughput ($F_{\max} / \text{CPI}$), however, is fabric-specific b
 
 The data support the following guidance for RV32IM-class soft cores on Artix-7:
 \begin{itemize}
-\item The 6-stage pipeline is the throughput-optimal depth on this fabric. It captures the full frequency benefit of the execute-stage split while paying a moderate CPI penalty (64.1\,MIPS on CoreMark, 1.88 CoreMark/MHz).
+\item The 6-stage pipeline is the highest-throughput depth in this configuration on this fabric. It captures the full frequency benefit of the execute-stage split while paying a moderate CPI penalty (64.1\,MIPS on CoreMark, 1.88 CoreMark/MHz).
 \item The classic 5-stage RISC pipeline is a dominated design point on this fabric: it shares the 4-stage's frequency limitation while adding load-use stalls. Unless area is the binding constraint, the 5-stage offers no advantage.
 \item The 7/8-stage designs match the 6-stage on frequency but pay progressively higher CPI costs. With SGF, the Mechanism~B component is eliminated, but Mechanism~A and IF2 bubble costs remain. These designs are justified when the IF split addresses a genuine timing bottleneck (e.g., synchronous BRAM instruction memory).
 \item On branch-dense workloads, designers should implement SGF in any pipeline with 3 or more stages of predictor update latency. The 0.5--0.7\% area cost is negligible relative to the 17--31\% misprediction reduction.
@@ -906,7 +940,7 @@ Five RV32IM pipeline variants (4 through 8 stages), sharing identical RTL on Art
 The measurements revealed a two-tier frequency structure ($p < 10^{-48}$, Cohen's $d = 18.5$) and separated pipeline-depth CPI overhead into Mechanism~A (inherent penalty scaling) and Mechanism~B (correctable stale-GHR inflation).
 A first-principles analytical model achieves $R^2 = 0.977$ across all data points, with physically interpretable terms for branch flush, load-use stalls, and IF2 bubbles.
 
-For practitioners designing RV32IM-class soft cores on Artix-7: the 6-stage pipeline is the throughput-optimal depth, the classic 5-stage is a dominated design point, and any pipeline with 3 or more stages of predictor update latency should implement SGF.
+For practitioners designing RV32IM-class soft cores on Artix-7: the 6-stage pipeline is the highest-throughput depth in this configuration, the classic 5-stage is a dominated design point, and any pipeline with 3 or more stages of predictor update latency should implement SGF.
 The 0.5--0.7\% area cost is negligible; the 17--31\% misprediction reduction is not.
 
 Future work includes extending SGF to tournament and TAGE predictor architectures, where multiple history lengths require per-table speculative state, and validating the two-tier frequency structure and SGF benefits on Intel FPGA fabrics.
