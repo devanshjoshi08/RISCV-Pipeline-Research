@@ -75,7 +75,7 @@ Within each tier, additional stages buy no frequency.
 Mechanism~A is inherent to pipeline depth and cannot be eliminated without reducing the pipeline.
 Mechanism~B is a correctable deficiency in the predictor's update path.
 Speculative history updates are well established in complex ASIC out-of-order processors (e.g., Alpha~21264, MIPS~R10000), but those mechanisms rely on deep reorder buffers and aggressive clock trees impractical on FPGA fabric.
-SGF is, to our knowledge, the first dual-GHR checkpointing architecture designed for resource-constrained, in-order soft-core processors on LUT-based FPGA.
+SGF adapts the dual-GHR checkpointing concept---established in ASIC out-of-order processors---to the resource and routing constraints of in-order soft cores on LUT-based FPGA, where reorder buffers and deep checkpoint arrays are impractical.
 Speculative GHR Forwarding (SGF) balances the rigid routing constraints of LUT-based interconnects without inducing frequency degradation.
 Measured results on Artix-7 show that SGF reduces mispredictions by 31.4\% on CoreMark and 22.7\% on statemate in 7-stage pipelines, at a cost of 55 LUTs and 63 flip-flops (0.7\% area) with no $F_{\max}$ loss.
 
@@ -85,7 +85,7 @@ The speculative GHR is more accurate than a committed GHR at any pipeline depth 
 The contributions of this work are:
 \begin{enumerate}
     \item \textbf{Speculative GHR Forwarding (SGF):} a lightweight dual-GHR mechanism that eliminates stale-GHR misprediction inflation (Mechanism~B) in deep FPGA pipelines, reducing mispredictions by up to 31.4\% at 0.5--0.7\% area cost with no $F_{\max}$ loss (Section~\ref{sec:sgf}).
-    \item \textbf{First FPGA measurement of stale-GHR degradation:} controlled separation of pipeline-depth CPI overhead into Mechanism~A (penalty scaling) and Mechanism~B (stale-GHR misprediction inflation), with per-workload classification across seven benchmarks (Section~\ref{sec:mispred}).
+    \item \textbf{Stale-GHR degradation measurement on FPGA:} controlled separation of pipeline-depth CPI overhead into Mechanism~A (penalty scaling) and Mechanism~B (stale-GHR misprediction inflation), with per-workload classification across seven benchmarks (Section~\ref{sec:mispred}).
     \item \textbf{Analytical CPI model:} a first-principles decomposition achieving $R^2 = 0.977$ across 35 workload--depth data points, with physically interpretable terms for branch flush, load-use stalls, and IF2 bubbles (Section~\ref{sec:model}).
     \item \textbf{Controlled experimental methodology:} pipeline depth as the sole independent variable across five design points, with all other microarchitectural modules shared from a common RTL codebase (Section~\ref{sec:methodology}).
     \item \textbf{Multi-seed FPGA characterization:} 50 post-place-and-route runs establishing a two-tier frequency structure with full statistical analysis (Section~\ref{sec:synth}).
@@ -238,6 +238,12 @@ Predictor update latency  & 2 & 2 & 3 & 4 & 4 \\
 \bottomrule
 \end{tabular}
 \end{table*}
+
+\textbf{Threats to isolation.}
+Pipeline depth is not a perfectly clean independent variable: each split introduces structural side effects (load-use stall changes, IF2 bubbles, forwarding-source count changes) that are inseparable from the depth increase itself.
+Table~\ref{tab:hazard} makes these asymmetries explicit.
+The analytical CPI model (Section~\ref{sec:model}) addresses this by decomposing CPI into separate terms for each structural effect, allowing the contribution of depth \emph{per se} to be distinguished from the contribution of the side effects each split introduces.
+The key claim is not that ``depth alone causes CPI increase'' but that ``each split introduces a quantifiable combination of frequency benefit and CPI cost, and the Mechanism~B component of that cost is correctable.''
 
 \subsection{Synthesis Methodology}
 \label{sec:synth_method}
@@ -516,6 +522,33 @@ The per-workload base $\gamma_w$ ranges from $-0.01$ (aha-mont64, multiply-domin
 \caption{Measured vs.\ predicted CPI across all seven workloads and five pipeline depths. The first-principles model (Eq.~\ref{eq:cpi_model}) achieves $R^2 = 0.977$.}
 \label{fig:cpi_vs_depth}
 \end{figure}
+
+Table~\ref{tab:ablation} decomposes the CoreMark CPI at each depth into its constituent terms, isolating each architectural cost.
+The branch-flush term grows with depth (Mechanism~A).
+The load-use term appears at depth~5 and increases at depth~8.
+The IF2 bubble appears at depth~7.
+Mechanism~B (the correctable component) is visible as the misprediction-count increase at depth~6.
+
+\begin{table*}[t]
+\centering
+\caption{CPI ablation for CoreMark: decomposition into architectural cost components at each pipeline depth. Each row shows one term of Eq.~\ref{eq:cpi_model}. The sum matches measured CPI within the model's residual ($\leq$0.09).}
+\label{tab:ablation}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{CPI Component} & \textbf{4-stg} & \textbf{5-stg} & \textbf{6-stg} & \textbf{7-stg} & \textbf{8-stg} \\
+\midrule
+Ideal throughput                    & 1.00  & 1.00  & 1.00  & 1.00  & 1.00 \\
+Branch flush ($M \cdot P / N$)     & 0.10  & 0.10  & 0.16  & 0.20  & 0.20 \\
+Load-use stall ($\alpha \cdot L$)  & 0.00  & 0.15  & 0.15  & 0.15  & 0.22 \\
+IF2 bubble ($\beta \cdot B \cdot f_b$) & 0.00 & 0.00 & 0.00 & 0.28 & 0.28 \\
+Workload base ($\gamma_w$)         & 0.45  & 0.45  & 0.45  & 0.45  & 0.45 \\
+\midrule
+\textbf{Model prediction}          & \textbf{1.55} & \textbf{1.70} & \textbf{1.76} & \textbf{2.08} & \textbf{2.15} \\
+\textbf{Measured CPI}              & \textbf{1.54} & \textbf{1.63} & \textbf{1.83} & \textbf{2.02} & \textbf{2.18} \\
+\bottomrule
+\end{tabular}
+\end{table*}
 
 \subsection{Throughput and CoreMark/MHz}
 \label{sec:throughput}
