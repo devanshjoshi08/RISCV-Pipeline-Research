@@ -51,7 +51,7 @@ As soft cores increasingly replace fixed-function IP in edge computing, embedded
 A less visible cost of deep pipelines compounds the problem.
 In a deeper pipeline, the latency between branch resolution and the next prediction spans more cycles.
 During these cycles the predictor's global history register (GHR) operates on stale state: branches predicted before prior branches resolve use a GHR that does not reflect the most recent outcomes.
-Gonzalez and Horowitz identified this effect in ASIC power-performance simulations \cite{gonzalez1999power}, and high-performance ASIC out-of-order processors (e.g., Alpha~21264, MIPS~R10000) deploy speculative history update mechanisms to address it.
+Gonzalez and Horowitz identified this effect in ASIC power-performance simulations \cite{gonzalez1999power}, and high-performance ASIC out-of-order processors (e.g., Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}) deploy speculative history update mechanisms to address it.
 However, those mechanisms rely on deep reorder buffers, checkpoint arrays, and aggressive clock trees that are impractical on resource-constrained FPGA fabric.
 To our knowledge, this effect has not been measured on FPGA fabric, where the pipeline-depth landscape differs fundamentally from ASIC and where a lightweight, in-order-compatible solution is needed.
 
@@ -139,8 +139,9 @@ None of these projects provides a controlled comparison across pipeline depths w
 
 The branch-prediction update-latency problem is well characterized in the ASIC literature.
 Gonzalez and Horowitz \cite{gonzalez1999power} showed that deeper ASIC pipelines degrade predictor accuracy through increased feedback delay.
-Seznec and Michaud studied the interaction between predictor update latency and table aliasing in tournament and TAGE predictors.
-Speculative history update mechanisms are standard in high-performance ASIC out-of-order processors (Alpha~21264, MIPS~R10000), where deep reorder buffers provide checkpoint storage.
+Seznec and Michaud studied the interaction between predictor update latency and table aliasing in conditional branch predictors \cite{michaud1999trading}.
+Seznec later proposed the TAGE predictor \cite{seznec2011tage}, which uses multiple history lengths.
+Speculative history update mechanisms are standard in high-performance ASIC out-of-order processors (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}), where deep reorder buffers provide checkpoint storage.
 On FPGA soft cores, where area and routing constraints preclude reorder buffers, these techniques have not been adapted.
 Our SGF mechanism addresses this gap with a lightweight, in-order-compatible design.
 
@@ -255,7 +256,7 @@ $F_{\max}$ for each run is derived from the worst negative slack (WNS) as $F_{\m
 
 \textbf{Reproducibility.}
 All benchmarks are compiled with \texttt{riscv-none-elf-gcc}~15.2.0 (xPack) using \texttt{-march=rv32im\_zicsr -mabi=ilp32 -O1 -nostdlib -ffreestanding}.
-CoreMark uses the official EEMBC source (\texttt{github.com/eembc/coremark}) with a bare-metal porting layer; Embench-IoT uses the official source (\texttt{github.com/embench/embench-iot}).
+CoreMark uses the official EEMBC source (\texttt{github.com/eembc/coremark}) with a bare-metal porting layer; Embench-IoT uses the official source \cite{embench2019}.
 Linker scripts place code at address 0 (IMEM) and data at 0x10000 (DMEM); the startup routine clears BSS and initializes seed variables before calling \texttt{main}.
 The 10 placement/routing directive pairings are: (1)~Default/Default, (2)~Explore/Explore, (3)~Default/NoTimingRelaxation, (4)~ExtraNetDelay\_high/Explore, (5)~Default/Default, (6)~ExtraPostPlacementOpt/AggressiveExplore, (7)~Explore/NoTimingRelaxation, (8)~ExtraNetDelay\_low/Explore, (9)~Default/AggressiveExplore, (10)~Explore/NoTimingRelaxation.
 Complete RTL, synthesis TCL scripts, benchmark hex files, and result logs are archived at \texttt{github.com/devanshjoshi08/RISCV-Pipeline-Research}.
@@ -273,7 +274,7 @@ Functional correctness is verified by confirming that all five pipeline variants
 
 \textbf{Official EEMBC CoreMark.} The industry-standard CoreMark benchmark \cite{coremark}, compiled from the official EEMBC source using riscv-none-elf-gcc~15.2.0 with -O1 optimization: 10 iterations in PERFORMANCE\_RUN mode, 2{,}893{,}145 instructions, 719{,}810 branches (24.9\% branch frequency).
 
-\textbf{Embench-IoT: aha-mont64.} Montgomery multiplication from the official Embench-IoT suite. Cryptographic kernel, multiply-heavy: 4{,}453{,}858 instructions, 512{,}593 branches (11.5\%).
+\textbf{Embench-IoT: aha-mont64.} Montgomery multiplication from the official Embench-IoT suite \cite{embench2019}. Cryptographic kernel, multiply-heavy: 4{,}453{,}858 instructions, 512{,}593 branches (11.5\%).
 
 \textbf{Embench-IoT: crc32.} CRC-32 computation: 4{,}008{,}648 instructions, 174{,}591 branches (4.4\%). Inner loop has extremely predictable branching (0.19\% misprediction rate).
 
@@ -416,8 +417,8 @@ CoreMark/MHz   & 2.23      & 2.12      & 1.88      & 1.71      & 1.58 \\
 
 \subsubsection{Embench-IoT}
 
-Table~\ref{tab:embench} presents four official Embench-IoT benchmarks.
-Each was compiled from the official Embench-IoT source with our bare-metal porting layer.
+Table~\ref{tab:embench} presents four official Embench-IoT \cite{embench2019} benchmarks.
+Each was compiled from the official source with our bare-metal porting layer.
 All four produce identical instruction and branch counts across pipeline depths.
 
 \begin{table*}[t]
@@ -851,7 +852,7 @@ Fig.~\ref{fig:predarch} compares the two architectures.
 The bimodal predictor produces nearly identical CPI values across all depths (4-stage: 1.41/1.41, 5-stage: 1.48/1.48, 6-stage: 1.68/1.68, 7-stage: 1.85/1.85, 8-stage: 1.99/1.99 for gshare/bimodal) and misprediction counts (202 vs.\ 203).
 The CPI trend across pipeline depths is preserved regardless of whether the predictor uses global history correlation or purely local PC-based prediction.
 
-SGF targets GHR-based predictors (gshare, TAGE, and similar correlation predictors).
+SGF targets GHR-based predictors (gshare \cite{mcfarling1993combining}, TAGE \cite{seznec2011tage}, and similar correlation predictors).
 For bimodal predictors, the analogous staleness effect would require speculative PHT forwarding, which is a different mechanism.
 The prevalence of history-based predictors in modern designs makes SGF broadly applicable.
 
@@ -961,7 +962,7 @@ The model predicts the depth-dependent CPI components from architectural paramet
 
 \textbf{SGF predictor scope.}
 SGF targets GHR-based predictors (gshare and its derivatives).
-Extension to tournament or TAGE predictors, which maintain multiple history lengths, would require per-table speculative histories.
+Extension to tournament or TAGE predictors \cite{seznec2011tage}, which maintain multiple history lengths, would require per-table speculative histories.
 The crc32 marginal disbenefit (+167 mispredictions, +0.096\% absolute) demonstrates that SGF is not universally positive, though the effect is negligible.
 
 % ====================================================================
@@ -979,7 +980,7 @@ A first-principles CPI model ($R^2 = 0.977$) decomposes each component.
 For practitioners designing RV32IM-class soft cores on Artix-7: the 6-stage pipeline is the highest-throughput depth in this configuration, the classic 5-stage is a dominated design point, and any pipeline with 3 or more stages of predictor update latency should implement SGF.
 The 0.5--0.7\% area cost is negligible; the 17--31\% misprediction reduction is not.
 
-Future work includes extending SGF to tournament and TAGE predictor architectures, where multiple history lengths require per-table speculative state, and validating the two-tier frequency structure and SGF benefits on Intel FPGA fabrics.
+Future work includes extending SGF to tournament and TAGE predictor architectures \cite{seznec2011tage}, where multiple history lengths require per-table speculative state, and validating the two-tier frequency structure and SGF benefits on Intel FPGA fabrics.
 
 The complete RTL, testbenches, synthesis scripts, and benchmark programs are publicly available at \url{https://github.com/devanshjoshi08/RISCV-RV32IM-Processor}.
 
