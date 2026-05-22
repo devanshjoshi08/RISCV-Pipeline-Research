@@ -26,13 +26,11 @@ Email: devanshjoshi08@gmail.com}
 \maketitle
 
 \begin{abstract}
-Deep pipelines on FPGA fabric suffer a previously unquantified branch-prediction degradation: the global history register (GHR) becomes stale as update latency grows with pipeline depth, inflating misprediction counts even when predictor hardware is unchanged.
-We quantify this effect, model it analytically, and eliminate it.
+Deep pipelines on FPGA fabric suffer a branch-prediction degradation that has not been isolated under controlled conditions: the global history register (GHR) becomes stale as update latency grows with pipeline depth, inflating misprediction counts even when predictor hardware is unchanged.
 Using five RV32IM pipeline variants (4 through 8 stages) synthesized from shared RTL on Xilinx Artix-7, we separate pipeline-depth CPI overhead into two mechanisms: Mechanism~A (longer per-misprediction flush penalty, inherent to depth) and Mechanism~B (inflated misprediction count from stale GHR state, correctable).
-A first-principles CPI model achieves $R^2 = 0.977$ across 35 workload--depth data points.
-To eliminate Mechanism~B, we propose Speculative GHR Forwarding (SGF), a dual-GHR architecture that updates the history register speculatively at prediction time with checkpoint-based rollback on misprediction.
-Measured results show that SGF reduces mispredictions by 31.4\% on CoreMark and 22.7\% on statemate in 7/8-stage pipelines---pushing misprediction counts \emph{below} the 4/5-stage baseline---at a cost of 0.5--0.7\% area with no $F_{\max}$ degradation.
-Fifty post-place-and-route runs (10 seeds per variant) establish a two-tier frequency structure (70--74\,MHz shallow, 115--118\,MHz deep; $p < 10^{-48}$, Cohen's $d = 18.5$).
+To eliminate Mechanism~B, we propose Speculative GHR Forwarding (SGF), a dual-GHR architecture that speculatively updates the history register at prediction time with checkpoint-based rollback.
+SGF reduces mispredictions by up to 31\% on branch-dense workloads at 0.5--0.7\% area cost with no frequency degradation.
+A first-principles CPI model ($R^2 = 0.977$, 35 data points) and 50 post-place-and-route synthesis runs with full statistical analysis support the measurements.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -57,7 +55,7 @@ In a deeper pipeline, the latency between branch resolution and the next predict
 During these cycles the predictor's global history register (GHR) operates on stale state: branches predicted before prior branches resolve use a GHR that does not reflect the most recent outcomes.
 Gonzalez and Horowitz identified this effect in ASIC power-performance simulations \cite{gonzalez1999power}, and high-performance ASIC out-of-order processors (e.g., Alpha~21264, MIPS~R10000) deploy speculative history update mechanisms to address it.
 However, those mechanisms rely on deep reorder buffers, checkpoint arrays, and aggressive clock trees that are impractical on resource-constrained FPGA fabric.
-The effect has never been measured on FPGAs, where the pipeline-depth landscape differs fundamentally from ASIC and where a lightweight, in-order-compatible solution is needed.
+To our knowledge, this effect has not been measured on FPGA fabric, where the pipeline-depth landscape differs fundamentally from ASIC and where a lightweight, in-order-compatible solution is needed.
 
 This paper provides two things the literature lacks.
 First, we build a controlled experiment: five RV32IM pipeline variants (4, 5, 6, 7, and 8 stages) that share identical RTL for the ALU, multiply-divide unit, gshare branch predictor, CSR unit, register file, instruction cache, and data memory.
@@ -705,7 +703,7 @@ Under SGF, the speculative GHR is updated immediately at prediction time. When t
 
 \textbf{Proposed countermeasure: speculative update confidence filter.} A 1-bit filter gate attached to the speculative GHR update logic would suppress updates for branches whose PHT counter is saturated at the extreme (\texttt{11} or \texttt{00}). These branches are overwhelmingly likely to repeat their current direction, making their speculative GHR contribution redundant. The filter requires one 2-bit comparator per prediction cycle and eliminates the crc32 pathology entirely without affecting SGF's benefit on CoreMark or statemate (where PHT counters oscillate and speculative updates carry useful information). We leave implementation of this filter to future work.
 
-\textbf{Risk assessment.} SGF's worst case (crc32: +167 mispredictions, 0\% CPI impact) is bounded and predictable: it occurs only on branches with $>$99\% bias in tight loops. No workload in our suite shows CPI degradation from SGF. The worst-case absolute cost (167 extra flush cycles) is three orders of magnitude smaller than SGF's best-case savings (159{,}932 fewer flush cycles on CoreMark).
+\textbf{Operating regime.} SGF is beneficial when the workload contains branches whose outcomes vary across short windows (CoreMark list comparisons, statemate FSM transitions, aha-mont64 conditional multiplications). SGF is neutral when branches are widely spaced (edn, Diagnostic) or when the committed GHR is already accurate (Dhrystone). SGF is marginally negative only when a single branch dominates the inner loop with $>$99\% bias in one direction (crc32). The negative case produces zero CPI impact because the absolute misprediction count remains negligible. In our seven-workload evaluation, no configuration shows CPI degradation from SGF. The worst-case absolute cost (167 extra flush cycles on crc32) is three orders of magnitude smaller than the best-case savings (159{,}932 fewer flush cycles on CoreMark).
 
 % ====================================================================
 \section{Discussion}
