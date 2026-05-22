@@ -26,11 +26,9 @@ Email: devanshjoshi08@gmail.com}
 \maketitle
 
 \begin{abstract}
-Deep pipelines on FPGA fabric suffer a branch-prediction degradation that has not been isolated under controlled conditions: the global history register (GHR) becomes stale as update latency grows with pipeline depth, inflating misprediction counts even when predictor hardware is unchanged.
-Using five RV32IM pipeline variants (4 through 8 stages) synthesized from shared RTL on Xilinx Artix-7, we separate pipeline-depth CPI overhead into two mechanisms: Mechanism~A (longer per-misprediction flush penalty, inherent to depth) and Mechanism~B (inflated misprediction count from stale GHR state, correctable).
-To eliminate Mechanism~B, we propose Speculative GHR Forwarding (SGF), a dual-GHR architecture that speculatively updates the history register at prediction time with checkpoint-based rollback.
-SGF reduces mispredictions by up to 31\% on branch-dense workloads at 0.5--0.7\% area cost with no frequency degradation.
-A first-principles CPI model ($R^2 = 0.977$, 35 data points) and 50 post-place-and-route synthesis runs with full statistical analysis support the measurements.
+Deeper FPGA pipelines inflate branch misprediction counts because the global history register (GHR) becomes stale before it is updated.
+We isolate this effect on Xilinx Artix-7 using five RV32IM pipeline variants (4--8 stages) that share all RTL except pipeline interconnect, and separate the CPI cost of depth into an inherent penalty-scaling component (Mechanism~A) and a correctable stale-GHR component (Mechanism~B).
+Speculative GHR Forwarding (SGF) eliminates Mechanism~B by updating the GHR speculatively at prediction time with checkpoint-based rollback, reducing mispredictions by 31\% on CoreMark at 0.7\% area cost with no frequency loss.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -74,13 +72,10 @@ Within each tier, additional stages buy no frequency.
 
 Mechanism~A is inherent to pipeline depth and cannot be eliminated without reducing the pipeline.
 Mechanism~B is a correctable deficiency in the predictor's update path.
-Speculative history updates are well established in complex ASIC out-of-order processors (e.g., Alpha~21264, MIPS~R10000), but those mechanisms rely on deep reorder buffers and aggressive clock trees impractical on FPGA fabric.
-SGF adapts the dual-GHR checkpointing concept---established in ASIC out-of-order processors---to the resource and routing constraints of in-order soft cores on LUT-based FPGA, where reorder buffers and deep checkpoint arrays are impractical.
-Speculative GHR Forwarding (SGF) balances the rigid routing constraints of LUT-based interconnects without inducing frequency degradation.
+SGF adapts the dual-GHR checkpointing concept from ASIC out-of-order processors to the constraints of in-order FPGA soft cores, where reorder buffers and deep checkpoint arrays are impractical.
 Measured results on Artix-7 show that SGF reduces mispredictions by 31.4\% on CoreMark and 22.7\% on statemate in 7-stage pipelines, at a cost of 55 LUTs and 63 flip-flops (0.7\% area) with no $F_{\max}$ loss.
 
-A surprising result: SGF pushes 7/8-stage misprediction counts \emph{below} the 4/5-stage baseline (101K vs.\ 145K on CoreMark).
-The speculative GHR is more accurate than a committed GHR at any pipeline depth because it reflects the most recent predicted control flow rather than waiting for resolution.
+On CoreMark, SGF pushes 7/8-stage misprediction counts below the 4/5-stage baseline (101K vs.\ 145K) because the speculative GHR reflects the most recent predicted control flow rather than waiting for resolution.
 
 The contributions of this work are:
 \begin{enumerate}
@@ -175,7 +170,10 @@ Rocket \cite{asanovic2016rocket} & \checkmark & \checkmark & \checkmark & \check
 \footnotesize{``Controlled'' = only the indicated variable changes; all others are held constant from shared RTL.}
 \end{table*}
 
-The gap is not the absence of pipeline-depth variation per se, but the absence of a controlled experiment in which \emph{only} pipeline depth varies while all other microarchitectural variables are held constant on the same FPGA device---and the absence of any mechanism to correct the stale-GHR degradation that such an experiment reveals.
+Two distinct gaps exist in the literature.
+The \emph{measurement gap}: no controlled experiment varies only pipeline depth while holding all other microarchitectural variables constant on a single FPGA device.
+The \emph{mechanism gap}: no lightweight, in-order-compatible fix for stale-GHR degradation has been proposed for FPGA soft cores, where the ASIC solutions (deep checkpoint arrays, reorder-buffer-backed speculative history) are impractical.
+This paper addresses both.
 
 % ====================================================================
 \section{Experimental Setup}
@@ -718,12 +716,8 @@ The most significant result is that SGF pushes 7/8-stage misprediction counts \e
 \item aha-mont64: 115{,}644 (7-stg SGF) vs.\ 139{,}739 (4/5-stg baseline)---17.2\% fewer.
 \end{itemize}
 
-This result is not paradoxical.
-The 4/5-stage baseline uses a committed GHR with 2-stage update latency.
-Even at 2 stages, there is a window during which the GHR is stale.
-SGF's speculative GHR has \emph{zero} update latency: it incorporates the predicted direction in the same cycle as the prediction.
-When the majority of predictions are correct (79.8\% on CoreMark), the speculative GHR reflects a more accurate approximation of the true branch history than any committed GHR, regardless of pipeline depth.
-SGF does not merely eliminate Mechanism~B---it provides a fundamentally fresher history than the committed-update approach at any depth.
+The explanation is straightforward: the speculative GHR has zero update latency (it incorporates the predicted direction in the same cycle as the prediction), while even the shallowest baseline has 2-stage latency.
+When predictions are mostly correct (79.8\% on CoreMark), the speculative GHR approximates true branch history more accurately than any committed GHR.
 
 \subsection{crc32 Edge Case Analysis and Confidence Filter Proposal}
 \label{sec:crc32}
@@ -979,10 +973,8 @@ This paper presents Speculative GHR Forwarding (SGF), a lightweight dual-GHR mic
 SGF reduces mispredictions by 31.4\% on CoreMark and 22.7\% on statemate in 7-stage pipelines on Artix-7, at a cost of 0.5--0.7\% area with no $F_{\max}$ degradation.
 The mechanism pushes deep-pipeline misprediction counts below the shallow-pipeline baseline because the speculative GHR reflects a more accurate approximation of the true branch history than any committed GHR operating with nonzero update latency.
 
-SGF was motivated by controlled measurements that no prior work had performed.
-Five RV32IM pipeline variants (4 through 8 stages), sharing identical RTL on Artix-7, were synthesized across 50 post-place-and-route runs and evaluated on seven benchmark workloads (35 validated data points).
-The measurements revealed a two-tier frequency structure ($p < 10^{-48}$, Cohen's $d = 18.5$) and separated pipeline-depth CPI overhead into Mechanism~A (inherent penalty scaling) and Mechanism~B (correctable stale-GHR inflation).
-A first-principles analytical model achieves $R^2 = 0.977$ across all data points, with physically interpretable terms for branch flush, load-use stalls, and IF2 bubbles.
+The controlled depth sweep that motivated SGF revealed a two-tier frequency structure on Artix-7 ($p < 10^{-48}$) and separated CPI overhead into Mechanism~A (inherent) and Mechanism~B (correctable).
+A first-principles CPI model ($R^2 = 0.977$) decomposes each component.
 
 For practitioners designing RV32IM-class soft cores on Artix-7: the 6-stage pipeline is the highest-throughput depth in this configuration, the classic 5-stage is a dominated design point, and any pipeline with 3 or more stages of predictor update latency should implement SGF.
 The 0.5--0.7\% area cost is negligible; the 17--31\% misprediction reduction is not.
