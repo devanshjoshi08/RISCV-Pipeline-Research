@@ -50,10 +50,14 @@ On FPGAs, where LUT delay is largely function-independent and routing delay domi
 Yet no published study isolates pipeline depth as the sole independent variable on a common FPGA target.
 Prior RISC-V soft cores differ in ISA support, predictor design, memory architecture, and forwarding strategy, making performance differences across projects unattributable to any single factor.
 
+As soft cores increasingly replace fixed-function IP in edge computing, embedded signal processing, and domain-specific accelerator control paths, understanding the limits of deep in-order pipelining on FPGAs becomes a systems-level question, not a niche academic exercise.
+
 A less visible cost of deep pipelines compounds the problem.
 In a deeper pipeline, the latency between branch resolution and the next prediction spans more cycles.
 During these cycles the predictor's global history register (GHR) operates on stale state: branches predicted before prior branches resolve use a GHR that does not reflect the most recent outcomes.
-Gonzalez and Horowitz identified this effect in ASIC power-performance simulations \cite{gonzalez1999power}, but it has never been measured on FPGA fabric, where the pipeline-depth landscape differs fundamentally from ASIC.
+Gonzalez and Horowitz identified this effect in ASIC power-performance simulations \cite{gonzalez1999power}, and high-performance ASIC out-of-order processors (e.g., Alpha~21264, MIPS~R10000) deploy speculative history update mechanisms to address it.
+However, those mechanisms rely on deep reorder buffers, checkpoint arrays, and aggressive clock trees that are impractical on resource-constrained FPGA fabric.
+The effect has never been measured on FPGAs, where the pipeline-depth landscape differs fundamentally from ASIC and where a lightweight, in-order-compatible solution is needed.
 
 This paper provides two things the literature lacks.
 First, we build a controlled experiment: five RV32IM pipeline variants (4, 5, 6, 7, and 8 stages) that share identical RTL for the ALU, multiply-divide unit, gshare branch predictor, CSR unit, register file, instruction cache, and data memory.
@@ -72,8 +76,9 @@ Within each tier, additional stages buy no frequency.
 
 Mechanism~A is inherent to pipeline depth and cannot be eliminated without reducing the pipeline.
 Mechanism~B is a correctable deficiency in the predictor's update path.
-We eliminate it with Speculative GHR Forwarding (SGF), a dual-GHR architecture that speculatively updates the history register at prediction time.
-Measured results on the Artix-7 fabric show that SGF reduces mispredictions by 31.4\% on CoreMark and 22.7\% on statemate in 7-stage pipelines, at a cost of 55 LUTs and 63 flip-flops (0.7\% area) with no $F_{\max}$ degradation.
+While speculative history updates exist in complex ASIC out-of-order processors, we present the first lightweight, dual-GHR checkpointing architecture designed for resource-constrained, in-order soft-core processors on FPGA fabric.
+Speculative GHR Forwarding (SGF) balances the rigid routing constraints of LUT-based interconnects without inducing frequency degradation.
+Measured results on Artix-7 show that SGF reduces mispredictions by 31.4\% on CoreMark and 22.7\% on statemate in 7-stage pipelines, at a cost of 55 LUTs and 63 flip-flops (0.7\% area) with no $F_{\max}$ loss.
 
 A surprising result: SGF pushes 7/8-stage misprediction counts \emph{below} the 4/5-stage baseline (101K vs.\ 145K on CoreMark).
 The speculative GHR is more accurate than a committed GHR at any pipeline depth because it reflects the most recent predicted control flow rather than waiting for resolution.
@@ -196,7 +201,7 @@ Each split targets a specific combinational path:
 
 \textbf{6-stage} (IF, ID, EX1, EX2, MEM, WB): Splits the execute phase, separating the forwarding multiplexer (EX1) from ALU and branch comparator (EX2). Three forwarding sources. Branch penalty: 3 cycles. This split targets the dominant critical path in the 4/5-stage designs.
 
-\textbf{7-stage} (IF1, IF2, ID, EX1, EX2, MEM, WB): Splits instruction fetch, placing branch prediction in IF2 with a registered PC. Introduces a 1-cycle IF2 bubble on every correctly predicted taken branch (IF1's speculative fetch is discarded). Branch penalty: 4 cycles. This split targets BRAM read latency.
+\textbf{7-stage} (IF1, IF2, ID, EX1, EX2, MEM, WB): Splits instruction fetch, placing branch prediction in IF2 with a registered PC. Introduces a 1-cycle IF2 bubble on every correctly predicted taken branch (IF1's speculative fetch is discarded). Branch penalty: 4 cycles. This split targets BRAM read latency. An industrial pipeline might deploy a zero-delay Next-Line Predictor (NLP) or BTB directly in IF1 to eliminate this bubble; we do not, because embedding specialized routing paths in IF1 would alter the physical timing paths unevenly across the 4-to-8-stage variants. The bubble is a deliberate control-variable constraint that preserves strict structural invariants across all depths.
 
 \textbf{8-stage} (IF1, IF2, ID, EX1, EX2, MEM1, MEM2, WB): Splits memory access, creating a dual load-use stall (loads not available until MEM2). Branch penalty: 4 cycles.
 
@@ -470,6 +475,13 @@ Unlike an empirical regression, each term corresponds to a specific physical mec
 \end{equation}
 where $D$ is pipeline depth, $w$ indexes the workload, $M_w(D)/N_w$ is the measured misprediction rate (mispredictions per instruction, which may vary with $D$ due to Mechanism~B), $P(D)$ is the flush penalty in cycles (2, 2, 3, 4, 4 for depths 4--8), $L(D)$ is the load-use stall cycles (0, 1, 1, 1, 1.5), $B(D)$ is the IF2 bubble indicator (0, 0, 0, 1, 1), $f_b$ is branch frequency, and $\gamma_w$ captures workload-specific base overhead from instruction mix, MDU stalls, and data hazards not attributable to pipeline depth.
 
+For completeness, the fully general form includes a memory-stall term:
+\begin{equation}
+\Pi_{\text{mem}} = r_{\text{imiss}} \cdot p_{\text{imiss}} + r_{\text{dmiss}} \cdot p_{\text{dmiss}}
+\label{eq:mem_stall}
+\end{equation}
+where $r$ and $p$ denote miss rate and miss penalty for instruction and data caches respectively. In our evaluation $\Pi_{\text{mem}} = 0$ because the distributed-RAM instruction and data memories are single-cycle with no miss path. We include this term to ensure the model generalizes to architectures with external DDR or multi-tiered cache hierarchies, where $\Pi_{\text{mem}}$ would add a depth-independent CPI component that dilutes the relative impact of Mechanisms~A and~B (see Section~\ref{sec:cache_miss} for quantitative sensitivity bounds).
+
 The two shared parameters $\alpha$ (load-use stall impact) and $\beta$ (IF2 bubble scaling) are fitted across all 35 data points, while $\gamma_w$ is fitted per workload.
 This yields 9 parameters (2 shared + 7 per-workload) for 35 observations.
 The fitted values are $\alpha = 0.145$ and $\beta = 1.12$.
@@ -651,15 +663,15 @@ SGF does not merely eliminate Mechanism~B---it provides a fundamentally fresher 
 \subsection{crc32 Edge Case Analysis and Confidence Filter Proposal}
 \label{sec:crc32}
 
-The crc32 pathology traces to a specific microarchitectural interaction.
-The inner loop contains a 99.8\% biased branch (the bit-test conditional).
-When this branch is rarely mispredicted, SGF shifts the wrong direction into \texttt{spec\_ghr}.
-Because the branch is so biased, the speculative GHR remains polluted for several subsequent predictions until either a correct prediction restores the pattern or an EX2 rollback corrects the state.
-In a tightly biased loop with one dominant branch, this creates a brief window of GHR contamination.
+The crc32 pathology traces to a specific microarchitectural interaction that we dissect here to demonstrate architectural predictability of SGF's edge cases.
 
-A \emph{speculative update confidence filter} would address this pathology: suppress speculative GHR updates for branches whose PHT counter is saturated at the extreme (11 or 00), since these branches are unlikely to change direction and their speculative contribution is redundant.
-We do not implement this filter in the current design to maintain architectural simplicity, but note that it would add only a 2-bit comparator per prediction cycle.
-The key observation is that SGF's worst case (crc32: +0.096\% branch impact, 0\% CPI impact) is negligible compared to its best case (CoreMark: $-$31.4\% misprediction reduction).
+\textbf{Structural mechanics.} The crc32 inner loop contains a single dominant branch (the bit-test conditional, \texttt{if (crc \& 1)}) that is taken 99.8\% of iterations. Under the baseline predictor, this branch's PHT counter saturates at \texttt{11} (strongly taken), and the committed GHR accumulates a long run of \texttt{1} bits. On the rare iteration where the branch is not taken, the baseline predictor mispredicts, but the GHR is not updated until EX2---by which time the next iteration has already been fetched with a still-correct (stale but accidentally accurate) GHR. The update latency acts as an accidental filter: the pollution from the rare misprediction arrives at the GHR after the next prediction has already used clean history.
+
+Under SGF, the speculative GHR is updated immediately at prediction time. When the rare not-taken misprediction occurs, SGF shifts a \texttt{0} into \texttt{spec\_ghr} in the same cycle. The next iteration's branch is then predicted using a GHR that contains the wrong bit. Because the PHT is indexed by PC~XOR~GHR, the polluted index maps to a different, potentially untrained counter. This produces 1--3 additional mispredictions before either the correct predictions restore the GHR pattern or the EX2 rollback fires. Over 174{,}591 total branches, this adds 167 mispredictions (0.096\%).
+
+\textbf{Proposed countermeasure: speculative update confidence filter.} A 1-bit filter gate attached to the speculative GHR update logic would suppress updates for branches whose PHT counter is saturated at the extreme (\texttt{11} or \texttt{00}). These branches are overwhelmingly likely to repeat their current direction, making their speculative GHR contribution redundant. The filter requires one 2-bit comparator per prediction cycle and eliminates the crc32 pathology entirely without affecting SGF's benefit on CoreMark or statemate (where PHT counters oscillate and speculative updates carry useful information). We leave implementation of this filter to future work.
+
+\textbf{Risk assessment.} SGF's worst case (crc32: +167 mispredictions, 0\% CPI impact) is bounded and predictable: it occurs only on branches with $>$99\% bias in tight loops. No workload in our suite shows CPI degradation from SGF. The worst-case absolute cost (167 extra flush cycles) is three orders of magnitude smaller than SGF's best-case savings (159{,}932 fewer flush cycles on CoreMark).
 
 % ====================================================================
 \section{Discussion}
