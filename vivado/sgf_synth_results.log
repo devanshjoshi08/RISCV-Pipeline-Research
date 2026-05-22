@@ -1,0 +1,9 @@
+=== SGF Predictor Synthesis Results ===
+=== Fri May 22 11:57:08 -0500 2026 ===
+variant,run,Fmax_MHz,WNS_ns,LUTs,FFs
+7stage_sgf,1,115.3,-3.676,7808,8617
+7stage_sgf,2,118.7,-3.422,7846,8605
+7stage_sgf,3,115.8,-3.638,7808,8617
+8stage_sgf,1,117.9,-3.480,7878,8705
+8stage_sgf,2,118.4,-3.445,7880,8703
+8stage_sgf,3,115.4,-3.662,7878,8705
