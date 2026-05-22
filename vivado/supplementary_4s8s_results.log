@@ -1,0 +1,201 @@
+=== Supplementary 4-stage & 8-stage Data ===
+=== Fri May 22 14:10:46 -0500 2026 ===
+
+=== PREDICTOR SWEEP (4s, 8s) ===
+--- 4s_pht32 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_4stage_top PHT=32 ===
+  Cycles:         4134
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.41
+  Mispredict%:    50.75%
+$finish called at time : 52165 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/4s_pht32_tb.sv" Line 39
+
+--- 8s_pht32 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_8stage_top PHT=32 ===
+  Cycles:         5840
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.99
+  Mispredict%:    50.75%
+$finish called at time : 69305 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/8s_pht32_tb.sv" Line 39
+
+--- 4s_pht64 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_4stage_top PHT=64 ===
+  Cycles:         4134
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.41
+  Mispredict%:    50.75%
+$finish called at time : 52165 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/4s_pht64_tb.sv" Line 39
+
+--- 8s_pht64 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_8stage_top PHT=64 ===
+  Cycles:         5840
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.99
+  Mispredict%:    50.75%
+$finish called at time : 69305 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/8s_pht64_tb.sv" Line 39
+
+--- 4s_pht128 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_4stage_top PHT=128 ===
+  Cycles:         4134
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.41
+  Mispredict%:    50.75%
+$finish called at time : 52165 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/4s_pht128_tb.sv" Line 39
+
+--- 8s_pht128 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_8stage_top PHT=128 ===
+  Cycles:         5840
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.99
+  Mispredict%:    50.75%
+$finish called at time : 69305 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/8s_pht128_tb.sv" Line 39
+
+=== BIMODAL PREDICTOR (4s, 8s) ===
+--- 4s_bimodal ---
+Time resolution is 1 ps
+=== Bimodal Dhrystone: rv32i_pipeline_4stage_top ===
+  Cycles:         4132
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 202
+  Dhrystones:     100
+  CPI:            1.41
+  Mispredict%:    50.50%
+$finish called at time : 52145 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/4s_bimodal_tb.sv" Line 39
+
+--- 8s_bimodal ---
+Time resolution is 1 ps
+=== Bimodal Dhrystone: rv32i_pipeline_8stage_top ===
+  Cycles:         5837
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 202
+  Dhrystones:     100
+  CPI:            1.99
+  Mispredict%:    50.50%
+$finish called at time : 69275 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/8s_bimodal_tb.sv" Line 39
+
+=== BRAM SYNTHESIS (4s, 8s) ===
+  bram_4s: Fmax=69.3 WNS=-9.425 LUTs=7121 FFs=8031
+
+=== PHT SCALING SWEEP (7s, 8s) ===
+--- 7s_pht256 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_7stage_top PHT=256 ===
+  Cycles:         5440
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.85
+  Mispredict%:    50.75%
+$finish called at time : 65295 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/7s_pht256_tb.sv" Line 34
+
+--- 8s_pht256 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_8stage_top PHT=256 ===
+  Cycles:         5840
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.99
+  Mispredict%:    50.75%
+$finish called at time : 69305 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/8s_pht256_tb.sv" Line 34
+
+--- 7s_pht512 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_7stage_top PHT=512 ===
+  Cycles:         5440
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.85
+  Mispredict%:    50.75%
+$finish called at time : 65295 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/7s_pht512_tb.sv" Line 34
+
+--- 8s_pht512 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_8stage_top PHT=512 ===
+  Cycles:         5840
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.99
+  Mispredict%:    50.75%
+$finish called at time : 69305 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/8s_pht512_tb.sv" Line 34
+
+--- 7s_pht1024 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_7stage_top PHT=1024 ===
+  Cycles:         5440
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.85
+  Mispredict%:    50.75%
+$finish called at time : 65295 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/7s_pht1024_tb.sv" Line 34
+
+--- 8s_pht1024 ---
+Time resolution is 1 ps
+=== rv32i_pipeline_8stage_top PHT=1024 ===
+  Cycles:         5840
+  Instructions:   2926
+  Branches:       400
+  Mispredictions: 203
+  Dhrystones:     100
+  CPI:            1.99
+  Mispredict%:    50.75%
+$finish called at time : 69305 ns : File "D:/RISCV-Vivado/vivado_fill_gaps/8s_pht1024_tb.sv" Line 34
+
+
+=== SAIF POWER ANALYSIS (4s, 8s) ===
+  --- saif_4s (rv32i_pipeline_4stage_top) ---
+  | Total On-Chip Power (W)  | 0.304        |
+  | Dynamic (W)              | 0.235        |
+  | Device Static (W)        | 0.069        |
+  | Clocks                   |     0.068 |        3 |       --- |             --- |
+  | Slice Logic              |     0.057 |    18075 |       --- |             --- |
+  |   LUT as Logic           |     0.046 |     6158 |     20800 |           29.61 |
+  | Signals                  |     0.093 |    13098 |       --- |             --- |
+  | DSPs                     |     0.017 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+
+  --- saif_8s (rv32i_pipeline_8stage_top) ---
+  | Total On-Chip Power (W)  | 0.317        |
+  | Dynamic (W)              | 0.248        |
+  | Device Static (W)        | 0.069        |
+  | Clocks                   |     0.074 |        3 |       --- |             --- |
+  | Slice Logic              |     0.058 |    19420 |       --- |             --- |
+  |   LUT as Logic           |     0.047 |     6745 |     20800 |           32.43 |
+  | Signals                  |     0.098 |    14303 |       --- |             --- |
+  | DSPs                     |     0.017 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+

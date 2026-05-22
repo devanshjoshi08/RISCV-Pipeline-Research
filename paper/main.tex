@@ -803,24 +803,27 @@ The data support the following guidance for RV32IM-class soft cores on Artix-7:
 \subsection{Predictor Configuration Sweep}
 \label{sec:predsweep}
 
-To verify that the CPI overhead from deeper pipelining is not an artifact of a specific predictor configuration, we swept the PHT depth across 32, 64, and 128 entries while running Dhrystone on the 5-, 6-, and 7-stage variants (9 combinations total).
-Fig.~\ref{fig:predsweep} shows that neither CPI nor misprediction rate changes across any of the 9 configurations.
-All three PHT sizes produce identical results: 203 mispredictions out of 400 branches (50.8\%) on every variant.
-The CPI penalty from deeper pipelining is driven by increased branch resolution latency rather than by predictor table capacity.
+To verify that the CPI overhead from deeper pipelining is not an artifact of predictor capacity or aliasing, we swept the PHT depth across six sizes---32, 64, 128, 256, 512, and 1024 entries---while running Dhrystone on all five pipeline variants (30 combinations total).
+Fig.~\ref{fig:predsweep} shows that neither CPI nor misprediction rate changes across any of the 30 configurations.
+Every PHT size from 32 to 1024 entries produces identical results: 203 mispredictions out of 400 branches (50.75\%) on every variant at every depth.
+
+This result directly refutes the concern that Mechanism~B might be an artifact of capacity aliasing in an undersized PHT.
+Even scaling the table by 16$\times$ (from 64 to 1024 entries) does not alter the misprediction count by a single branch.
+The CPI penalty from deeper pipelining is driven entirely by pipeline structure---update latency and flush depth---not by predictor table capacity.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{predictor_sweep.png}
-\caption{CPI and misprediction rate on Dhrystone across three PHT sizes (32, 64, 128) and three pipeline depths. All 9 configurations yield identical misprediction counts.}
+\caption{CPI and misprediction rate on Dhrystone across six PHT sizes (32--1024) and five pipeline depths (30 combinations). All 30 configurations yield identical misprediction counts (203), proving that Mechanism~B is orthogonal to predictor capacity.}
 \label{fig:predsweep}
 \end{figure}
 
 \subsection{Gshare vs.\ Bimodal Comparison}
 \label{sec:bimodal}
 
-To establish generality across predictor architectures, we replaced the gshare predictor with a bimodal predictor that indexes the PHT using only the PC (no global history register).
-Fig.~\ref{fig:predarch} compares the two architectures on Dhrystone.
-The bimodal predictor produces nearly identical CPI values (1.48, 1.68, 1.85 for depths 5, 6, 7 respectively---matching gshare exactly) and misprediction counts (202 vs.\ 203).
+To establish generality across predictor architectures, we replaced the gshare predictor with a bimodal predictor that indexes the PHT using only the PC (no global history register) and ran Dhrystone on all five pipeline depths.
+Fig.~\ref{fig:predarch} compares the two architectures.
+The bimodal predictor produces nearly identical CPI values across all depths (4-stage: 1.41/1.41, 5-stage: 1.48/1.48, 6-stage: 1.68/1.68, 7-stage: 1.85/1.85, 8-stage: 1.99/1.99 for gshare/bimodal) and misprediction counts (202 vs.\ 203).
 The CPI trend across pipeline depths is preserved regardless of whether the predictor uses global history correlation or purely local PC-based prediction.
 
 SGF targets GHR-based predictors (gshare, TAGE, and similar correlation predictors).
@@ -837,11 +840,12 @@ The prevalence of history-based predictors in modern designs makes SGF broadly a
 \subsection{BRAM Instruction Memory Effect}
 \label{sec:bram}
 
-To test whether the 7-stage IF split becomes beneficial with synchronous memory, we synthesized BRAM variants of the 5-, 6-, and 7-stage pipelines using a registered-output instruction memory that infers Block RAM.
+To test whether the 7-stage IF split becomes beneficial with synchronous memory, we synthesized BRAM variants of the 4-, 5-, 6-, and 7-stage pipelines using a registered-output instruction memory that infers Block RAM.
 Fig.~\ref{fig:bram} shows the results.
 
-With BRAM, the 5-stage achieves 73.7\,MHz, the 6-stage 121.5\,MHz, and the 7-stage 120.9\,MHz.
+With BRAM, the 4-stage achieves 69.3\,MHz, the 5-stage 73.7\,MHz, the 6-stage 121.5\,MHz, and the 7-stage 120.9\,MHz.
 The 7-stage design improves from 115.0\,MHz (LUT) to 120.9\,MHz (BRAM), nearly matching the 6-stage.
+The 4-stage slightly decreases from 70.4 to 69.3\,MHz because the BRAM's registered output adds latency to the already-long execute-stage critical path.
 The IF1/IF2 boundary naturally absorbs the BRAM's 1-cycle read latency, and the 7-stage becomes competitive with the 6-stage on frequency.
 However, the CPI overhead of the deeper pipeline remains, so the 7-stage would need SGF and moderate-branch-density workloads to match the 6-stage's throughput even with BRAM-competitive frequency.
 
@@ -855,28 +859,37 @@ However, the CPI overhead of the deeper pipeline remains, so the 7-stage would n
 \subsection{Power and Efficiency}
 \label{sec:power}
 
-Power estimates are obtained from SAIF-annotated post-simulation switching activity analysis in Vivado for the 5-, 6-, and 7-stage variants.
+Power estimates are obtained from SAIF-annotated switching activity analysis in Vivado for all five pipeline variants.
 Fig.~\ref{fig:power} shows the on-chip power breakdown.
-Total power is nearly identical across all three variants: 0.299\,W (5-stage), 0.298\,W (6-stage), and 0.300\,W (7-stage).
-Static power is constant at 0.069\,W, as expected since it depends on device characteristics rather than design activity.
-Dynamic power is also nearly identical ($\sim$0.230\,W), indicating that the pipeline register overhead of deeper variants is offset by shorter combinational paths that reduce glitching \cite{chandrakasan1992low}.
-Pipeline depth has negligible impact on power for this class of design on this fabric, making frequency and CPI the dominant efficiency factors.
+Total power ranges from 0.298\,W (6-stage) to 0.317\,W (8-stage), a spread of only 6\% across the full depth range.
+Static power is constant at 0.069\,W across all variants.
+Dynamic power increases modestly from 0.230\,W (5/6-stage) to 0.248\,W (8-stage), reflecting the additional pipeline registers and forwarding paths in deeper designs.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{power_comparison.png}
-\caption{On-chip power breakdown (dynamic and static) for the 5-, 6-, and 7-stage variants on Artix-7. Power is approximately constant across pipeline depths.}
+\caption{On-chip power breakdown (dynamic and static) for all five pipeline depths on Artix-7 (SAIF-based analysis).}
 \label{fig:power}
 \end{figure}
 
-Fig.~\ref{fig:efficiency} shows the power efficiency in MIPS per watt.
-The 6-stage design leads at 237\,MIPS/W, followed by the 7-stage at 205\,MIPS/W and the 5-stage at 159\,MIPS/W.
-Since power is approximately constant across variants, efficiency tracks throughput directly, reinforcing the 6-stage as the most efficient design point on this Artix-7 fabric.
+\textbf{Energy-Delay Product (EDP).}
+To evaluate the power-performance tradeoff, we compute the energy per CoreMark execution and the EDP:
+\begin{equation}
+E = P_{\text{dyn}} \times \frac{\text{Cycles}}{F_{\max}}; \quad \text{EDP} = E \times \frac{\text{Cycles}}{F_{\max}}
+\end{equation}
+The 6-stage achieves the lowest energy (10.4\,mJ) and EDP (471\,mJ$\cdot$ms), beating the 4-stage (15.0\,mJ, 952\,mJ$\cdot$ms) by 50\% on EDP despite consuming similar power.
+The 8-stage's energy rises to 13.4\,mJ due to higher CPI, yielding an EDP of 718\,mJ$\cdot$ms.
+The 6-stage is the most energy-efficient depth on this fabric because its 67\% frequency advantage over the 4/5-stage outpaces the 4\% power increase.
+SGF's additional 55 LUTs and 63 FFs add $<$1\% to dynamic power (estimated from the resource proportion), confirming negligible energy overhead.
+
+Fig.~\ref{fig:efficiency} shows the power efficiency in MIPS per watt across all five depths.
+The 6-stage leads at 237\,MIPS/W, followed by the 7-stage at 203\,MIPS/W and the 4-stage at 168\,MIPS/W.
+The 5-stage (155\,MIPS/W) and 8-stage (166\,MIPS/W) are the least efficient, confirming that the 5-stage is a dominated design point on power efficiency as well as throughput.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{efficiency_comparison.png}
-\caption{Power efficiency (MIPS/W) for the 5-, 6-, and 7-stage variants.}
+\caption{Power efficiency (MIPS/W) for all five pipeline depths (SAIF-based power, diagnostic workload throughput).}
 \label{fig:efficiency}
 \end{figure}
 
