@@ -838,12 +838,11 @@ The prevalence of history-based predictors in modern designs makes SGF broadly a
 \subsection{BRAM Instruction Memory Effect}
 \label{sec:bram}
 
-To test whether the 7-stage IF split becomes beneficial with synchronous memory, we synthesized BRAM variants of the 4-, 5-, 6-, and 7-stage pipelines using a registered-output instruction memory that infers Block RAM.
-The 8-stage BRAM variant failed to route in Vivado due to congestion from the combined MEM1/MEM2 split and BRAM read-port timing; this routing failure is itself informative, as it indicates that the 8-stage memory split creates placement pressure that the Artix-7 fabric cannot resolve with BRAM-based instruction memory.
-Fig.~\ref{fig:bram} shows the results for the four variants that completed successfully.
+To test whether the 7-stage IF split becomes beneficial with synchronous memory, we synthesized BRAM variants of all five pipelines using a registered-output instruction memory that infers Block RAM.
+Fig.~\ref{fig:bram} shows the results.
 
-With BRAM, the 4-stage achieves 69.3\,MHz, the 5-stage 73.7\,MHz, the 6-stage 121.5\,MHz, and the 7-stage 120.9\,MHz.
-The 7-stage design improves from 115.0\,MHz (LUT) to 120.9\,MHz (BRAM), nearly matching the 6-stage.
+With BRAM, the 4-stage achieves 69.3\,MHz, the 5-stage 73.7\,MHz, the 6-stage 121.5\,MHz, the 7-stage 120.9\,MHz, and the 8-stage 121.2\,MHz.
+The 7- and 8-stage designs both improve under BRAM (from 115.0 and 117.5\,MHz to 120.9 and 121.2\,MHz respectively), nearly matching the 6-stage.
 The 4-stage slightly decreases from 70.4 to 69.3\,MHz because the BRAM's registered output adds latency to the already-long execute-stage critical path.
 The IF1/IF2 boundary naturally absorbs the BRAM's 1-cycle read latency, and the 7-stage becomes competitive with the 6-stage on frequency.
 However, the CPI overhead of the deeper pipeline remains, so the 7-stage would need SGF and moderate-branch-density workloads to match the 6-stage's throughput even with BRAM-competitive frequency.
