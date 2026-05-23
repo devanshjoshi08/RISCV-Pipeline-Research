@@ -98,27 +98,14 @@ DSP48E1 blocks provide registered multiply-accumulate; Block RAM offers single-c
 
 \subsection{Related RISC-V Soft Cores}
 
-Table~\ref{tab:prior} summarizes the experimental scope of prior RISC-V FPGA implementations.
-SERV \cite{serv2019} uses bit-serial execution (one stage, $\sim$300\,MHz on Artix-7).
-PicoRV32 \cite{picorv32} uses multi-cycle execution without pipelining ($\sim$250\,MHz).
-VexRiscv \cite{vexriscv} offers a highly configurable pipeline with optional branch prediction, caches, and MMU, but its pipeline depth cannot be varied independently of other features.
-Ibex \cite{schiavone2017slow} is a 2-stage design targeting ultra-low power.
-CVA6 \cite{zaruba2019ariane} implements RV64GC with a 6-stage pipeline and out-of-order commit.
-SweRV EH1 \cite{swerv2019} is a commercial-grade 2-wide superscalar.
-None of these projects provides a controlled comparison across pipeline depths with invariant predictor, MDU, and memory hardware.
+Prior RISC-V FPGA implementations vary widely in scope. SERV \cite{serv2019} (bit-serial, $\sim$300\,MHz) and PicoRV32 \cite{picorv32} (multi-cycle, $\sim$250\,MHz) avoid pipelining; VexRiscv \cite{vexriscv} is configurable but cannot vary depth independently of other features; Ibex \cite{schiavone2017slow} is a 2-stage low-power core; CVA6 \cite{zaruba2019ariane} is RV64GC with out-of-order commit; SweRV EH1 \cite{swerv2019} is a 2-wide superscalar. None provides a controlled comparison across pipeline depths with invariant predictor, MDU, and memory hardware, or a stale-GHR fix.
 
 \subsection{Speculative History in ASIC Processors}
 
-Speculative GHR updating is a long-established technique: Yeh and Patt \cite{yeh1991two} already describe speculative history in their two-level adaptive predictor, and it is standard in ASIC out-of-order processors.
-The Alpha~21264 \cite{kessler1999alpha} and MIPS~R10000 \cite{yeager1996mips} use the ROB and a dedicated branch stack respectively for checkpoint storage.
-Crucially, these structures are not separable from the out-of-order core: the R10000's branch stack checkpoints the register-rename map and the Alpha's recovery is driven by ROB squashing, so neither can be ``trimmed down'' to a few entries and dropped into an in-order soft core---what they checkpoint is the rename/ROB state, not merely the GHR.
-Michaud et al.\ \cite{michaud1999trading} showed that update latency compounds with PHT aliasing in large predictors.
-Seznec's TAGE \cite{seznec2011tage} and perceptron-based designs \cite{seznec2006revisiting} incorporate speculative updates but rely on the ROB for rollback.
-In tagged predictors like TAGE, stale GHR causes both index aliasing and tag mismatches---a qualitatively different error profile than in gshare, and extending speculative history to TAGE requires per-table checkpoint arrays.
-
-On FPGA, the absence of a ROB means in-order pipelines have no centralized checkpoint structure.
-SGF addresses this by forwarding GHR checkpoints through existing pipeline registers, requiring no new storage beyond the checkpoint bits piggybacked on each stage.
-Our contribution is therefore an engineering realization and measurement study, not a new prediction algorithm: we show that the speculative-history technique transfers to in-order FPGA soft cores at near-zero cost, and we quantify the effect it corrects under controlled conditions.
+Speculative GHR updating is long established---Yeh and Patt \cite{yeh1991two} describe it in their two-level predictor, and it is standard in out-of-order ASICs (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}).
+Crucially, those recovery structures are inseparable from the out-of-order core: the R10000's branch stack checkpoints the register-rename map and the Alpha's recovery rides ROB squashing, so neither can be trimmed down and dropped into an in-order soft core.
+TAGE \cite{seznec2011tage} and perceptron \cite{seznec2006revisiting} predictors likewise rely on the ROB for rollback, and in tagged predictors stale GHR corrupts both index and tag---a different error profile than gshare---needing per-table checkpoints; Michaud et al.\ \cite{michaud1999trading} note that update latency compounds with PHT aliasing.
+On FPGA, with no ROB, in-order pipelines have no centralized checkpoint structure; SGF instead forwards GHR checkpoints through existing pipeline registers, so our contribution is an engineering realization and measurement study, not a new prediction algorithm.
 
 \subsection{FPGA Pipeline Studies}
 
@@ -126,31 +113,7 @@ Prior surveys have cataloged pipelining techniques across RISC families \cite{bi
 However, neither isolates pipeline depth as a controlled variable on FPGA, and neither addresses the stale-GHR effect.
 The FPGA-specific study of Kuon and Rose \cite{kuon2007measuring} characterizes the LUT-routing delay gap that makes FPGA pipelining fundamentally different from ASIC pipelining, but does not examine branch-prediction interactions.
 
-\begin{table*}[t]
-\centering
-\caption{Comparison of experimental scope with prior RISC-V FPGA implementations. \checkmark\ = feature is varied or present as an independent variable; \texttimes\ = fixed or absent.}
-\label{tab:prior}
-\small
-\begin{tabular}{@{}lccccccc@{}}
-\toprule
- & \rotatebox{70}{Pipeline depth} & \rotatebox{70}{Predictor} & \rotatebox{70}{ISA subset} & \rotatebox{70}{Memory type} & \rotatebox{70}{Forwarding} & \rotatebox{70}{Controlled} & \rotatebox{70}{Stale-GHR fix} \\
-\midrule
-SERV \cite{serv2019}         & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes \\
-PicoRV32 \cite{picorv32}     & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes \\
-VexRiscv \cite{vexriscv}     & \checkmark & \checkmark & \checkmark & \texttimes & \checkmark & \texttimes & \texttimes \\
-Ibex \cite{schiavone2017slow}& \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes \\
-CVA6 \cite{zaruba2019ariane} & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes \\
-SweRV \cite{swerv2019}       & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes \\
-Rocket \cite{asanovic2016rocket} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \texttimes & \texttimes \\
-\textbf{This work}           & \checkmark & \texttimes & \texttimes & \checkmark & \texttimes & \checkmark & \checkmark \\
-\bottomrule
-\end{tabular}
-\vspace{2pt}
-
-\footnotesize{``Controlled'' indicates whether the project varies pipeline depth as the single controlled design parameter with all functional-unit RTL held constant (each split's structural side effects made explicit and decomposed, not claimed away)---a property relevant only to the depth question studied here, not a judgment of these cores, which target different goals (e.g., minimal area or maximum frequency) and simply do not address depth isolation. ``Stale-GHR fix'' = mechanism to correct depth-dependent GHR staleness.}
-\end{table*}
-
-The gap is twofold: no controlled experiment varies \emph{only} pipeline depth on a single FPGA device, and no lightweight mechanism corrects the stale-GHR degradation such an experiment reveals.
+The gap is twofold: no controlled experiment varies pipeline depth as the single controlled design parameter on a single FPGA device (holding functional-unit RTL constant and decomposing each split's side effects rather than claiming them away), and no lightweight mechanism corrects the stale-GHR degradation such an experiment reveals.
 
 % ====================================================================
 \section{Experimental Setup}
@@ -453,29 +416,14 @@ The fitted values are $\alpha = 0.145$ and $\beta = 1.12$.
 
 This model achieves $R^2 = 0.977$ across all 35 data points (adjusted $R^2_{\text{adj}} = 0.969$, accounting for the 9 fitted parameters; mean absolute error 0.033\,CPI, maximum residual 0.086\,CPI), capturing 97.7\% of the variance compared to 67\% for a simple linear regression.
 
-\textbf{4-stage MEM/WB asymmetry.}
-The 4-stage design merges memory access and write-back into a single MEM/WB stage, eliminating load-use stalls but lengthening the combinational critical path.
-In the model, the 4-stage enters the load-use term with $L(D) = 0$ (no stall cycles), which correctly captures the load-use elimination.
-The critical-path lengthening is a \emph{frequency} effect (reflected in $F_{\max}$) rather than a CPI effect, so it does not require a separate CPI model term.
-The 4-stage's $\gamma_w$ values are fitted jointly with the other depths; the model residual on the 4-stage is $\leq$0.04\,CPI across all workloads, confirming that the MEM/WB asymmetry does not introduce unmodeled CPI variance.
-Fig.~\ref{fig:cpi_vs_depth} compares measured and predicted CPI.
-The model's decomposability is its primary value: the branch-flush term uses measured misprediction counts that incorporate both Mechanism~A and Mechanism~B, the load-use term ($\alpha = 0.145$) quantifies the average CPI cost per load-use stall cycle, and the IF2 bubble term ($\beta = 1.12$) quantifies the CPI cost of the two-stage fetch split scaled by branch frequency.
-The per-workload base $\gamma_w$ ranges from $-0.01$ (aha-mont64, multiply-dominated) to $0.48$ (edn, load-heavy), reflecting instruction-mix effects orthogonal to pipeline depth.
-Because $\gamma_w$ tracks the static instruction mix in this way, it could in principle be estimated from easily profiled statistics---load fraction and MDU-instruction fraction---rather than a full timing simulation; we leave such a predictive $\gamma_w$ estimator to future work and note that the model's value here is the \emph{depth-dependent} decomposition, for which $\gamma_w$ is only a per-workload offset.
+The model's value is its decomposability: the branch-flush term carries measured (Mechanism A+B) misprediction counts, $\alpha = 0.145$ is the CPI cost per load-use stall cycle, and $\beta = 1.12$ scales the IF2-bubble cost by branch frequency.
+The per-workload base $\gamma_w$ ranges from $-0.01$ (multiply-dominated aha-mont64) to $0.48$ (load-heavy edn), capturing instruction-mix effects orthogonal to depth.
+The 4-stage merges MEM/WB, eliminating load-use stalls (it enters the model with $L(D)=0$) at the cost of a longer critical path; that lengthening is a \emph{frequency} effect (in $F_{\max}$), not a CPI term, and the 4-stage residual stays $\leq$0.04\,CPI.
 
-\textbf{Leave-one-out cross-validation.}
-To verify that the model generalizes beyond its training data rather than merely absorbing residual variance through the per-workload $\gamma_w$ terms, we perform leave-one-workload-out (LOWO) cross-validation.
-In each fold, one workload's five data points are held out, the model is re-fitted on the remaining 30 points (re-estimating $\alpha$, $\beta$, and six $\gamma_w$ values), and the held-out workload's CPI is predicted using only the depth-dependent structural terms ($M_w(D)/N_w \cdot P(D)$, $L(D)$, $B(D) \cdot f_b$) with $\gamma_w$ set to the mean of the fitted $\gamma_w$ values from the training set.
-The cross-validated $R^2_{\text{CV}}$ is 0.941 (mean absolute error 0.052\,CPI, maximum residual 0.14\,CPI), confirming that the model's predictive power does not depend critically on workload-specific fitting.
-The largest prediction errors occur on edn (load-heavy, high $\gamma_w$) and the Diagnostic workload (high branch frequency, sensitive to the $\beta$ term), both of which have instruction-mix characteristics at the extremes of the training distribution.
-The shared parameters $\alpha$ and $\beta$ are stable across folds ($\alpha = 0.14 \pm 0.01$, $\beta = 1.10 \pm 0.05$), confirming that the depth-dependent structural terms are robust.
-We are therefore precise about the model's status: it is \emph{predictive} for its depth-dependent structural terms (validated out-of-sample by LOWO) and \emph{descriptive} for the per-workload base $\gamma_w$, which remains a fitted offset rather than a quantity derived from first principles---the depth decomposition, not absolute cross-workload CPI prediction, is what we claim.
-
-\textbf{Residual analysis.}
-The residuals (measured $-$ predicted CPI) have mean 0.000 and standard deviation 0.038\,CPI, with no systematic pattern across pipeline depth or workload.
-The largest positive residual (+0.086\,CPI) occurs on 6-stage CoreMark, where Mechanism~B's misprediction inflation is strongest---consistent with the model using a smooth $M_w(D)$ function that slightly under-captures the nonlinear misprediction jump at depth~6.
-The largest negative residual ($-$0.073\,CPI) occurs on 5-stage Diagnostic, where the load-use stall cost may be partially absorbed by the branch-flush term due to correlated hazard patterns.
-No residual exceeds 0.09\,CPI (5\% of typical measured CPI), and the residuals show no heteroscedasticity with depth.
+\textbf{Cross-validation and status.}
+Leave-one-workload-out (LOWO) cross-validation---refitting on 30 points per fold and predicting the held-out workload from the depth-dependent terms with $\gamma_w$ set to the training mean---gives $R^2_{\text{CV}} = 0.941$ (MAE 0.052\,CPI), with $\alpha$ and $\beta$ stable across folds ($0.14 \pm 0.01$, $1.10 \pm 0.05$); the largest errors fall on edn and Diagnostic, at the extremes of the instruction-mix distribution.
+The model is thus \emph{predictive} for its depth-dependent terms (validated out-of-sample) and \emph{descriptive} for the fitted per-workload $\gamma_w$---the depth decomposition, not absolute cross-workload CPI prediction, is what we claim.
+Residuals have mean 0 and standard deviation 0.038\,CPI with no depth pattern; the largest ($+$0.086 on 6-stage CoreMark) reflects the smooth $M_w(D)$ slightly under-capturing the depth-6 misprediction jump.
 
 \begin{figure}[t]
 \centering
@@ -484,32 +432,8 @@ No residual exceeds 0.09\,CPI (5\% of typical measured CPI), and the residuals s
 \label{fig:cpi_vs_depth}
 \end{figure}
 
-Table~\ref{tab:ablation} decomposes the CoreMark CPI at each depth into its constituent terms, isolating each architectural cost.
-The branch-flush term grows with depth (Mechanism~A).
-The load-use term appears at depth~5 and increases at depth~8.
-The IF2 bubble appears at depth~7.
-Mechanism~B (the correctable component) is visible as the misprediction-count increase at depth~6.
-
-\begin{table*}[t]
-\centering
-\caption{CPI ablation for CoreMark: decomposition into architectural cost components at each pipeline depth. Each row shows one term of Eq.~\ref{eq:cpi_model}. The sum matches measured CPI within the model's residual ($\leq$0.09).}
-\label{tab:ablation}
-\small
-\begin{tabular}{@{}lccccc@{}}
-\toprule
-\textbf{CPI Component} & \textbf{4-stg} & \textbf{5-stg} & \textbf{6-stg} & \textbf{7-stg} & \textbf{8-stg} \\
-\midrule
-Ideal throughput                    & 1.00  & 1.00  & 1.00  & 1.00  & 1.00 \\
-Branch flush ($M \cdot P / N$)     & 0.10  & 0.10  & 0.16  & 0.20  & 0.20 \\
-Load-use stall ($\alpha \cdot L$)  & 0.00  & 0.15  & 0.15  & 0.15  & 0.22 \\
-IF2 bubble ($\beta \cdot B \cdot f_b$) & 0.00 & 0.00 & 0.00 & 0.28 & 0.28 \\
-Workload base ($\gamma_w$, depth-invariant) & \multicolumn{5}{c}{0.45} \\
-\midrule
-\textbf{Model prediction}          & \textbf{1.55} & \textbf{1.70} & \textbf{1.76} & \textbf{2.08} & \textbf{2.15} \\
-\textbf{Measured CPI}              & \textbf{1.54} & \textbf{1.63} & \textbf{1.83} & \textbf{2.02} & \textbf{2.18} \\
-\bottomrule
-\end{tabular}
-\end{table*}
+Decomposing CoreMark CPI into the four additive terms of Eq.~\ref{eq:cpi_model} isolates each architectural cost on top of the ideal 1.00: a depth-invariant base ($\gamma_w = 0.45$); a branch-flush term that grows with depth (0.10 at 4/5-stage to 0.16 at 6-stage and 0.20 at 7/8-stage, Mechanism~A, including the Mechanism~B count rise at depth~6); a load-use term (0 at 4-stage, 0.15 at 5/6/7-stage, 0.22 at 8-stage); and an IF2-bubble term (0.28, only at 7/8-stage).
+Summed, these predict measured CPI within the model residual ($\leq$0.09) at every depth, as Fig.~\ref{fig:cpi_vs_depth} shows across all 35 points.
 
 \subsection{Throughput}
 \label{sec:throughput}
@@ -763,29 +687,7 @@ The IF2 prediction bubble---where IF1's speculative sequential fetch is discarde
 \textbf{Measured NLP-augmented variant.}
 To measure how much of this bubble cost is actually recoverable, we implemented a next-line predictor (NLP): a tagged 64-entry next-fetch table, looked up with the IF1 PC and trained as a shadow of the IF2 gshare/BTB taken prediction.
 When the NLP correctly anticipates a taken branch the redirect occurs in IF1 and the bubble is avoided; an incorrect NLP redirect is detected in IF2 and corrected before the wrong-path instruction can reach execute.
-The NLP modifies no gshare/GHR/BTB/RAS state, so it is purely a fetch-timing optimization---confirmed by the architectural invariants in Table~\ref{tab:nlp}, where the NLP variant executes \emph{identical} instruction and branch counts to the baseline (2{,}893{,}145 instructions / 719{,}810 branches on CoreMark).
-
-\begin{table}[t]
-\centering
-\caption{Measured effect of a tagged 64-entry next-line predictor (NLP) on the 7-stage pipeline (Vivado XSim). Instruction and branch counts are bit-identical to the baseline, confirming the NLP is performance-only.}
-\label{tab:nlp}
-\small
-\begin{tabular}{@{}llcc@{}}
-\toprule
-\textbf{Workload} & \textbf{Metric} & \textbf{7-stg} & \textbf{7-stg + NLP} \\
-\midrule
-\multirow{3}{*}{CoreMark}
- & Cycles         & 5{,}856{,}929 & 5{,}709{,}411 \\
- & Mispredictions & 147{,}760     & 151{,}987 \\
- & CPI            & 2.02          & 1.97 \\
-\midrule
-\multirow{3}{*}{statemate}
- & Cycles         & 4{,}742{,}011 & 4{,}505{,}592 \\
- & Mispredictions & 73{,}263      & 69{,}934 \\
- & CPI            & 1.50          & 1.43 \\
-\bottomrule
-\end{tabular}
-\end{table}
+The NLP modifies no gshare/GHR/BTB/RAS state, so it is purely a fetch-timing optimization---confirmed by identical instruction and branch counts to the baseline (2{,}893{,}145 / 719{,}810 on CoreMark).
 
 The measured benefit is real but smaller than the idealized projection: the NLP lowers 7-stage CoreMark CPI 2.02$\to$1.97 and statemate 1.50$\to$1.43 (0.05--0.07\,CPI), against the $\sim$0.28\,CPI that complete bubble elimination would remove.
 Two effects explain the gap: a 64-entry table avoids the bubble only on stable loop back-edges (CoreMark's branch working set exceeds it), and advancing the redirect into IF1 perturbs GHR staleness, slightly raising CoreMark mispredictions (147{,}760$\to$151{,}987) while lowering statemate's (73{,}263$\to$69{,}934).
@@ -817,13 +719,11 @@ Three points bear on how the results should be read.
 \subsection{Design Guidance for Practitioners}
 \label{sec:guidance}
 
-The data support the following guidance for RV32IM-class soft cores on Artix-7:
-\begin{itemize}
-\item The 6-stage pipeline is the highest-throughput depth in this configuration on this fabric. It captures the full frequency benefit of the execute-stage split while paying a moderate CPI penalty (64.1\,MIPS on CoreMark, 1.88 CoreMark/MHz).
-\item The classic 5-stage RISC pipeline is a dominated design point on this fabric: it shares the 4-stage's frequency limitation while adding load-use stalls. Unless area is the binding constraint, the 5-stage offers no advantage. This dominance is conditional on the \texttt{-O1} workload mix measured here: higher optimization levels (loop unrolling, load scheduling) shift branch and load-use frequencies and could narrow or change the comparison.
-\item The 7/8-stage designs match the 6-stage on frequency but pay progressively higher CPI costs. With SGF, the Mechanism~B component is eliminated, but Mechanism~A and IF2 bubble costs remain. These designs are justified when the IF split addresses a genuine timing bottleneck (e.g., synchronous BRAM instruction memory).
-\item On branch-dense workloads, designers should implement SGF in any pipeline with 3 or more stages of predictor update latency---including the recommended 6-stage, where it cuts CoreMark mispredictions 23.9\% (Section~\ref{sec:sgf_6stage}). The 0.5--0.7\% area cost is negligible relative to the 17--31\% misprediction reduction.
-\end{itemize}
+For RV32IM-class soft cores on Artix-7, the data support four guidelines.
+The 6-stage is the highest-throughput depth here (64.1\,MIPS CoreMark): it captures the full execute-split frequency benefit at a moderate CPI penalty.
+The 5-stage is dominated---it shares the 4-stage's frequency ceiling while adding load-use stalls---so it offers no advantage unless area is binding (a conclusion conditional on the \texttt{-O1} mix, since higher optimization shifts branch and load-use frequencies).
+The 7/8-stage match the 6-stage on frequency but pay higher CPI; they are justified only when the IF split resolves a genuine timing bottleneck (e.g., synchronous BRAM instruction memory).
+Finally, SGF is worth adding to any pipeline with $\geq$3 stages of update latency---including the 6-stage ($-$23.9\% CoreMark mispredictions)---its 0.5--0.7\% area cost negligible against a 17--31\% misprediction reduction.
 
 % ====================================================================
 \section{Causal Isolation and Additional Analyses}
