@@ -146,9 +146,7 @@ module rv32i_pipeline_7stage_bram_top (
                         mem_mem_write || mem_mem_read ||
                         mem_jal || mem_jalr;
 
-    // =========================================================================
     // IF1: PC generation + icache read (single icache, combinational output)
-    // =========================================================================
 
     assign if1_pc_plus4 = if1_pc + 32'd4;
 
@@ -207,9 +205,7 @@ module rv32i_pipeline_7stage_bram_top (
 
     assign debug_pc = if1_pc;
 
-    // =========================================================================
     // IF1/IF2: registers PC + instruction from icache
-    // =========================================================================
 
     // Merge flushes: hazard unit flush OR IF2 prediction redirect
     logic if1_if2_flush;
@@ -228,9 +224,7 @@ module rv32i_pipeline_7stage_bram_top (
         .instr_out   (if2_instr)
     );
 
-    // =========================================================================
     // IF2: branch prediction (uses registered PC from IF1)
-    // =========================================================================
 
     btb_type_t bp_update_type;
     always_comb begin
@@ -260,9 +254,7 @@ module rv32i_pipeline_7stage_bram_top (
 
     assign debug_instr = id_instr;
 
-    // =========================================================================
     // IF2/ID (reuses pipe_if_id — carries instruction from IF2)
-    // =========================================================================
 
     pipe_if_id u_if2_id (
         .clk               (clk),
@@ -279,9 +271,7 @@ module rv32i_pipeline_7stage_bram_top (
         .predict_taken_out (id_predict_taken)
     );
 
-    // =========================================================================
     // ID
-    // =========================================================================
 
     assign id_opcode  = id_instr[6:0];
     assign id_rd      = id_instr[11:7];
@@ -316,9 +306,7 @@ module rv32i_pipeline_7stage_bram_top (
     assign id_is_ret  = id_jalr && (id_rs1 == 5'd1 || id_rs1 == 5'd5) && (id_rd != id_rs1);
     assign id_ras_push = id_is_call;
 
-    // =========================================================================
     // ID/EX1
-    // =========================================================================
 
     pipe_id_ex u_id_ex1 (
         .clk(clk), .rst_n(rst_n), .flush(id_ex1_flush), .stall(id_ex1_stall || bram_stall),
@@ -352,9 +340,7 @@ module rv32i_pipeline_7stage_bram_top (
         .ras_ptr_out(ex1_ras_ptr)
     );
 
-    // =========================================================================
     // EX1: forwarding + operand select (identical to 6-stage)
-    // =========================================================================
 
     logic [31:0] ex2_fwd_result;
     always_comb begin
@@ -416,9 +402,7 @@ module rv32i_pipeline_7stage_bram_top (
     assign ex1_alu_b = (ex1_alu_src) ? ex1_imm : ex1_fwd_rs2;
     assign ex1_csr_wdata = ex1_csr_zimm ? {27'b0, ex1_rs1_addr} : ex1_fwd_rs1;
 
-    // =========================================================================
     // EX1/EX2
-    // =========================================================================
 
     logic mdu_stall;
     assign mdu_stall = ex2_is_mext && !mdu_valid;
@@ -457,9 +441,7 @@ module rv32i_pipeline_7stage_bram_top (
         .ras_ptr_out(ex2_ras_ptr)
     );
 
-    // =========================================================================
     // EX2: ALU + branch + CSR + MDU (identical to 6-stage)
-    // =========================================================================
 
     alu u_alu (
         .a(ex2_alu_a), .b(ex2_alu_b), .op(ex2_alu_op),
@@ -511,9 +493,7 @@ module rv32i_pipeline_7stage_bram_top (
     assign ex2_do_branch = ex2_branch & ex2_branch_taken;
     assign debug_alu_result = ex2_alu_result;
 
-    // =========================================================================
     // Hazard detection (7-stage: flushes 4 stages on mispredict)
-    // =========================================================================
 
     hazard_unit u_hazard (
         .ex2_mem_read  (ex2_mem_read),
@@ -537,9 +517,7 @@ module rv32i_pipeline_7stage_bram_top (
         .ex1_ex2_flush (ex1_ex2_flush)
     );
 
-    // =========================================================================
     // EX2/MEM
-    // =========================================================================
 
     logic ex2_suppress;
     assign ex2_suppress = ex2_trap || mdu_stall;
@@ -562,9 +540,7 @@ module rv32i_pipeline_7stage_bram_top (
         .is_csr_out(mem_is_csr), .csr_rdata_out(mem_csr_rdata)
     );
 
-    // =========================================================================
     // MEM
-    // =========================================================================
 
     dmem u_dmem (
         .clk(clk), .mem_read(mem_mem_read), .mem_write(mem_mem_write),
@@ -572,9 +548,7 @@ module rv32i_pipeline_7stage_bram_top (
         .write_data(mem_rs2_data), .read_data(mem_read_data)
     );
 
-    // =========================================================================
     // MEM/WB
-    // =========================================================================
 
     pipe_mem_wb u_mem_wb (
         .clk(clk), .rst_n(rst_n),
@@ -590,9 +564,7 @@ module rv32i_pipeline_7stage_bram_top (
         .is_csr_out(wb_is_csr), .csr_rdata_out(wb_csr_rdata)
     );
 
-    // =========================================================================
     // WB
-    // =========================================================================
 
     always_comb begin
         if (wb_jal || wb_jalr)   wb_rd_data = wb_pc_plus4;

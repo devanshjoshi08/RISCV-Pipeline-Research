@@ -29,7 +29,7 @@ diag_cpi = [1.38, 1.60, 1.66, 1.89, 2.11]       # Diagnostic
 cm_mips   = [f / c for f, c in zip(fmax, cm_cpi)]
 diag_mips = [f / c for f, c in zip(fmax, diag_cpi)]
 
-# --- Throughput (CoreMark + Diagnostic) ---
+# Throughput (CoreMark + Diagnostic)
 x = np.arange(len(LABELS)); w = 0.38
 fig, ax = plt.subplots(figsize=(3.6, 2.8))
 b1 = ax.bar(x - w/2, cm_mips,   w, label="CoreMark",   color="#2196F3", edgecolor="black", linewidth=0.6)
@@ -51,7 +51,7 @@ fig.savefig(os.path.join(FIG_DIR, "throughput_comparison.png"))
 fig.savefig(os.path.join(FIG_DIR, "throughput_comparison.pdf"))
 plt.close(fig)
 
-# --- Published cores sanity check (ours = 10-seed Fmax) ---
+# Published cores sanity check (ours = 10-seed Fmax)
 cores = ["SERV", "PicoRV32", "VexRiscv", "Ibex", "CVA6",
          "4-stage (ours)", "5-stage (ours)", "6-stage (ours)",
          "7-stage (ours)", "8-stage (ours)"]

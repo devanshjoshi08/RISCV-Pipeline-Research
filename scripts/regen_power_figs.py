@@ -37,7 +37,7 @@ eff    = [m / p for m, p in zip(mips, total)]
 
 W, H = 3.5, 2.8
 
-# --- Power breakdown (stacked dynamic + static) ---
+# Power breakdown (stacked dynamic + static)
 fig, ax = plt.subplots(figsize=(W, H))
 b1 = ax.bar(LABELS, dynamic, color="tab:red", edgecolor="black", linewidth=0.6,
             label="Dynamic", width=0.6)
@@ -58,7 +58,7 @@ fig.savefig(os.path.join(FIG_DIR, "power_comparison.png"))
 fig.savefig(os.path.join(FIG_DIR, "power_comparison.pdf"))
 plt.close(fig)
 
-# --- Efficiency (MIPS/W) ---
+# Efficiency (MIPS/W)
 fig, ax = plt.subplots(figsize=(W, H))
 bars = ax.bar(LABELS, eff, color=COLORS, edgecolor="black", linewidth=0.6, width=0.6)
 for bar in bars:

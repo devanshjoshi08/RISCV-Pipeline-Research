@@ -105,9 +105,7 @@ module rv32i_pipeline_4stage_top (
                        mw_mem_write || mw_mem_read ||
                        mw_jal || mw_jalr;
 
-    // =========================================================================
     // IF
-    // =========================================================================
 
     assign if_pc_plus4 = if_pc + 32'd4;
 
@@ -186,9 +184,7 @@ module rv32i_pipeline_4stage_top (
     assign debug_pc    = if_pc;
     assign debug_instr = id_instr;
 
-    // =========================================================================
     // IF/ID
-    // =========================================================================
 
     pipe_if_id u_if_id (
         .clk               (clk),
@@ -205,9 +201,7 @@ module rv32i_pipeline_4stage_top (
         .predict_taken_out (id_predict_taken)
     );
 
-    // =========================================================================
     // ID
-    // =========================================================================
 
     assign id_opcode  = id_instr[6:0];
     assign id_rd      = id_instr[11:7];
@@ -243,9 +237,7 @@ module rv32i_pipeline_4stage_top (
     assign id_is_ret  = id_jalr && (id_rs1 == 5'd1 || id_rs1 == 5'd5) && (id_rd != id_rs1);
     assign id_ras_push = id_is_call;
 
-    // =========================================================================
     // ID/EX
-    // =========================================================================
 
     pipe_id_ex u_id_ex (
         .clk(clk), .rst_n(rst_n), .flush(id_ex_flush), .stall(id_ex_stall),
@@ -279,9 +271,7 @@ module rv32i_pipeline_4stage_top (
         .ras_ptr_out(ex_ras_ptr)
     );
 
-    // =========================================================================
     // EX: forwarding + ALU + branch + CSR + MDU (merged single stage)
-    // =========================================================================
 
     // MW result for forwarding (combinational, includes dmem read for loads)
     logic [31:0] mw_fwd_result;
@@ -387,9 +377,7 @@ module rv32i_pipeline_4stage_top (
     assign ex_do_branch = ex_branch & ex_branch_taken;
     assign debug_alu_result = ex_alu_result;
 
-    // =========================================================================
     // Hazard detection (2-stage flush on branch, no load-use stall)
-    // =========================================================================
 
     hazard_unit u_hazard (
         .ex_rs1_addr   (ex_rs1_addr),
@@ -407,9 +395,7 @@ module rv32i_pipeline_4stage_top (
         .id_ex_flush   (id_ex_flush)
     );
 
-    // =========================================================================
     // EX/MW (reuses pipe_ex_mem to carry signals into merged MEM/WB stage)
-    // =========================================================================
 
     logic ex_suppress;
     assign ex_suppress = ex_trap || mdu_stall;
@@ -432,9 +418,7 @@ module rv32i_pipeline_4stage_top (
         .is_csr_out(mw_is_csr), .csr_rdata_out(mw_csr_rdata)
     );
 
-    // =========================================================================
     // MW: merged memory access + writeback
-    // =========================================================================
 
     dmem u_dmem (
         .clk(clk), .mem_read(mw_mem_read), .mem_write(mw_mem_write),

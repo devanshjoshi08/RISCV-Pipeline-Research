@@ -30,9 +30,7 @@ puts $fd "============================================================"
 puts $fd ""
 close $fd
 
-# =====================================================================
 # Shared RTL files
-# =====================================================================
 set shared_rtl [list \
     "$rtl_dir/pkg_riscv.sv" "$rtl_dir/alu.sv" "$rtl_dir/mdu.sv" \
     "$rtl_dir/control.sv" "$rtl_dir/branch_unit.sv" "$rtl_dir/branch_predictor.sv" \
@@ -42,9 +40,7 @@ set shared_rtl [list \
     "$rtl_dir/pipe_mem_wb.sv" \
 ]
 
-# =====================================================================
 # Helper: synth + implement one variant, extract results
-# =====================================================================
 proc synth_variant {name work_dir top_module rtl_files} {
     global part clk_xdc log_file
 
@@ -137,31 +133,24 @@ proc synth_variant {name work_dir top_module rtl_files} {
     close_project -quiet
 }
 
-# =====================================================================
 # 5-STAGE
-# =====================================================================
 set rtl5 [concat $shared_rtl [glob "$project_dir/rtl_5stage/*.sv"]]
 synth_variant "synth_5stage" "$project_dir/vivado_synth/5stage" \
     "rv32i_pipeline_5stage_top" $rtl5
 
-# =====================================================================
 # 6-STAGE (baseline)
-# =====================================================================
 set rtl6 [concat $shared_rtl [list "$rtl_dir/pipe_ex1_ex2.sv" \
     "$rtl_dir/forwarding_unit.sv" "$rtl_dir/hazard_unit.sv" \
     "$rtl_dir/rv32i_pipeline_top.sv"]]
 synth_variant "synth_6stage" "$project_dir/vivado_synth/6stage" \
     "rv32i_pipeline_top" $rtl6
 
-# =====================================================================
 # 7-STAGE
-# =====================================================================
 set rtl7 [concat $shared_rtl [list "$rtl_dir/pipe_ex1_ex2.sv"] \
     [glob "$project_dir/rtl_7stage/*.sv"]]
 synth_variant "synth_7stage" "$project_dir/vivado_synth/7stage" \
     "rv32i_pipeline_7stage_top" $rtl7
 
-# =====================================================================
 puts "\n================================================================"
 puts "  ALL SYNTHESIS COMPLETE"
 puts "  Results saved to: $log_file"

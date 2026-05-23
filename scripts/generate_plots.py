@@ -12,18 +12,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# ---------------------------------------------------------------------------
 # Paths
-# ---------------------------------------------------------------------------
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIG_DIR = os.path.join(BASE, "paper", "figures")
 RESULTS_DIR = os.path.join(BASE, "results")
 os.makedirs(FIG_DIR, exist_ok=True)
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
-# ---------------------------------------------------------------------------
 # Synthesis Data
-# ---------------------------------------------------------------------------
 variants = ["5-stage", "6-stage", "7-stage"]
 colors = ["#4878CF", "#E8833A", "#6ACC65"]
 
@@ -36,9 +32,7 @@ synth = {
                 "Power_W": 0.300, "Dynamic_W": 0.231},
 }
 
-# ---------------------------------------------------------------------------
 # Benchmark Data (from simulation)
-# ---------------------------------------------------------------------------
 diag = {
     "5-stage": {"cycles": 2187, "instrs": 1367, "branches": 360, "mispred": 69},
     "6-stage": {"cycles": 2267, "instrs": 1367, "branches": 360, "mispred": 69},
@@ -133,9 +127,7 @@ with open(json_path, "w") as f:
     json.dump(all_data, f, indent=2)
 print(f"Saved JSON: {json_path}")
 
-# ---------------------------------------------------------------------------
 # Style - clean, modern publication look
-# ---------------------------------------------------------------------------
 IEEE_WIDTH = 3.5
 IEEE_HEIGHT = 2.8
 FONT_SIZE = 10
@@ -161,13 +153,11 @@ plt.rcParams.update({
     "legend.edgecolor": "0.8",
 })
 
-
 def save(fig, name):
     path = os.path.join(FIG_DIR, name)
     fig.savefig(path, bbox_inches="tight", dpi=300)
     plt.close(fig)
     print(f"Saved: {path}")
-
 
 def bar_labels(ax, bars, fmt="{:.1f}", offset=0.5, fs=None):
     if fs is None:
@@ -177,10 +167,7 @@ def bar_labels(ax, bars, fmt="{:.1f}", offset=0.5, fs=None):
         ax.text(bar.get_x() + bar.get_width() / 2, h + offset,
                 fmt.format(h), ha="center", va="bottom", fontsize=fs)
 
-
-# ===========================================================================
 # Fig 1: Fmax comparison
-# ===========================================================================
 fig, ax = plt.subplots(figsize=(IEEE_WIDTH, IEEE_HEIGHT))
 vals = [synth[v]["Fmax_MHz"] for v in variants]
 bars = ax.bar(variants, vals, color=colors, edgecolor="black", linewidth=0.6, width=0.55)
@@ -191,9 +178,7 @@ ax.set_ylim(0, max(vals) * 1.18)
 fig.tight_layout()
 save(fig, "fmax_comparison.png")
 
-# ===========================================================================
 # Fig 2: Area comparison
-# ===========================================================================
 fig, ax = plt.subplots(figsize=(IEEE_WIDTH, IEEE_HEIGHT))
 x = np.arange(len(variants))
 w = 0.30
@@ -212,9 +197,7 @@ ax.legend(fontsize=FONT_SIZE - 2, loc="lower right")
 fig.tight_layout()
 save(fig, "area_comparison.png")
 
-# ===========================================================================
 # Fig 3: Power comparison
-# ===========================================================================
 fig, ax = plt.subplots(figsize=(IEEE_WIDTH, IEEE_HEIGHT))
 dyn    = [synth[v]["Dynamic_W"] for v in variants]
 static = [synth[v]["Static_W"]  for v in variants]
@@ -233,9 +216,7 @@ ax.legend(fontsize=FONT_SIZE - 2, loc="upper right")
 fig.tight_layout()
 save(fig, "power_comparison.png")
 
-# ===========================================================================
 # Fig 4: CPI comparison across workloads (NEW - key figure)
-# ===========================================================================
 fig, ax = plt.subplots(figsize=(IEEE_WIDTH + 0.5, 3.5))
 x = np.arange(3)
 
@@ -266,9 +247,7 @@ ax.legend(fontsize=7, loc="lower right")
 fig.tight_layout()
 save(fig, "cpi_comparison.png")
 
-# ===========================================================================
 # Fig 5: Throughput comparison
-# ===========================================================================
 fig, ax = plt.subplots(figsize=(IEEE_WIDTH, IEEE_HEIGHT))
 mips = [synth[v]["Throughput_MIPS"] for v in variants]
 bars = ax.bar(variants, mips, color=colors, edgecolor="black", linewidth=0.6, width=0.55)
@@ -279,9 +258,7 @@ ax.set_ylim(0, max(mips) * 1.18)
 fig.tight_layout()
 save(fig, "throughput_comparison.png")
 
-# ===========================================================================
 # Fig 6: Efficiency comparison
-# ===========================================================================
 fig, ax = plt.subplots(figsize=(IEEE_WIDTH, IEEE_HEIGHT))
 eff = [synth[v]["Efficiency_MIPS_W"] for v in variants]
 bars = ax.bar(variants, eff, color=colors, edgecolor="black", linewidth=0.6, width=0.55)
@@ -292,9 +269,7 @@ ax.set_ylim(0, max(eff) * 1.18)
 fig.tight_layout()
 save(fig, "efficiency_comparison.png")
 
-# ===========================================================================
 # Fig 7: Mispredict rate comparison (NEW - supports novelty claim)
-# ===========================================================================
 fig, ax = plt.subplots(figsize=(IEEE_WIDTH + 0.5, IEEE_HEIGHT))
 wk_names = ["Sort", "Compute", "CM-insp.", "Branch", "CRC32"]
 wk_data = [bench_sort, bench_compute, coremark, bench_branch, bench_crc32]
@@ -320,9 +295,7 @@ ax.legend(fontsize=7, loc="upper left")
 fig.tight_layout()
 save(fig, "mispred_comparison.png")
 
-# ===========================================================================
 # Fig 8: Published cores comparison
-# ===========================================================================
 cores = [
     ("CVA6\n(6-stage)",        80),
     ("Ours-5s\n(5-stage)",     78),

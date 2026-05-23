@@ -1,19 +1,8 @@
-// Speculative GHR Forwarding (SGF) branch predictor.
-//
-// Novel contribution: eliminates Mechanism B (stale-predictor mispredictions)
-// in deep FPGA pipelines by speculatively updating the GHR at prediction time
-// rather than waiting for branch resolution in EX2.
-//
-// Key difference from baseline gshare (branch_predictor.sv):
-//   - Maintains two GHRs: spec_ghr (updated at prediction) and committed_ghr (updated at resolution)
-//   - Predictions use spec_ghr for PHT indexing, keeping history fresh
-//   - On misprediction, spec_ghr is restored from a per-branch checkpoint
-//   - PHT updates use the checkpointed GHR from prediction time (not current committed)
-//   - Net effect: deep pipelines (7/8-stage) achieve the misprediction rate of shallow pipelines (4/5-stage)
-//
-// Interface is identical to branch_predictor.sv with one addition:
-//   - ghr_checkpoint_out: the spec_ghr at prediction time, to be forwarded through pipeline registers
-//   - ghr_checkpoint_in: the checkpointed GHR returned at update time for precise PHT indexing
+// gshare predictor with a speculative GHR. spec_ghr updates at prediction time,
+// committed_ghr at resolution; predictions index on spec_ghr, PHT updates index on
+// a per-branch GHR checkpoint forwarded through the pipeline, and spec_ghr is
+// restored from committed_ghr on flush. Adds ghr_checkpoint_out/ghr_checkpoint_in
+// to the branch_predictor.sv interface.
 
 import pkg_riscv::*;
 
@@ -57,7 +46,7 @@ module branch_predictor_sgf #(
   localparam BTB_IDX  = $clog2(BTB_DEPTH);
   localparam BTB_TAG  = 32 - BTB_IDX - 2;
 
-  // === Two-GHR architecture ===
+  // Two-GHR architecture
   // spec_ghr: updated speculatively at prediction time (fresh for next prediction)
   // committed_ghr: updated at branch resolution (ground truth)
   logic [PHT_IDX-1:0] spec_ghr;
@@ -77,7 +66,7 @@ module branch_predictor_sgf #(
   logic [1:0]  ras_ptr;
   assign ras_ptr_out = ras_ptr;
 
-  // === Prediction indexing (uses SPECULATIVE GHR) ===
+  // Prediction indexing (uses SPECULATIVE GHR)
   logic [PHT_IDX-1:0] pht_predict_idx;
   logic [BTB_IDX-1:0] btb_predict_idx;
   logic [BTB_TAG-1:0] btb_predict_tag;
@@ -112,7 +101,7 @@ module branch_predictor_sgf #(
     end
   end
 
-  // === Update indexing (uses CHECKPOINTED GHR from prediction time) ===
+  // Update indexing (uses CHECKPOINTED GHR from prediction time)
   logic [PHT_IDX-1:0] pht_update_idx;
   logic [BTB_IDX-1:0] btb_update_idx;
   logic [BTB_TAG-1:0] btb_update_tag;
@@ -140,7 +129,7 @@ module branch_predictor_sgf #(
         ras[i] <= 0;
     end else begin
 
-      // === Speculative GHR update at prediction time ===
+      // Speculative GHR update at prediction time
       // On every conditional branch prediction, shift the predicted direction
       // into spec_ghr. This keeps the history fresh for the next prediction,
       // even if the current branch hasn't resolved yet.
@@ -148,12 +137,12 @@ module branch_predictor_sgf #(
         spec_ghr <= {spec_ghr[PHT_IDX-2:0], predict_taken};
       end
 
-      // === Committed GHR update at resolution time ===
+      // Committed GHR update at resolution time
       if (update_en) begin
         committed_ghr <= {committed_ghr[PHT_IDX-2:0], actual_taken};
       end
 
-      // === Restore speculative GHR on misprediction ===
+      // Restore speculative GHR on misprediction
       // On flush, the speculative path was wrong. Restore spec_ghr from
       // the committed state (shifted by the actual outcome of the flushing branch).
       if (flush) begin

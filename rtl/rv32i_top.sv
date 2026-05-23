@@ -9,7 +9,7 @@ module rv32i_top (
     output logic [31:0] debug_alu_result
 );
 
-    // ----- Internal wires -----
+    // Internal wires
     logic [31:0] pc_current, pc_plus4, pc_next;
     logic [31:0] instr;
     logic [31:0] rs1_data, rs2_data, rd_data;
@@ -29,7 +29,7 @@ module rv32i_top (
     logic        branch_taken;
     logic        do_branch;
 
-    // ----- Instruction field extraction -----
+    // Instruction field extraction
     logic [6:0]  opcode;
     logic [4:0]  rd, rs1, rs2;
     logic [2:0]  funct3;
@@ -42,18 +42,18 @@ module rv32i_top (
     assign rs2    = instr[24:20];
     assign funct7 = instr[31:25];
 
-    // ----- PC + 4 -----
+    // PC + 4
     assign pc_plus4 = pc_current + 32'd4;
 
-    // ----- Branch / Jump targets -----
+    // Branch / Jump targets
     assign branch_target = pc_current + imm;        // B-type: PC + imm
     assign jal_target    = pc_current + imm;        // JAL:    PC + imm
     assign jalr_target   = (rs1_data + imm) & ~32'b1; // JALR: (rs1 + imm) & ~1
 
-    // ----- Branch decision -----
+    // Branch decision
     assign do_branch = branch & branch_taken;
 
-    // ----- Next PC mux -----
+    // Next PC mux
     always_comb begin
         if (jal)
             pc_next = jal_target;
@@ -65,11 +65,11 @@ module rv32i_top (
             pc_next = pc_plus4;
     end
 
-    // ----- ALU input muxes -----
+    // ALU input muxes
     assign alu_a = (auipc) ? pc_current : rs1_data;
     assign alu_b = (alu_src) ? imm : rs2_data;
 
-    // ----- Write-back mux -----
+    // Write-back mux
     always_comb begin
         if (lui)
             rd_data = imm;                  // LUI: load upper immediate
@@ -81,7 +81,7 @@ module rv32i_top (
             rd_data = alu_result;           // ALU result
     end
 
-    // ----- Debug outputs -----
+    // Debug outputs
     assign debug_pc         = pc_current;
     assign debug_instr      = instr;
     assign debug_alu_result = alu_result;

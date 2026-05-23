@@ -15,9 +15,7 @@
 #   results/synth_seeds_results.csv  -- structured, one row per (variant, seed)
 #   results/synth_seeds_results.log  -- human-readable summary
 
-# =====================================================================
 # Configuration -- edit these as needed
-# =====================================================================
 set script_dir  [file normalize [file dirname [info script]]]
 set rtl_dir     "$script_dir/rtl"
 set results_dir "$script_dir/results"
@@ -33,9 +31,7 @@ file mkdir $work_base
 set csv_file "$results_dir/synth_seeds_results.csv"
 set log_file "$results_dir/synth_seeds_results.log"
 
-# =====================================================================
 # Minimal XDC for out-of-context synthesis (clock + IO standards only)
-# =====================================================================
 set clk_xdc "$work_base/seed_clk_only.xdc"
 set fd [open $clk_xdc w]
 puts $fd "create_clock -period $clk_period -name clk \[get_ports clk\]"
@@ -43,9 +39,7 @@ puts $fd "set_property IOSTANDARD LVCMOS33 \[get_ports clk\]"
 puts $fd "set_property IOSTANDARD LVCMOS33 \[get_ports rst_n\]"
 close $fd
 
-# =====================================================================
 # Shared RTL (common across all pipeline variants)
-# =====================================================================
 set shared_rtl [list \
     "$rtl_dir/pkg_riscv.sv" "$rtl_dir/alu.sv" "$rtl_dir/mdu.sv" \
     "$rtl_dir/control.sv" "$rtl_dir/branch_unit.sv" "$rtl_dir/branch_predictor.sv" \
@@ -55,11 +49,9 @@ set shared_rtl [list \
     "$rtl_dir/pipe_mem_wb.sv" \
 ]
 
-# =====================================================================
 # Pipeline variant definitions
 # Format: {display_name top_module {extra_rtl_specs...}}
 # Spec: "file:<path>" or "glob:<pattern>"
-# =====================================================================
 set variants {}
 
 lappend variants [list "5-stage" "rv32i_pipeline_5stage_top" \
@@ -81,9 +73,7 @@ lappend variants [list "7-stage" "rv32i_pipeline_7stage_top" \
 # lappend variants [list "8-stage" "rv32i_pipeline_8stage_top" \
 #     [list "glob:$script_dir/rtl_8stage/*.sv"]]
 
-# =====================================================================
 # Helpers
-# =====================================================================
 
 # Resolve "file:" / "glob:" specs into a flat file list
 proc resolve_rtl_spec {spec_list} {
@@ -106,7 +96,7 @@ proc extract_results {clk_pd} {
     set r [dict create wns N/A fmax N/A luts N/A ffs N/A \
            dsps N/A brams N/A total_power N/A dynamic_power N/A]
 
-    # -- Timing (WNS -> Fmax) --
+    # Timing (WNS -> Fmax)
     set rpt [report_timing_summary -return_string -no_header]
     foreach line [split $rpt "\n"] {
         if {[regexp {^\s+(-?\d+\.\d+)\s+} $line -> val]} {
@@ -119,7 +109,7 @@ proc extract_results {clk_pd} {
         }
     }
 
-    # -- Utilization --
+    # Utilization
     set rpt [report_utilization -return_string]
     foreach line [split $rpt "\n"] {
         if {[regexp {Slice LUTs\s*\|\s*(\d+)}     $line -> v]} { dict set r luts  $v }
@@ -128,7 +118,7 @@ proc extract_results {clk_pd} {
         if {[regexp {Block RAM Tile\s*\|\s*(\d+)}  $line -> v]} { dict set r brams $v }
     }
 
-    # -- Power --
+    # Power
     set rpt [report_power -return_string]
     foreach line [split $rpt "\n"] {
         if {[regexp {Total On-Chip Power.*\|\s*([0-9.]+)} $line -> v]} {
@@ -143,9 +133,7 @@ proc extract_results {clk_pd} {
     return $r
 }
 
-# =====================================================================
 # Initialize output files
-# =====================================================================
 set fd [open $csv_file w]
 puts $fd "variant,seed,fmax_mhz,wns_ns,luts,ffs,dsps,brams,total_power_w,dynamic_power_w"
 close $fd
@@ -161,10 +149,8 @@ puts $fd "================================================================"
 puts $fd ""
 close $fd
 
-# =====================================================================
 # MAIN: synth once per variant (project mode), then impl N times
 #       with different seeds (non-project mode from checkpoint)
-# =====================================================================
 set total_start [clock seconds]
 
 foreach variant $variants {
@@ -181,9 +167,7 @@ foreach variant $variants {
     set extra_rtl [resolve_rtl_spec $rtl_spec]
     set all_rtl   [concat $shared_rtl $extra_rtl]
 
-    # ==================================================================
     # Phase 1: Synthesis in project mode (reuses existing synth_all flow)
-    # ==================================================================
     puts "  Creating project..."
     create_project "seed_${vsafe}" "$work_dir/proj" -part $part -force
 
@@ -217,12 +201,10 @@ foreach variant $variants {
     close_design
     close_project -quiet
 
-    # ==================================================================
     # Phase 2: Implementation per seed (non-project mode)
     #
     # We open the synth checkpoint, place, route, extract, close.
     # Each iteration starts from the same netlist with a different seed.
-    # ==================================================================
     foreach seed $seeds {
         puts "\n  --- $vname / seed $seed ---"
         set t0 [clock seconds]
@@ -263,12 +245,12 @@ foreach variant $variants {
 
         set impl_time [expr {[clock seconds] - $t0}]
 
-        # -- CSV --
+        # CSV
         set fd [open $csv_file a]
         puts $fd "$vname,$seed,$fmax,$wns,$luts,$ffs,$dsps,$brams,$tpow,$dpow"
         close $fd
 
-        # -- Log --
+        # Log
         set fd [open $log_file a]
         puts $fd "------------------------------------------------------------"
         puts $fd "  $vname  |  seed $seed  |  ${impl_time}s"
@@ -283,7 +265,7 @@ foreach variant $variants {
         puts $fd ""
         close $fd
 
-        # -- Console --
+        # Console
         puts "    => Fmax=$fmax MHz  LUTs=$luts  FFs=$ffs  BRAMs=$brams  Power=$tpow W  (${impl_time}s)"
 
         # Save routed checkpoint for later inspection
@@ -295,9 +277,7 @@ foreach variant $variants {
 
 set total_time [expr {[clock seconds] - $total_start}]
 
-# =====================================================================
 # Print final summary table
-# =====================================================================
 puts "\n================================================================"
 puts "  ALL SEED RUNS COMPLETE  (total: ${total_time}s)"
 puts "================================================================\n"

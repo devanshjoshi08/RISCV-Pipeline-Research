@@ -41,7 +41,7 @@ set ::env(TMPDIR) "D:/RISCV-Vivado/tmp"
 file mkdir "D:/RISCV-Vivado/tmp"
 file mkdir $work_root
 
-# --- Build a 4096-word imem copy (CoreMark needs 16 KB; default imem is 1 KB) ---
+# Build a 4096-word imem copy (CoreMark needs 16 KB; default imem is 1 KB)
 proc make_imem4k {dst} {
     global rtl_dir
     set fd [open "$rtl_dir/imem.sv" r]; set c [read $fd]; close $fd

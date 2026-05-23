@@ -28,9 +28,7 @@ plt.rcParams.update({
 COLORS = ['#2196F3', '#4CAF50', '#FF9800', '#E91E63', '#9C27B0']
 LABELS = ['4-stage', '5-stage', '6-stage', '7-stage', '8-stage']
 
-# ============================================================
 # DATA
-# ============================================================
 
 # Synthesis results: 3 seeds per variant
 synth_fmax = {
@@ -109,9 +107,7 @@ sort_data = {
     'depths': [5, 6],
 }
 
-# ============================================================
 # CPI MODEL FIT
-# ============================================================
 # Fit CPI = a + b*D + c*fb using Dhrystone + Diagnostic (10 points)
 depths_all = [4, 5, 6, 7, 8]
 fb_dhry = dhry['branches'] / dhry['instr']  # 0.1367
@@ -176,9 +172,7 @@ print(f"  Interaction (D, D*fb): AIC={aic_interaction:.1f}, R²={r2_interaction:
 print(f"  Quadratic (D, D², fb): AIC={aic_quadratic:.1f}, R²={r2_quadratic:.3f}")
 print(f"  Full (D, fb, D*fb):    AIC={aic_full:.1f}, R²={r2_full:.3f}")
 
-# ============================================================
 # Throughput and DMIPS calculations
-# ============================================================
 print("\n=== Throughput (using Diagnostic CPI) ===")
 for i, name in enumerate(LABELS):
     fm = fmax_mean[name]
@@ -197,9 +191,7 @@ for i, name in enumerate(LABELS):
     dmips = dhrystones_per_sec / 1757
     print(f"  {name}: DMIPS={dmips:.0f}, DMIPS/MHz={dmips/fm:.2f}")
 
-# ============================================================
 # PLOTS
-# ============================================================
 
 # 1. Fmax comparison bar chart with error bars
 fig, ax = plt.subplots(figsize=(7, 4))

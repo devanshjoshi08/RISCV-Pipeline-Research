@@ -9,9 +9,7 @@ set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
 set asm_dir     "$project_dir/programs/asm"
 
-# =====================================================================
 # Helper: create project, add files, simulate, close
-# =====================================================================
 proc run_test {proj_name work_dir part rtl_files tb_files sim_top hex_files} {
     global project_dir asm_dir
 
@@ -58,9 +56,7 @@ proc run_test {proj_name work_dir part rtl_files tb_files sim_top hex_files} {
     close_project -quiet
 }
 
-# =====================================================================
 # Shared file lists
-# =====================================================================
 set shared_rtl [list \
     "$rtl_dir/pkg_riscv.sv" "$rtl_dir/alu.sv" "$rtl_dir/mdu.sv" \
     "$rtl_dir/control.sv" "$rtl_dir/branch_unit.sv" "$rtl_dir/branch_predictor.sv" \
@@ -75,9 +71,7 @@ set hex_files [list "sum_1_to_10.hex" "test_comprehensive.hex" "test_mext_csr.he
     "bench_crc32.hex" "bench_sort.hex" "dhrystone.hex" "coremark_minimal.hex"]
 set part "xc7a35tcpg236-1"
 
-# =====================================================================
 # 5-STAGE TESTS
-# =====================================================================
 set rtl5 [concat $shared_rtl [glob "$project_dir/rtl_5stage/*.sv"]]
 
 run_test "test_5s_basic" "$project_dir/vivado_test/5s_basic" $part \
@@ -92,9 +86,7 @@ run_test "test_5s_mext" "$project_dir/vivado_test/5s_mext" $part \
     $rtl5 [list "$project_dir/tb_5stage/rv32i_5stage_mext_csr_tb.sv"] \
     "rv32i_5stage_mext_csr_tb" $hex_files
 
-# =====================================================================
 # 6-STAGE TESTS (baseline)
-# =====================================================================
 set rtl6 [concat $shared_rtl [list "$rtl_dir/pipe_ex1_ex2.sv" \
     "$rtl_dir/forwarding_unit.sv" "$rtl_dir/hazard_unit.sv" \
     "$rtl_dir/rv32i_pipeline_top.sv"]]
@@ -111,9 +103,7 @@ run_test "test_6s_mext" "$project_dir/vivado_test/6s_mext" $part \
     $rtl6 [list "$project_dir/tb/rv32i_mext_csr_tb.sv"] \
     "rv32i_mext_csr_tb" $hex_files
 
-# =====================================================================
 # 7-STAGE TESTS
-# =====================================================================
 set rtl7 [concat $shared_rtl [list "$rtl_dir/pipe_ex1_ex2.sv"] \
     [glob "$project_dir/rtl_7stage/*.sv"]]
 
@@ -129,9 +119,7 @@ run_test "test_7s_mext" "$project_dir/vivado_test/7s_mext" $part \
     $rtl7 [list "$project_dir/tb_7stage/rv32i_7stage_mext_csr_tb.sv"] \
     "rv32i_7stage_mext_csr_tb" $hex_files
 
-# =====================================================================
 # 4-STAGE TESTS
-# =====================================================================
 set rtl4 [concat $shared_rtl [glob "$project_dir/rtl_4stage/*.sv"]]
 
 run_test "test_4s_basic" "$project_dir/vivado_test/4s_basic" $part \
@@ -146,9 +134,7 @@ run_test "test_4s_mext" "$project_dir/vivado_test/4s_mext" $part \
     $rtl4 [list "$project_dir/tb_4stage/rv32i_4stage_mext_csr_tb.sv"] \
     "rv32i_4stage_mext_csr_tb" $hex_files
 
-# =====================================================================
 # 8-STAGE TESTS
-# =====================================================================
 set rtl8 [concat $shared_rtl [list "$rtl_dir/pipe_ex1_ex2.sv"] \
     [glob "$project_dir/rtl_8stage/*.sv"]]
 
@@ -164,7 +150,6 @@ run_test "test_8s_mext" "$project_dir/vivado_test/8s_mext" $part \
     $rtl8 [list "$project_dir/tb_8stage/rv32i_8stage_mext_csr_tb.sv"] \
     "rv32i_8stage_mext_csr_tb" $hex_files
 
-# =====================================================================
 puts "\n================================================================"
 puts "  ALL TESTS COMPLETE"
 puts "================================================================\n"

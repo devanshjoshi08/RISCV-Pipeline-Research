@@ -37,9 +37,7 @@ set rtl8sgf [concat $shared_rtl [list \
     "$github_dir/rtl_8stage/pipe_if1_if2.sv" \
     "$github_dir/rtl_8stage/pipe_mem1_mem2.sv"]]
 
-# ============================================================
 # PART 1: BENCHMARK EVALUATION
-# ============================================================
 
 set fd [open $log_file w]
 puts $fd "=== SGF Predictor Benchmark Results ==="
@@ -186,9 +184,7 @@ foreach bench $benchmarks {
 
 puts "\n  BENCHMARKS COMPLETE: $log_file"
 
-# ============================================================
 # PART 2: SYNTHESIS (3 seeds each for Fmax comparison)
-# ============================================================
 
 set fd [open $synth_log w]
 puts $fd "=== SGF Predictor Synthesis Results ==="

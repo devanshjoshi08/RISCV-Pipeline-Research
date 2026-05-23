@@ -30,7 +30,6 @@ set shared_rtl [list \
 
 set part "xc7a35tcpg236-1"
 
-# =====================================================================
 proc run_bench {proj_name work_dir part rtl_files tb_file sim_top bench_hex hex_name} {
     global project_dir asm_dir log_file
 
@@ -69,9 +68,7 @@ proc run_bench {proj_name work_dir part rtl_files tb_file sim_top bench_hex hex_
     close_project -quiet
 }
 
-# =====================================================================
 # Generate a testbench for a given DUT and benchmark hex
-# =====================================================================
 proc write_bench_tb {filepath top_module bench_hex} {
     global asm_dir
     # Use absolute path with forward slashes so xsim finds hex file
@@ -127,9 +124,7 @@ proc write_bench_tb {filepath top_module bench_hex} {
     close $fd
 }
 
-# =====================================================================
 # All 7 benchmarks
-# =====================================================================
 set benchmarks [list \
     "bench_diagnostic.hex" \
     "bench_branch_heavy.hex" \
@@ -176,9 +171,7 @@ set variants [list \
 set tb_tmp_dir "$project_dir/vivado_bench"
 file mkdir $tb_tmp_dir
 
-# =====================================================================
 # Run all variants x all benchmarks = 35 runs
-# =====================================================================
 foreach variant $variants {
     set vlabel [lindex $variant 0]
     set vtop   [lindex $variant 1]

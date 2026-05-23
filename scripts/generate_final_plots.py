@@ -21,9 +21,7 @@ COLORS = ['#2196F3', '#4CAF50', '#FF9800', '#E91E63', '#9C27B0']
 LABELS = ['4-stage', '5-stage', '6-stage', '7-stage', '8-stage']
 DEPTHS = [4, 5, 6, 7, 8]
 
-# ============================================================
 # SYNTHESIS DATA (from seed_results.log)
-# ============================================================
 synth_fmax = {
     '4-stage': [75.9, 76.5, 73.1],
     '5-stage': [75.9, 77.4, 74.0],
@@ -34,9 +32,7 @@ synth_fmax = {
 fmax_mean = {k: np.mean(v) for k, v in synth_fmax.items()}
 fmax_std = {k: np.std(v, ddof=1) for k, v in synth_fmax.items()}
 
-# ============================================================
 # COMPLETE VALIDATED BENCHMARK DATA (all 5 depths)
-# ============================================================
 
 # Dhrystone: 2926 instr, 400 branches, 203 mispred (all depths identical)
 dhry_cpi = [1.41, 1.48, 1.68, 1.85, 1.99]
@@ -81,9 +77,7 @@ ALL_BENCHMARKS = [
     ('edn', edn_cpi, edn_fb),
 ]
 
-# ============================================================
 # CPI MODEL FIT (7 workloads x 5 depths = 35 data points)
-# ============================================================
 D_all = []
 fb_all = []
 cpi_all = []
@@ -130,9 +124,7 @@ print(f"  CPI = {a:.3f} + {b:.3f}*D + {c:.3f}*fb")
 print(f"  R² = {r2:.3f}, MAE = {mae:.3f}, Max residual = {max_resid:.3f}")
 print(f"  AIC: linear={aic_linear:.1f}, interaction={aic_inter:.1f}, quadratic={aic_quad:.1f}, full={aic_full:.1f}")
 
-# ============================================================
 # PLOTS
-# ============================================================
 
 # 1. Fmax comparison with error bars
 fig, ax = plt.subplots(figsize=(7, 4))

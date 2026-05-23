@@ -24,22 +24,22 @@ module icache_bram #(
   input  logic [31:0] mem_data    // arrives 1 cycle after mem_addr is presented
 );
 
-  // ---------- cache storage ----------
+  // cache storage
   logic                  valid_arr [0:NUM_LINES-1];
   logic [TAG_BITS-1:0]   tags      [0:NUM_LINES-1];
   logic [31:0]           data      [0:NUM_LINES-1];
 
-  // ---------- address decode ----------
+  // address decode
   logic [INDEX_BITS-1:0] index;
   logic [TAG_BITS-1:0]   tag;
   assign index = addr[INDEX_BITS+1:2];
   assign tag   = addr[31:INDEX_BITS+2];
 
-  // ---------- hit detection ----------
+  // hit detection
   logic cache_hit;
   assign cache_hit = valid_arr[index] && (tags[index] == tag);
 
-  // ---------- FSM ----------
+  // FSM
   typedef enum logic [1:0] {
     S_IDLE,       // check cache, serve hit or start miss
     S_WAIT_BRAM   // waiting for BRAM read data (1-cycle latency)
@@ -52,7 +52,7 @@ module icache_bram #(
   logic [INDEX_BITS-1:0] miss_index_r;
   logic [TAG_BITS-1:0]   miss_tag_r;
 
-  // ---------- outputs ----------
+  // outputs
   always_comb begin
     // defaults
     mem_addr   = addr;       // speculatively present address to BRAM
@@ -61,7 +61,6 @@ module icache_bram #(
     state_next = state;
 
     case (state)
-      // ----------------------------------------------------------
       S_IDLE: begin
         if (cache_hit) begin
           instr   = data[index];
@@ -76,7 +75,6 @@ module icache_bram #(
         end
       end
 
-      // ----------------------------------------------------------
       S_WAIT_BRAM: begin
         // BRAM data is now available on mem_data.
         // Serve it directly and fill the cache line.
@@ -92,7 +90,7 @@ module icache_bram #(
     endcase
   end
 
-  // ---------- sequential ----------
+  // sequential
   integer i;
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin

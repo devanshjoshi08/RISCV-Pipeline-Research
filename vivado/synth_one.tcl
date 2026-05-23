@@ -72,7 +72,7 @@ set dcp "$work/${name}_synth.dcp"
 
 puts "\n======== $name ========"
 
-# --- SYNTH ---
+# SYNTH
 if {![file exists $dcp]} {
   puts "  Synthesizing $name ..."
   read_verilog -sv [concat $S $extra]
@@ -85,7 +85,7 @@ if {![file exists $dcp]} {
   puts "  Cached: $dcp"
 }
 
-# --- PLACE + ROUTE x3 ---
+# PLACE + ROUTE x3
 foreach {pdir rdir label} {
   Default  Default  dir_default
   Explore  Explore  dir_explore

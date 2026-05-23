@@ -113,9 +113,7 @@ module rv32i_pipeline_5stage_top (
                         mem_mem_write || mem_mem_read ||
                         mem_jal || mem_jalr;
 
-    // =========================================================================
     // IF
-    // =========================================================================
 
     assign if_pc_plus4 = if_pc + 32'd4;
 
@@ -194,9 +192,7 @@ module rv32i_pipeline_5stage_top (
     assign debug_pc    = if_pc;
     assign debug_instr = id_instr;
 
-    // =========================================================================
     // IF/ID
-    // =========================================================================
 
     pipe_if_id u_if_id (
         .clk               (clk),
@@ -213,9 +209,7 @@ module rv32i_pipeline_5stage_top (
         .predict_taken_out (id_predict_taken)
     );
 
-    // =========================================================================
     // ID
-    // =========================================================================
 
     assign id_opcode  = id_instr[6:0];
     assign id_rd      = id_instr[11:7];
@@ -250,9 +244,7 @@ module rv32i_pipeline_5stage_top (
     assign id_is_ret  = id_jalr && (id_rs1 == 5'd1 || id_rs1 == 5'd5) && (id_rd != id_rs1);
     assign id_ras_push = id_is_call;
 
-    // =========================================================================
     // ID/EX
-    // =========================================================================
 
     pipe_id_ex u_id_ex (
         .clk(clk), .rst_n(rst_n), .flush(id_ex_flush), .stall(id_ex_stall),
@@ -286,9 +278,7 @@ module rv32i_pipeline_5stage_top (
         .ras_ptr_out(ex_ras_ptr)
     );
 
-    // =========================================================================
     // EX: forwarding + ALU + branch + CSR + MDU (merged single stage)
-    // =========================================================================
 
     // MEM result for forwarding
     logic [31:0] mem_fwd_result;
@@ -398,9 +388,7 @@ module rv32i_pipeline_5stage_top (
     assign ex_do_branch = ex_branch & ex_branch_taken;
     assign debug_alu_result = ex_alu_result;
 
-    // =========================================================================
     // Hazard detection
-    // =========================================================================
 
     hazard_unit u_hazard (
         .mem_mem_read  (mem_mem_read),
@@ -420,9 +408,7 @@ module rv32i_pipeline_5stage_top (
         .id_ex_flush   (id_ex_flush)
     );
 
-    // =========================================================================
     // EX/MEM
-    // =========================================================================
 
     logic ex_suppress;
     assign ex_suppress = ex_trap || mdu_stall;
@@ -445,9 +431,7 @@ module rv32i_pipeline_5stage_top (
         .is_csr_out(mem_is_csr), .csr_rdata_out(mem_csr_rdata)
     );
 
-    // =========================================================================
     // MEM
-    // =========================================================================
 
     dmem u_dmem (
         .clk(clk), .mem_read(mem_mem_read), .mem_write(mem_mem_write),
@@ -455,9 +439,7 @@ module rv32i_pipeline_5stage_top (
         .write_data(mem_rs2_data), .read_data(mem_read_data)
     );
 
-    // =========================================================================
     // MEM/WB
-    // =========================================================================
 
     pipe_mem_wb u_mem_wb (
         .clk(clk), .rst_n(rst_n),
@@ -473,9 +455,7 @@ module rv32i_pipeline_5stage_top (
         .is_csr_out(wb_is_csr), .csr_rdata_out(wb_csr_rdata)
     );
 
-    // =========================================================================
     // WB
-    // =========================================================================
 
     always_comb begin
         if (wb_jal || wb_jalr)   wb_rd_data = wb_pc_plus4;
