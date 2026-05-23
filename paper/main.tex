@@ -227,19 +227,7 @@ All are compiled at \texttt{-O1}; higher optimization levels may alter branch de
 Each benchmark reads the hardware performance counters (\texttt{mcycle}, \texttt{minstret}, branch count, misprediction count) before and after the workload, computes deltas, and stores results to data memory for testbench readout.
 Functional correctness is verified by confirming that all five pipeline variants produce identical instruction counts, branch counts, and memory checksums for each workload.
 
-\textbf{Dhrystone 2.1.} A synthetic integer benchmark \cite{hennessy2017computer} ported to bare-metal RV32IM: 100 iterations, 2{,}926 instructions, 400 branches (13.7\% branch frequency).
-
-\textbf{Diagnostic workload.} A mixed program exercising integer arithmetic, load/store sequences, function calls, and conditional branches: 1{,}367 instructions, 360 branches (26.3\% branch frequency).
-
-\textbf{Official EEMBC CoreMark.} The industry-standard CoreMark benchmark \cite{coremark}, compiled from the official EEMBC source using riscv-none-elf-gcc~15.2.0 with -O1 optimization: 10 iterations in PERFORMANCE\_RUN mode, 2{,}893{,}145 instructions, 719{,}810 branches (24.9\% branch frequency).
-
-\textbf{Embench-IoT: aha-mont64.} Montgomery multiplication from the official Embench-IoT suite \cite{embench2019}. Cryptographic kernel, multiply-heavy: 4{,}453{,}858 instructions, 512{,}593 branches (11.5\%).
-
-\textbf{Embench-IoT: crc32.} CRC-32 computation: 4{,}008{,}648 instructions, 174{,}591 branches (4.4\%). Inner loop has extremely predictable branching (0.19\% misprediction rate).
-
-\textbf{Embench-IoT: statemate.} Finite state machine simulation: 3{,}160{,}225 instructions, 376{,}291 branches (11.9\%). Data-dependent state transitions produce a moderate misprediction rate that increases with pipeline depth.
-
-\textbf{Embench-IoT: edn.} Encoder-decoder signal processing: 2{,}972{,}527 instructions, 338{,}986 branches (11.4\%).
+The seven workloads, listed as (instructions, branches, branch frequency), are: \textbf{Dhrystone~2.1} \cite{hennessy2017computer} (2{,}926, 400, 13.7\%); a mixed \textbf{Diagnostic} program exercising arithmetic, load/store, calls, and conditional branches (1{,}367, 360, 26.3\%); official EEMBC \textbf{CoreMark} \cite{coremark} (10 iterations, PERFORMANCE\_RUN; 2{,}893{,}145, 719{,}810, 24.9\%); and four Embench-IoT \cite{embench2019} kernels---\textbf{aha-mont64} (Montgomery multiply, multiply-heavy; 4{,}453{,}858, 512{,}593, 11.5\%), \textbf{crc32} (4{,}008{,}648, 174{,}591, 4.4\%; near-perfectly predictable, 0.19\% misprediction rate), \textbf{statemate} (FSM with data-dependent transitions; 3{,}160{,}225, 376{,}291, 11.9\%), and \textbf{edn} (signal processing; 2{,}972{,}527, 338{,}986, 11.4\%).
 
 % ====================================================================
 \section{Baseline Results}
@@ -589,33 +577,25 @@ This result follows directly from the update-latency asymmetry: the speculative 
 When predictions are mostly correct (79.8\% on CoreMark), the speculative GHR provides a more accurate approximation of true branch history than any committed GHR operating with nonzero latency.
 This means SGF is beneficial at \emph{any} pipeline depth where the predictor uses global history---not only at depths where Mechanism~B is measurable.
 
-This asymmetry also resolves an apparent numerical paradox.
-SGF reduces 7-stage CoreMark mispredictions by 31.4\%, far more than the +5.7\% Mechanism~B inflation measured at the 6-stage---a discrepancy that would be contradictory if SGF merely reversed the depth-added staleness.
-It does more than that: the +5.7\% figure quantifies only the \emph{marginal} latency introduced by deepening the pipeline (from a 2-stage to a 3--4-stage update path), whereas the 31.4\% reduction reflects elimination of the \emph{entire} update latency, including the 2-stage component shared by every baseline depth.
-Mechanism~B is thus the depth-dependent slice of a larger latency cost that SGF removes in full; the magnitude of SGF's benefit is bounded by total update latency, not by the smaller depth-marginal inflation that the controlled experiments isolate.
+This also resolves an apparent paradox: the 31.4\% reduction far exceeds the $+$5.7\% Mechanism~B inflation measured at the 6-stage because that figure captures only the \emph{marginal} latency added by deepening (2- to 3--4-stage update path), whereas SGF removes the \emph{entire} update latency including the 2-stage component shared by every baseline depth.
+Mechanism~B is thus the depth-dependent slice of a larger latency cost; SGF's benefit is bounded by total update latency, not the smaller depth-marginal inflation the controlled experiments isolate.
 
-\textbf{CPI impact decomposition.}
-SGF's 31\% misprediction reduction on CoreMark translates to a 3\% CPI improvement (2.02 to 1.96 on the 7-stage).
-The modest CPI impact reflects the fact that Mechanism~B is one of four CPI components: the remainder consists of Mechanism~A (inherent flush penalty, $\sim$0.20 CPI), the IF2 bubble ($\sim$0.28 CPI), and load-use stalls ($\sim$0.15 CPI).
-SGF completely eliminates Mechanism~B; the remaining components require structural pipeline changes and are addressable by orthogonal techniques (e.g., a next-line predictor to eliminate the IF2 bubble, Section~\ref{sec:counterfactual}).
+\textbf{CPI impact.}
+The 31\% misprediction reduction yields a 3\% CPI improvement (2.02$\to$1.96 on the 7-stage) because Mechanism~B is one of four CPI components alongside Mechanism~A ($\sim$0.20 CPI), the IF2 bubble ($\sim$0.28), and load-use stalls ($\sim$0.15).
+SGF eliminates Mechanism~B fully; the rest require structural changes addressable by orthogonal techniques (e.g., the next-line predictor of Section~\ref{sec:counterfactual}).
 
 \subsection{crc32 Edge Case and the Confidence-Filter Tradeoff}
 \label{sec:crc32}
 
 The crc32 pathology traces to a specific microarchitectural interaction that we dissect here to demonstrate architectural predictability of SGF's edge cases.
 
-\textbf{Structural mechanics.} The crc32 inner loop contains a single dominant branch (the bit-test conditional, \texttt{if (crc \& 1)}) that is taken 99.8\% of iterations. Under the baseline predictor, this branch's PHT counter saturates at \texttt{11} (strongly taken), and the committed GHR accumulates a long run of \texttt{1} bits. On the rare iteration where the branch is not taken, the baseline predictor mispredicts, but the GHR is not updated until EX2---by which time the next iteration has already been fetched with a still-correct (stale but accidentally accurate) GHR. The update latency acts as an accidental filter: the pollution from the rare misprediction arrives at the GHR after the next prediction has already used clean history.
+\textbf{Structural mechanics.} The crc32 inner loop has one dominant branch (\texttt{if (crc \& 1)}), taken 99.8\% of iterations, so its PHT counter saturates and the committed GHR holds a long run of \texttt{1}s.
+Under the baseline, a rare not-taken misprediction does not reach the GHR until EX2---after the next iteration has already been predicted with clean (stale but accidentally accurate) history, so update latency acts as an accidental filter.
+SGF instead shifts the wrong \texttt{0} into \texttt{spec\_ghr} immediately, so the next prediction uses a polluted PC\,XOR\,GHR index (a different, possibly untrained counter), adding 1--3 mispredictions until correct predictions or the EX2 rollback restore the pattern---167 in total over 174{,}591 branches (0.096\%).
 
-Under SGF, the speculative GHR is updated immediately at prediction time. When the rare not-taken misprediction occurs, SGF shifts a \texttt{0} into \texttt{spec\_ghr} in the same cycle. The next iteration's branch is then predicted using a GHR that contains the wrong bit. Because the PHT is indexed by PC~XOR~GHR, the polluted index maps to a different, potentially untrained counter. This produces 1--3 additional mispredictions before either the correct predictions restore the GHR pattern or the EX2 rollback fires. Over 174{,}591 total branches, this adds 167 mispredictions (0.096\%).
-
-\textbf{A confidence filter would close it---but at a measured cost.}
-The natural countermeasure suppresses speculative GHR updates when the PHT counter is saturated (\texttt{11} or \texttt{00}): such high-confidence predictions are overwhelmingly likely to be correct, so their speculative contribution is usually redundant, and gating them (one 2-bit comparator, no flip-flops) restores crc32 to the baseline 344 mispredictions.
-We implemented and measured this filter, and \emph{deliberately do not adopt it}.
-While it eliminates the crc32 inflation, it also suppresses useful speculative freshening on workloads whose hot branches are stably biased: on CoreMark the filter raises mispredictions from 101{,}418 to 117{,}207, cutting SGF's reduction from 31.4\% to 20.7\%.
-The trade is lopsided---the filter removes a 167-misprediction, \emph{zero-CPI} blip on crc32 (0.096\% of its branches) at the price of $\sim$16{,}000 real misprediction savings on CoreMark.
-We therefore ship SGF without the filter and accept the crc32 edge case, whose 167 extra mispredictions change CPI by less than $0.01$ (1.52 in both cases) because they fall on a branch predictable enough that the extra flushes are negligible against the loop's runtime.
-This is a concrete instance of a general principle: a saturation-based filter forfeits speculative freshening precisely on the stable branches where SGF still helps, so it should not be applied to GHR-based predictors whose target workloads (CoreMark, statemate) are dominated by such branches.
-We frame the filter as a characterized point in the design space rather than a discarded idea: it is retained as a build-time option for deployments whose workload is dominated by crc-like, highly-biased branches, but it is disabled by default because that is the wrong default for the branch-dense workloads SGF targets.
+\textbf{A confidence filter would close it---at a cost.}
+Suppressing speculative updates when the PHT counter is saturated (one 2-bit comparator, no flip-flops) restores crc32 to its baseline 344 mispredictions, but we measured that it also forfeits useful freshening on stably-biased hot branches: on CoreMark it raises mispredictions from 101{,}418 to 117{,}207, cutting SGF's reduction from 31.4\% to 20.7\%.
+The trade is lopsided---a 167-misprediction, zero-CPI blip on crc32 against $\sim$16{,}000 real CoreMark savings---so we ship SGF without the filter (crc32 CPI unchanged at 1.52, the extra flushes negligible against the loop runtime) and retain it only as a build-time option for crc-like, highly-biased workloads.
 
 \textbf{Operating regime.} SGF benefits workloads whose branch outcomes vary across short windows (CoreMark, statemate, aha-mont64), is neutral when branches are widely spaced (edn, Diagnostic) or already accurate (Dhrystone), and is CPI-neutral on highly biased loops (crc32) despite a small misprediction blip. No workload shows CPI degradation.
 
@@ -648,12 +628,9 @@ SGF is therefore beneficial at every depth with nonzero update latency, and most
 The data identify one partitioning boundary that matters on this fabric: splitting the monolithic execute stage into EX1 (forwarding) and EX2 (computation).
 This split produces a 56\% frequency improvement (74 to 117\,MHz).
 No other split---IF into IF1/IF2, MEM into MEM1/MEM2---produces a statistically significant frequency gain (within-tier differences are $<$2\%).
-The practical design question on Artix-7 is binary: does the pipeline split the execute stage?
-If yes, the designer gains 56\% frequency at a cost of $\sim$0.12 CPI per additional stage.
-If no, frequency is capped regardless of total depth.
-
-This finding is specific to Artix-7's 6-input LUT fabric and Vivado 2025.2.
-A fabric with different LUT depth, routing topology, or process node could place the boundary at a different pipeline stage.
+The practical design question on Artix-7 is therefore binary: split the execute stage (gain 56\% frequency at $\sim$0.12 CPI per added stage) or leave frequency capped regardless of depth.
+This contrasts with ASICs, where $F_{\max}$ rises roughly monotonically with depth because gate delay scales with logic levels \cite{hrishikesh2002optimal}; on FPGAs, function-independent LUT delay and undiminished routing delay \cite{kuon2007measuring} mean only breaks of LUT-dominated chains (the execute stage) help.
+The boundary is thus specific to Artix-7's 6-input LUT fabric and Vivado 2025.2 (a different LUT depth, routing topology, or process node could move it), but the CPI model's per-stage costs are hazard-driven and fabric-independent, so the model and SGF's misprediction reduction transfer to other FPGA families---only the frequency tier boundaries shift.
 
 \subsection{Physical Critical Path Analysis}
 \label{sec:critpath}
@@ -695,18 +672,6 @@ The model's $B(D)$ term is thus an \emph{upper bound} on the recoverable cost, o
 
 The combined NLP+SGF variant, measured directly, shows the two mechanisms are complementary: SGF+NLP reaches CPI 1.89, better than SGF (1.96) or NLP (1.97) alone, with a misprediction count (101{,}449) essentially equal to SGF alone (101{,}418)---SGF's zero-latency speculative GHR absorbs the fetch-timing perturbation that raised the NLP's mispredictions in isolation, so the combined cycle saving (360{,}399) slightly \emph{exceeds} the sum of the parts (307{,}450).
 Even so, 1.89\,CPI remains above the 6-stage's 1.83, so the 6-stage stays throughput-optimal; recovering more of the 0.28\,CPI bound (a larger next-fetch table or next-line-and-set predictor) is future work.
-
-\subsection{FPGA vs.\ ASIC Depth Behavior}
-\label{sec:fpga_asic}
-
-The depth--frequency relationship on FPGA differs qualitatively from ASICs.
-On ASICs, $F_{\max}$ increases roughly monotonically with depth because gate delay scales linearly with the number of logic levels per stage \cite{hrishikesh2002optimal}.
-On FPGAs, LUT delay is function-independent (a 6-input LUT computes any Boolean function with the same propagation delay), and routing delay---which does not decrease with pipeline register insertion---dominates total path delay \cite{kuon2007measuring}.
-This produces the two-tier structure observed here: only splits that break LUT-dominated logic chains (the execute stage) yield frequency gains; splits targeting routing-dominated paths (IF, MEM) do not.
-
-The CPI model's per-stage costs (flush penalty, load-use stalls, IF2 bubble) are fabric-independent because they are driven by hazard structure, not physical timing.
-Absolute throughput ($F_{\max}/\text{CPI}$) is fabric-specific.
-This separation means the CPI model and SGF's misprediction reduction transfer to other FPGA families; only the frequency tier boundaries would shift.
 
 \subsection{Anticipated Objections}
 \label{sec:objections}
