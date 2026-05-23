@@ -104,17 +104,6 @@
   address      = {San Jose, CA}
 }
 
-@article{chandrakasan1992low,
-  title   = {Low-power {CMOS} digital design},
-  author  = {Chandrakasan, Anantha P. and Sheng, Samuel and Brodersen, Robert W.},
-  journal = {IEEE Journal of Solid-State Circuits},
-  volume  = {27},
-  number  = {4},
-  pages   = {473--484},
-  year    = {1992},
-  publisher = {IEEE}
-}
-
 @misc{serv2019,
   title        = {{SERV}: The {SErial} {RISC-V} {CPU}},
   author       = {Kindgren, Olof},
@@ -166,36 +155,8 @@
   year      = {2016}
 }
 
-@article{boutros2020fpga,
-  title   = {Beyond academic benchmarks: Bringing {FPGA} acceleration to the masses with {HLS}},
-  author  = {Boutros, Andrew and Betz, Vaughn},
-  journal = {IEEE Transactions on Reconfigurable Technology and Systems (TRETS)},
-  volume  = {13},
-  number  = {4},
-  pages   = {1--22},
-  year    = {2020},
-  publisher = {IEEE}
-}
-
-@inproceedings{fowers2012performance,
-  title     = {A performance and energy comparison of {FPGAs}, {GPUs}, and multicores for sliding-window applications},
-  author    = {Fowers, Jeremy and Brown, Greg and Cooke, Patrick and Stitt, Greg},
-  booktitle = {Proceedings of the ACM/SIGDA International Symposium on Field-Programmable Gate Arrays (FPGA)},
-  pages     = {47--56},
-  year      = {2012},
-  organization = {ACM}
-}
-
-@article{cong2011high,
-  title   = {High-level synthesis for {FPGAs}: From prototyping to deployment},
-  author  = {Cong, Jason and Liu, Bin and Neuendorffer, Stephen and Noguera, Juanjo and Vissers, Kees and Zhang, Zhiru},
-  journal = {IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems},
-  volume  = {30},
-  number  = {4},
-  pages   = {473--491},
-  year    = {2011},
-  publisher = {IEEE}
-}
+% boutros2020fpga removed: paper is about HLS acceleration, not LUT-routing delay.
+% Citations redirected to kuon2007measuring which is the authoritative source.
 
 @inproceedings{biglari2019pipelining,
   title     = {A Survey on Pipelining Techniques in {RISC} Processors},
@@ -221,10 +182,10 @@
 % Additional references for IEEE TC submission
 % ====================================================================
 
-@inproceedings{kessler1999alpha,
+@article{kessler1999alpha,
   title     = {The {Alpha} 21264 microprocessor},
   author    = {Kessler, Richard E.},
-  booktitle = {IEEE Micro},
+  journal   = {IEEE Micro},
   volume    = {19},
   number    = {2},
   pages     = {24--36},
@@ -232,10 +193,10 @@
   publisher = {IEEE}
 }
 
-@inproceedings{yeager1996mips,
+@article{yeager1996mips,
   title     = {The {MIPS} {R10000} superscalar microprocessor},
   author    = {Yeager, Kenneth C.},
-  booktitle = {IEEE Micro},
+  journal   = {IEEE Micro},
   volume    = {16},
   number    = {2},
   pages     = {28--40},
@@ -273,5 +234,49 @@
   booktitle = {Proceedings of the 26th Annual International Symposium on Computer Architecture (ISCA)},
   pages     = {292--303},
   year      = {1999},
+  organization = {IEEE}
+}
+
+@inproceedings{smith1981study,
+  title     = {A study of branch prediction strategies},
+  author    = {Smith, James E.},
+  booktitle = {Proceedings of the 8th Annual Symposium on Computer Architecture (ISCA)},
+  pages     = {135--148},
+  year      = {1981}
+}
+
+@inproceedings{yeh1991two,
+  title     = {Two-level adaptive training branch prediction},
+  author    = {Yeh, Tse-Yu and Patt, Yale N.},
+  booktitle = {Proceedings of the 24th Annual International Symposium on Microarchitecture (MICRO)},
+  pages     = {51--61},
+  year      = {1991},
+  organization = {ACM/IEEE}
+}
+
+@inproceedings{jimenez2001dynamic,
+  title     = {Dynamic branch prediction with perceptrons},
+  author    = {Jim{\'e}nez, Daniel A. and Lin, Calvin},
+  booktitle = {Proceedings of the 7th International Symposium on High-Performance Computer Architecture (HPCA)},
+  pages     = {197--206},
+  year      = {2001},
+  organization = {IEEE}
+}
+
+@inproceedings{hartstein2002optimum,
+  title     = {The optimum pipeline depth for a microprocessor},
+  author    = {Hartstein, A. and Puzak, Thomas R.},
+  booktitle = {Proceedings of the 29th Annual International Symposium on Computer Architecture (ISCA)},
+  pages     = {7--13},
+  year      = {2002},
+  organization = {IEEE}
+}
+
+@inproceedings{karkhanis2004first,
+  title     = {A first-order superscalar processor model},
+  author    = {Karkhanis, Tejas S. and Smith, James E.},
+  booktitle = {Proceedings of the 31st Annual International Symposium on Computer Architecture (ISCA)},
+  pages     = {338--349},
+  year      = {2004},
   organization = {IEEE}
 }
