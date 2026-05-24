@@ -188,18 +188,3 @@ constraints/               Basys 3 XDC
 tools/                     hex disassembler, riscv-tests runner
 ```
 
-## References
-
-- McFarling, *Combining Branch Predictors*, WRL TN-36, 1993 (gshare)
-- Yeh & Patt, *Two-Level Adaptive Training Branch Prediction*, MICRO 1991
-- Smith, *A Study of Branch Prediction Strategies*, ISCA 1981
-- Jiménez & Lin, *Dynamic Branch Prediction with Perceptrons*, HPCA 2001
-- Hartstein & Puzak, *The Optimum Pipeline Depth for a Microprocessor*, ISCA 2002
-- Karkhanis & Smith, *A First-Order Superscalar Processor Model*, ISCA 2004
-- Kuon & Rose, *Measuring the Gap Between FPGAs and ASICs*, 2007
-- Patterson & Hennessy, *Computer Organization and Design: RISC-V Edition*
-- [RISC-V ISA](https://riscv.org/specifications/) · [riscv-tests](https://github.com/riscv-software-src/riscv-tests)
-
-## License
-
-MIT
