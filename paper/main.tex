@@ -13,6 +13,17 @@
 
 \graphicspath{{figures/}}
 
+% Tighter float packing: lets floats fill more of a page and reduces the
+% whitespace gaps that otherwise appear when a large float is deferred.
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.80}
+\renewcommand{\dbltopfraction}{0.92}
+\renewcommand{\dblfloatpagefraction}{0.80}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{5}
+
 \begin{document}
 
 \title{Speculative GHR Forwarding: Eliminating Stale Branch-Predictor State in Deep FPGA Pipelines}
@@ -48,7 +59,7 @@ Prior RISC-V soft cores differ in ISA support, predictor design, memory architec
 No published study varies pipeline depth as the single controlled design parameter on a common FPGA target while holding the RTL of all other microarchitectural modules constant. Each stage split does carry structural side effects (an added load-use stall, a fetch bubble, an extra forwarding source), which we make explicit and decompose rather than assume away.
 
 A subtler cost compounds the explicit penalty of deeper pipelines: the predictor's global history register (GHR) becomes stale because the latency between branch resolution and the next prediction spans more cycles.
-Speculative history updating is itself an established technique: Yeh and Patt's two-level adaptive predictor \cite{yeh1991two} already updates history speculatively, and ASIC out-of-order processors (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}) recover it on misprediction through the reorder buffer or a dedicated branch stack; Gonzalez and Horowitz quantified the staleness cost in ASIC simulations \cite{gonzalez1999power}.
+Speculative history updating is itself an established technique: Yeh and Patt's two-level adaptive predictor \cite{yeh1991two} already updates history speculatively, and ASIC out-of-order processors (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}) recover it on misprediction through the reorder buffer (ROB) or a dedicated branch stack; Gonzalez and Horowitz quantified the staleness cost in ASIC simulations \cite{gonzalez1999power}.
 These recovery mechanisms are tied to the out-of-order substrate, however: the R10000's branch stack checkpoints the register-map alias table and the Alpha's recovery rides the ROB. These are centralized structures that an in-order FPGA soft core lacks and could not add cheaply (the structures alone would dwarf the predictor they protect).
 The effect itself has not been measured under controlled conditions on FPGA fabric, and no lightweight in-order realization of speculative history has been demonstrated there.
 
@@ -528,7 +539,6 @@ Diagnostic   & 69        & 69                 & 69        & 69                 &
 \bottomrule
 \end{tabular}
 
-\vspace{2pt}
 \footnotesize{$\Delta$\% column shows 7-stage/8-stage misprediction change (rounded). 8-stage baseline counts equal 7-stage (both have 4-stage update latency). \textbf{Hardware cost (7-stage, workload-independent):} +49 LUTs (+0.6\%), +57 FFs (+0.7\%), 0 DSP/BRAM, $F_{\max}$ 117.5 vs.\ 115.0\,MHz (no degradation). Net cycle savings: CoreMark $+$159{,}932, statemate $+$63{,}222, aha-mont64 $+$89{,}044 (others 0).}
 \end{table*}
 
@@ -757,7 +767,7 @@ This also answers the memory-mapping concern: the main study uses distributed LU
 \subsection{Power and Efficiency}
 \label{sec:power}
 
-Power is estimated with Vivado's \texttt{report\_power} on each out-of-context--synthesized variant, annotated with workload-specific switching activity captured as a SAIF file from a behavioral CoreMark simulation of that variant.
+Power is estimated with Vivado's \texttt{report\_power} on each out-of-context--synthesized variant, annotated with workload-specific switching activity captured as a Switching Activity Interchange Format (SAIF) file from a behavioral CoreMark simulation of that variant.
 These are Vivado vector-based estimates at ``Medium'' confidence, not physical measurements, and can differ from silicon by roughly $\pm$20--30\%; we therefore rely on the \emph{relative ordering across depths}, not the absolute watts, and report no hardware-power validation.
 Under workload-specific activity, total on-chip power \emph{falls} with depth, from 0.235\,W (4-stage) to 0.217\,W (8-stage); static power is constant at 0.069\,W and dynamic power drops from 0.167\,W to 0.149\,W.
 This trend is opposite to a uniform-toggle approximation: although deeper pipelines add registers, their lower IPC, more bubbles and stalls per cycle, reduces average switching activity, so on the same workload they draw \emph{less} dynamic power, an effect only a workload-derived SAIF can capture.
