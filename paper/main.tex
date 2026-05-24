@@ -151,13 +151,13 @@ A 6-bit history is short relative to high-performance gshare but representative 
 The five variants are constructed by splitting or merging stages of a common datapath.
 Each split targets a specific combinational path:
 
-\textbf{4-stage} (IF, ID, EX, MEM/WB): Merges memory access and write-back, eliminating the load-use \emph{stall}, load data returns at the end of the combined MEM/WB stage, in time to forward to the next instruction's EX, but creating the longest critical path. One forwarding source (MEM/WB$\to$EX). Branch penalty: 2 cycles.
+\textbf{4-stage} (IF, ID, EX, MEM/WB): Merges memory access and write-back. Load data returns at the end of the combined MEM/WB stage, in time to forward to the next instruction's EX, which eliminates the load-use \emph{stall} but creates the longest critical path. One forwarding source (MEM/WB$\to$EX). Branch penalty: 2 cycles.
 
 \textbf{5-stage} (IF, ID, EX, MEM, WB): Classic RISC organization \cite{patterson1985reduced}. Introduces a 1-cycle load-use stall. Two forwarding sources. Branch penalty: 2 cycles.
 
 \textbf{6-stage} (IF, ID, EX1, EX2, MEM, WB): Splits the execute phase, separating the forwarding multiplexer (EX1) from ALU and branch comparator (EX2). Three forwarding sources. Branch penalty: 3 cycles. This split targets the dominant critical path in the 4/5-stage designs.
 
-\textbf{7-stage} (IF1, IF2, ID, EX1, EX2, MEM, WB): Splits instruction fetch, placing branch prediction in IF2 with a registered PC. Introduces a 1-cycle IF2 bubble on every correctly predicted taken branch (IF1's speculative fetch is discarded). Branch penalty: 4 cycles. This split targets BRAM read latency. An industrial pipeline might deploy a zero-delay Next-Line Predictor (NLP) or BTB directly in IF1 to eliminate this bubble; we do not, because embedding specialized routing paths in IF1 would alter the physical timing paths unevenly across the 4-to-8-stage variants. The bubble is a deliberate control-variable constraint that preserves strict structural invariants across all depths.
+\textbf{7-stage} (IF1, IF2, ID, EX1, EX2, MEM, WB): Splits instruction fetch, placing branch prediction in IF2 with a registered PC. Introduces a 1-cycle IF2 bubble on every correctly predicted taken branch (IF1's speculative fetch is discarded). Branch penalty: 4 cycles. This split targets BRAM read latency. An industrial pipeline might deploy a zero-delay Next-Line Predictor (NLP) or BTB directly in IF1 to eliminate this bubble. We do not, because embedding specialized routing paths in IF1 would alter the physical timing paths unevenly across the 4-to-8-stage variants. The bubble is a deliberate control-variable constraint that preserves strict structural invariants across all depths.
 
 \textbf{8-stage} (IF1, IF2, ID, EX1, EX2, MEM1, MEM2, WB): Splits memory access, creating a dual load-use stall (loads not available until MEM2). Branch penalty: 4 cycles.
 
@@ -201,14 +201,14 @@ $F_{\max}$ for each run is derived from the worst negative slack (WNS) as $F_{\m
 \textbf{Seed selection.}
 The 10 placement/routing directive pairings were fixed \emph{before} any synthesis run was executed and were not modified or re-selected after observing results.
 The pairings were chosen to sample the space of Vivado optimization heuristics, not to optimize for any particular variant.
-We treat these pairings as a fixed, pre-registered sample and report run-to-run dispersion (mean, standard deviation, $t$-based 95\% CI) as sensitivity to \emph{these seven directives}, not as an estimate over the population of all achievable placements, nor a random sample of Vivado's optimization space.
-This distinction matters for absolute spreads, but not for cross-variant comparisons: because every variant (baseline and SGF) is synthesized under the \emph{same} directive set, an SGF-vs-baseline $F_{\max}$ comparison is paired and controlled regardless of how representative the set is.
+We treat these pairings as a fixed, pre-registered sample. Run-to-run dispersion (mean, standard deviation, $t$-based 95\% CI) is reported as sensitivity to \emph{these seven directives}, not as an estimate over the population of all achievable placements or a random sample of Vivado's optimization space.
+This distinction matters for absolute spreads, but not for cross-variant comparisons. Because every variant (baseline and SGF) is synthesized under the \emph{same} directive set, an SGF-vs-baseline $F_{\max}$ comparison is paired and controlled regardless of how representative the set is.
 Ten runs is a modest sample: it is sufficient to separate the 44\,MHz inter-tier gap (Cohen's $d = 18.5$, non-overlapping CIs) from within-tier noise, but not to resolve the sub-2\,MHz intra-tier differences, which we accordingly do not interpret.
 
 \textbf{Simulation environment.}
 All cycle counts and misprediction counts are from Vivado XSim behavioral (RTL) simulation.
-The design is a single-clock-domain synchronous pipeline with no asynchronous interfaces, so behavioral simulation is \emph{expected} to reproduce the synthesized design's cycle count; we present this as an assertion grounded in the deterministic single-clock structure, not a hardware-validated result (no physical-board cycle measurement is reported here; Section~\ref{sec:limitations}).
-We scope it deliberately: simulation validates \emph{cycle counts}, and hence CPI, but not physical timing, which is established separately by post-place-and-route static timing analysis (the source of all $F_{\max}$ values); we never treat a cycle-accurate simulation as evidence of timing closure.
+The design is a single-clock-domain synchronous pipeline with no asynchronous interfaces, so behavioral simulation is \emph{expected} to reproduce the synthesized design's cycle count. We present this as an assertion grounded in the deterministic single-clock structure, not a hardware-validated result (no physical-board cycle measurement is reported here; Section~\ref{sec:limitations}).
+We scope it deliberately. Simulation validates \emph{cycle counts}, and hence CPI, but not physical timing; physical timing is established separately by post-place-and-route static timing analysis (the source of all $F_{\max}$ values). We never treat a cycle-accurate simulation as evidence of timing closure.
 Determinism is verified by identical instruction counts, branch counts, and memory checksums across all five depth variants for every workload.
 
 \textbf{Reproducibility.}
@@ -456,8 +456,8 @@ SGF instead reaches zero effective update latency without relocating any logic.
 
 For precise PHT indexing, a 6-bit GHR checkpoint is forwarded through the pipeline registers alongside each branch instruction, requiring 24 additional flip-flops across the four pipeline stages between IF2 and EX2.
 On misprediction, the checkpoint stored with the mispredicted branch provides the correct committed GHR state for rollback.
-The cost scales linearly in the GHR width $h$ and is bounded analytically: each pipeline stage between IF2 and EX2 carries an $h$-bit checkpoint ($h\!\times\!s$ flip-flops for $s$ stages), and rollback is a single $h$-bit 2:1 multiplexer (\texttt{spec\_ghr}~$\leftarrow$~\texttt{committed\_ghr}); both grow linearly, with no quadratic or fan-out-sensitive term.
-Concretely, a BRAM-backed gshare with a 2048-entry PHT and an 11-bit GHR, the configuration the reviewer-relevant ``free'' BRAM predictor implies, needs $11\!\times\!4=44$ checkpoint flip-flops and one 11-bit mux on the 7-stage, versus 24 flip-flops at 6 bits: still well under 0.5\% of the core.
+The cost scales linearly in the GHR width $h$ and is bounded analytically. Each pipeline stage between IF2 and EX2 carries an $h$-bit checkpoint ($h\!\times\!s$ flip-flops for $s$ stages), and rollback is a single $h$-bit 2:1 multiplexer (\texttt{spec\_ghr}~$\leftarrow$~\texttt{committed\_ghr}). Both grow linearly, with no quadratic or fan-out-sensitive term.
+Concretely, a BRAM-backed gshare with a 2048-entry PHT and an 11-bit GHR (the configuration the ``free'' BRAM predictor implies) needs $11\!\times\!4=44$ checkpoint flip-flops and one 11-bit mux on the 7-stage, versus 24 flip-flops at 6 bits. That is still well under 0.5\% of the core.
 Moving the PHT into a BRAM tile removes its LUTs entirely, so SGF's \emph{relative} overhead actually shrinks as the predictor grows.
 Only multi-table predictors, which need a separate checkpoint per history length, grow the cost super-linearly (Section~\ref{sec:limitations}).
 
@@ -722,13 +722,13 @@ $\Delta$ 7/8-stg & +1.2\% & +10.0\% & +1.4\% & +10.0\% & +1.3\% & +10.0\% & +1.2
 \end{table*}
 
 \textbf{statemate (controlled result).}
-We treat statemate as the load-bearing result of this experiment: its branch outcomes are data-dependent yet its branch pattern is sparse enough (IBD~=~8.4) that aliasing does not dominate, so the depth effect is observed against a stable baseline.
+We treat statemate as the load-bearing result of this experiment. Its branch outcomes are data-dependent, yet its branch pattern is sparse enough (IBD~=~8.4) that aliasing does not dominate, so the depth effect is observed against a stable baseline.
 Across a 32$\times$ capacity range (PHT=32 to 1024), the misprediction inflation at 7/8-stage depth is +10.0\% at every PHT size from 32 to 256, with absolute counts varying by fewer than 8 mispredictions out of 73{,}000.
-At PHT=1024 the larger table resolves some aliasing and lowers the absolute baseline, yet the depth-dependent inflation does not merely persist, it grows to +11.8\%.
-No PHT capacity from 32 to 1024 entries closes the depth gap, which is the expected signature of an effect that is not caused by table capacity: a 32$\times$ sweep cannot remove what aliasing did not create.
+At PHT=1024 the larger table resolves some aliasing and lowers the absolute baseline. Yet the depth-dependent inflation does not merely persist; it grows to +11.8\%.
+No PHT capacity from 32 to 1024 entries closes the depth gap. This is the expected signature of an effect that is not caused by table capacity: a 32$\times$ sweep cannot remove what aliasing did not create.
 
 \textbf{CoreMark (high-aliasing corroboration).}
-CoreMark has the densest branch pattern of any workload (IBD~=~4.0) and therefore the highest aliasing pressure, which makes its absolute baseline counts swing non-monotonically with table size (145K--172K; the 64-entry table happens to alias favorably, the 256-entry table unfavorably).
+CoreMark has the densest branch pattern of any workload (IBD~=~4.0) and therefore the highest aliasing pressure. Its absolute baseline counts swing non-monotonically with table size (145K--172K; the 64-entry table happens to alias favorably, the 256-entry table unfavorably).
 This aliasing noise partially masks the depth effect, so we deliberately do \emph{not} rest the causal claim on CoreMark's inflation magnitude.
 Two depth-robust facts nonetheless survive the aliasing: the 6-stage exceeds the 4/5-stage baseline at \emph{every} one of the six table sizes, and the 7/8-stage exhibits a consistent +0.7--1.9\% inflation at every size.
 The contrast between the two workloads is itself diagnostic.
@@ -739,7 +739,7 @@ A larger table reduces absolute mispredictions but does not correct the stale-GH
 \label{sec:bimodal}
 
 To confirm that Mechanism~B requires a GHR, we replaced the gshare predictor with a bimodal predictor that indexes the PHT using only the PC (no global history register) and ran CoreMark and statemate on all five pipeline depths.
-The bimodal predictor produces \emph{exactly} the same misprediction count at every depth on both workloads, 85{,}493 (CoreMark) and 63{,}272 (statemate), not a single additional misprediction at any depth, whereas on the same workloads and pipelines gshare shows $+$5.7\% inflation on CoreMark at 6-stage and $+$10.0\% on statemate at 7/8-stage (Table~\ref{tab:phtsweep}).
+The bimodal predictor produces \emph{exactly} the same misprediction count at every depth on both workloads: 85{,}493 (CoreMark) and 63{,}272 (statemate), not a single additional misprediction at any depth. On the same workloads and pipelines, gshare shows $+$5.7\% inflation on CoreMark at 6-stage and $+$10.0\% on statemate at 7/8-stage (Table~\ref{tab:phtsweep}).
 The only architectural difference is the presence of a GHR in the prediction index.
 
 \textbf{Causal conclusion.}
