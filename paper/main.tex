@@ -70,7 +70,7 @@ The experiment also reveals a two-tier frequency structure on Artix-7: shallow p
 
 The two contributions are thus cleanly separated.
 \textbf{(1)~A controlled measurement study} that varies pipeline depth as the single controlled design parameter on FPGA (functional-unit RTL held constant, each split's side effects decomposed): it separates inherent from correctable CPI overhead, establishes the correctable part causally with the bimodal and 32$\times$ PHT controls, captures it in a first-principles CPI model ($R^2 = 0.977$, $R^2_{\text{CV}} = 0.941$), and characterizes the two-tier $F_{\max}$ structure and 6-stage throughput optimum (Sections~\ref{sec:results}--\ref{sec:causal}).
-\textbf{(2)~Speculative GHR Forwarding}, a ROB-free realization of speculative branch history for in-order FPGA soft cores that eliminates the correctable component (Section~\ref{sec:sgf}).
+\textbf{(2)~Speculative GHR Forwarding}, a realization of speculative branch history for in-order FPGA soft cores that eliminates the correctable component (Section~\ref{sec:sgf}). The non-trivial part is not the absence of a ROB (automatic for any in-order core) but that the \emph{existing} pipeline registers already carry enough per-branch state to serve as the checkpoint-forwarding path, so speculative recovery needs no dedicated structure at all; the supporting result is a correctness argument (Section~\ref{sec:sgf_integration}) showing that in-order single-issue resolution admits no nested rollback, so one forwarded checkpoint per branch suffices.
 
 \section{Background and Related Work}
 \label{sec:background}
@@ -285,7 +285,7 @@ Dhrystone and Diagnostic produce \emph{identical} misprediction counts at all de
 The 5-stage CPI exceeds the 4-stage despite an identical branch penalty because of its 1-cycle load-use stall (absent in the 4-stage merged MEM/WB).
 
 CoreMark, by contrast, exhibits a depth-dependent rise in misprediction count, the signature of Mechanism~B.
-The 6-stage produces 154{,}077 mispredictions (21.4\%) versus 145{,}735 (20.2\%) at 4/5-stage (a 5.7\% increase from the longer update latency), with the 7/8-stage between at 147{,}760 (20.5\%).
+The 6-stage produces 154{,}077 mispredictions (21.4\%) versus 145{,}735 (20.2\%) at 4/5-stage (a 5.7\% increase from the longer update latency), with the 7- and 8-stage \emph{identical} at 147{,}760 (20.5\%): the two deepest pipelines share the same 4-stage predictor update latency, so the 8-stage's extra MEM split adds flush-penalty cycles (Mechanism~A) but no new staleness (Mechanism~B).
 All five variants execute identical instruction (2{,}893{,}145) and branch (719{,}810) counts, and the official CoreMark/MHz score ranges from 2.23 (4-stage) to 1.58 (8-stage).
 This inflation is the specific target of SGF.
 
@@ -586,7 +586,7 @@ SGF eliminates Mechanism~B fully; the rest require structural changes addressabl
 \subsection{crc32 Edge Case and the Confidence-Filter Tradeoff}
 \label{sec:crc32}
 
-One workload, crc32, shows a misprediction \emph{increase} under SGF. We treat it as a bounded, fully-explained edge case rather than a counterexample: the increase is 167 mispredictions out of 174{,}591 branches (0.096\%), it changes CPI by less than 0.01 (1.52 in both cases), and its cause is a single identifiable interaction described below. No workload, crc32 included, shows a CPI regression. We dissect it because predicting exactly where SGF is and is not neutral is part of characterizing the mechanism.
+One workload, crc32, shows a misprediction \emph{increase} under SGF. We treat it as a bounded, fully-explained edge case rather than a counterexample: the increase is 167 mispredictions out of 174{,}591 branches (0.096\%), it changes CPI by less than 0.01 (1.52 in both cases), and its cause is a single identifiable interaction described below. No workload, crc32 included, shows a CPI regression. We dissect it because predicting exactly where SGF is and is not neutral is part of characterizing the mechanism. Stated as a class: SGF can \emph{raise} the raw misprediction count on workloads dominated by saturated-counter, highly-biased branches, where the baseline's update latency was accidentally beneficial; this is a \emph{structural} edge case, predictable from the PHT-saturation interaction, not a rare anomaly, though across our suite it remains CPI-neutral.
 
 \textbf{Structural mechanics.} The crc32 inner loop has one dominant branch (\texttt{if (crc \& 1)}), taken 99.8\% of iterations, so its PHT counter saturates and the committed GHR holds a long run of \texttt{1}s.
 Under the baseline, a rare not-taken misprediction does not reach the GHR until EX2, after the next iteration has already been predicted with clean (stale but accidentally accurate) history, so update latency acts as an accidental filter.
@@ -649,15 +649,9 @@ This asymmetry, LUT-dominated paths benefit from splitting, routing-dominated pa
 \subsection{Cache Miss Sensitivity Analysis}
 \label{sec:cache_miss}
 
-All benchmarks in this study execute from a small instruction memory with near-100\% cache hit rates.
-In production systems, cache misses add a depth-independent CPI component that reduces the relative impact of branch-prediction improvements.
-To quantify this boundary, we model the CPI under cache misses as:
-\begin{equation}
-\text{CPI}_{\text{total}} = \text{CPI}_{\text{core}} + r_{\text{miss}} \times p_{\text{miss}}
-\end{equation}
-where $r_{\text{miss}}$ is the miss rate and $p_{\text{miss}}$ is the miss penalty in cycles.
-SGF's \emph{absolute} cycle saving on 7-stage CoreMark (159{,}932 flush cycles) is independent of miss rate, so its \emph{relative} throughput benefit shrinks as memory stalls grow: from 3.0\% at zero misses (this study) to 2.7\% (1\% miss, 20-cycle penalty), 2.0\% (2\%/50-cycle), and 0.9\% (5\%/100-cycle).
-This dilution is inherent to all branch-prediction work: SGF is most valuable in embedded systems with tightly coupled memories (the primary FPGA-soft-core use case) and least valuable when cache-miss penalties dominate.
+All benchmarks execute from single-cycle memory (near-100\% hit). In production, cache misses add a depth-independent term $\text{CPI}_{\text{total}} = \text{CPI}_{\text{core}} + r_{\text{miss}}\,p_{\text{miss}}$ (miss rate $\times$ penalty) that dilutes branch-prediction gains.
+SGF's \emph{absolute} cycle saving on 7-stage CoreMark (159{,}932 flush cycles) is miss-rate-independent, so its \emph{relative} benefit shrinks as memory stalls grow: 3.0\% at zero misses, to 2.7\% (1\%/20-cycle), 2.0\% (2\%/50-cycle), and 0.9\% (5\%/100-cycle).
+SGF is thus most valuable in embedded systems with tightly coupled memories, the primary FPGA-soft-core use case, and least where cache-miss penalties dominate.
 
 \subsection{Recovering the IF2 Bubble: A Measured Next-Line Predictor}
 \label{sec:counterfactual}
@@ -766,6 +760,13 @@ These two experiments close the causal chain:
 \item The PHT capacity sweep proves that Mechanism~B is \emph{not} an aliasing artifact, the inflation persists at every table size from 32 to 1024 entries.
 \item Therefore, Mechanism~B is caused specifically by stale GHR update latency in the pipeline, and SGF, which eliminates this latency, is the correct fix.
 \end{enumerate}
+
+\textbf{Is SGF better than abandoning global history?}
+The bimodal counts also answer a practitioner question for area-constrained designs: is a correlation predictor with SGF preferable to a simpler GHR-free bimodal predictor of the same size?
+The answer is workload-dependent.
+On statemate, global history is genuinely predictive: gshare+SGF (56{,}627) beats bimodal (63{,}272), which beats stale-GHR gshare (73{,}263), so SGF is what makes the correlation predictor worth its GHR.
+On CoreMark, however, the 64-entry gshare is aliasing-bound, and bimodal (85{,}493) records \emph{fewer} mispredictions than gshare even with SGF (101{,}418): SGF removes the staleness component but not the table-capacity aliasing that hurts a tiny gshare on CoreMark's dense branch set.
+The honest guidance is thus not universal: SGF makes gshare worth its GHR \emph{when global history helps}; where a small table leaves gshare aliasing-bound, a bimodal predictor can be the better area-constrained choice, and SGF does not change that.
 
 \subsection{BRAM Instruction Memory Effect}
 \label{sec:bram}
