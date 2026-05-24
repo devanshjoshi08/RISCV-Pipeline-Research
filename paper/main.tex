@@ -27,15 +27,11 @@ Email: \{devansh.jos, shafin.ula\}@utexas.edu}
 \maketitle
 
 \begin{abstract}
-In deep in-order FPGA pipelines, the global history register (GHR) used by correlation-based branch predictors can become stale as update latency grows with pipeline depth, inflating misprediction counts even when the predictor hardware is unchanged.
-We isolate this effect through a controlled experiment: five RV32IM pipeline variants (4--8 stages) sharing identical RTL for all functional units, synthesized on Xilinx Artix-7 XC7A35T across 50 post-place-and-route runs.
-The experiment separates depth-dependent CPI overhead into an inherent component (higher per-misprediction flush penalty, present on all workloads) and a correctable component (stale-GHR misprediction inflation of up to 10\%, present only on the two of seven workloads with short inter-branch distance and data-dependent outcomes), with causal isolation confirmed by two controls: a bimodal predictor (no GHR) shows zero depth-dependent inflation, and a PHT capacity sweep (32--1024 entries) shows the inflation persists at every table size.
-To eliminate the correctable component, we present Speculative GHR Forwarding (SGF), a ROB-free realization of speculative history updating, a technique standard in out-of-order ASICs but, to our knowledge, not previously demonstrated in an in-order FPGA soft core, using a dual-GHR scheme that updates the history register speculatively at prediction time and forwards pipeline-register checkpoints for rollback.
-On the 7-stage pipeline, SGF reduces CoreMark mispredictions by 31.4\% and statemate mispredictions by 22.7\% at 0.7\% area cost with no frequency degradation, pushing deep-pipeline misprediction counts below the shallow-pipeline baseline.
-Because the misprediction penalty is one of several CPI components, this yields a modest direct CPI improvement ($\sim$3\% on 7-stage CoreMark); the case for SGF is its cost-benefit ratio, an entire correctable error class removed at sub-1\% area, rather than a large speedup.
-A first-principles CPI model ($R^2 = 0.977$, cross-validated $R^2_{\text{CV}} = 0.941$) decomposes the remaining depth-dependent costs into physically interpretable terms.
-The experiment also reveals a two-tier frequency structure on Artix-7 (70--74 vs.\ 115--118\,MHz, $p < 0.001$) driven by the execute-stage critical path, identifying the 6-stage pipeline as the highest-throughput design point on this fabric.
-All results are bounded to one FPGA family (Artix-7), one toolchain (Vivado 2025.2), one in-order microarchitecture, the gshare predictor family, and \texttt{-O1} compilation; we report them as measured outcomes under these conditions, not as fabric- or predictor-independent laws.
+Deeper pipelines raise branch-misprediction cost twice over: a larger per-misprediction flush penalty, and, less obviously, a global history register (GHR) whose update latency grows with depth and inflates misprediction counts even when the predictor hardware is unchanged.
+Through a controlled experiment, five RV32IM pipeline variants (4--8 stages) built from identical functional-unit RTL and synthesized on Xilinx Artix-7 XC7A35T over 50 post-place-and-route runs, we first separate depth-dependent CPI into an inherent flush component and a correctable stale-GHR component (up to 10\%, present only on the two of seven workloads with short inter-branch distance and data-dependent branches), isolate the latter causally with a no-GHR bimodal control and a 32$\times$ PHT capacity sweep, and fit a first-principles CPI model ($R^2 = 0.977$, $R^2_{\text{CV}} = 0.941$).
+We then eliminate the correctable component with Speculative GHR Forwarding (SGF): speculative history with checkpoint rollback is well established in ASIC pipelines (recovered through the reorder buffer, or in in-order designs through shift-register histories with checkpoint/mask restore), and SGF's contribution is its FPGA realization, reusing an in-order soft core's existing pipeline registers as the rollback path rather than adding any dedicated recovery structure, via a dual GHR that updates at prediction time.
+SGF cuts 7-stage CoreMark mispredictions 31.4\% and statemate 22.7\% at 0.7\% area and no frequency loss, pushing deep-pipeline accuracy below the shallow-pipeline baseline; because the misprediction penalty is only one of several CPI terms, the direct CPI gain is modest ($\sim$3\%), so the case for SGF is its cost-benefit ratio, not a large speedup.
+All results are bounded to Artix-7, Vivado 2025.2, one in-order RV32IM core, the gshare predictor, and \texttt{-O1} compilation, reported as measured outcomes under these conditions rather than fabric- or predictor-independent laws; on this fabric the execute-stage split also yields a two-tier $F_{\max}$ structure (70--74 vs.\ 115--118\,MHz, $p < 0.001$) that makes the 6-stage the highest-throughput depth.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -49,11 +45,11 @@ How deep should an FPGA pipeline be?
 On ASIC processes the answer is well studied: partition the datapath until gate delay per stage reaches 6--8 FO4 inverter delays, then stop because branch-misprediction penalties and power begin to dominate \cite{hrishikesh2002optimal, sprangle2002increasing, hartstein2002optimum}.
 On FPGAs, where LUT delay is largely function-independent and routing delay dominates timing \cite{xilinx_7series, kuon2007measuring}, that answer does not transfer directly.
 Prior RISC-V soft cores differ in ISA support, predictor design, memory architecture, and forwarding strategy, making performance differences across projects unattributable to any single factor.
-No published study varies pipeline depth as the single controlled design parameter on a common FPGA target while holding the RTL of all other microarchitectural modules constant, each stage split does carry structural side effects (an added load-use stall, a fetch bubble, an extra forwarding source), which we make explicit and decompose rather than assume away.
+No published study varies pipeline depth as the single controlled design parameter on a common FPGA target while holding the RTL of all other microarchitectural modules constant. Each stage split does carry structural side effects (an added load-use stall, a fetch bubble, an extra forwarding source), which we make explicit and decompose rather than assume away.
 
 A subtler cost compounds the explicit penalty of deeper pipelines: the predictor's global history register (GHR) becomes stale because the latency between branch resolution and the next prediction spans more cycles.
 Speculative history updating is itself an established technique: Yeh and Patt's two-level adaptive predictor \cite{yeh1991two} already updates history speculatively, and ASIC out-of-order processors (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}) recover it on misprediction through the reorder buffer or a dedicated branch stack; Gonzalez and Horowitz quantified the staleness cost in ASIC simulations \cite{gonzalez1999power}.
-These recovery mechanisms are tied to the out-of-order substrate, however, the R10000's branch stack checkpoints the register-map alias table and the Alpha's recovery rides the ROB, centralized structures that an in-order FPGA soft core lacks and could not add cheaply (the structures alone would dwarf the predictor they protect).
+These recovery mechanisms are tied to the out-of-order substrate, however: the R10000's branch stack checkpoints the register-map alias table and the Alpha's recovery rides the ROB. These are centralized structures that an in-order FPGA soft core lacks and could not add cheaply (the structures alone would dwarf the predictor they protect).
 The effect itself has not been measured under controlled conditions on FPGA fabric, and no lightweight in-order realization of speculative history has been demonstrated there.
 
 This paper makes two principal contributions (listed at the end of this section).
@@ -67,12 +63,14 @@ First, we construct a controlled experiment, five RV32IM pipeline variants (4--8
 Two controls establish that Mechanism~B is causal rather than correlational: a bimodal predictor (no GHR) shows \emph{zero} depth-dependent inflation on the same workloads, and a 32$\times$ PHT capacity sweep shows the inflation is not a table-size aliasing artifact (Section~\ref{sec:causal}).
 
 Second, we propose Speculative GHR Forwarding (SGF), a lightweight dual-GHR mechanism that eliminates Mechanism~B without a ROB: it updates the history register speculatively at prediction time and forwards GHR checkpoints through existing pipeline registers for rollback.
-SGF is therefore not a new prediction algorithm but a realization result, speculative history, standard in out-of-order ASICs, obtained in an in-order soft core at negligible cost (49~LUTs / 57~FFs, 0.7\% area, no frequency loss) by exploiting the pipeline registers as a natural checkpoint path.
+SGF is therefore not a new prediction algorithm, nor a new rollback concept (speculative history with checkpoint restore is established in both out-of-order and in-order ASIC pipelines), but a realization result: it obtains speculative history in an in-order FPGA soft core at negligible cost (49~LUTs / 57~FFs, 0.7\% area, no frequency loss) by reusing the existing pipeline registers as the checkpoint path, rather than adding the dedicated recovery hardware ASIC schemes assume.
 On the 7-stage pipeline it cuts mispredictions 31.4\% on CoreMark and 22.7\% on statemate, pushing deep-pipeline counts \emph{below} the shallow-pipeline baseline, an effect unreachable by merely shortening the update path.
 
 The experiment also reveals a two-tier frequency structure on Artix-7: shallow pipelines (4/5-stage) cluster at 70--74\,MHz, while deep pipelines (6/7/8-stage) cluster at 115--118\,MHz ($p < 0.001$, Cohen's $d = 18.5$), with the execute-stage split at depth~6 as the sole significant frequency knee.
 
-In summary, the contributions are: (1)~a ROB-free realization of speculative branch history for in-order FPGA soft cores (Section~\ref{sec:sgf}); (2)~a controlled depth characterization that varies depth as the single controlled design parameter, functional-unit RTL held constant, each split's structural side effects made explicit and decomposed, with causal isolation via a bimodal control and a 32$\times$ PHT sweep (Sections~\ref{sec:mispred},~\ref{sec:causal}); (3)~a first-principles CPI model with four interpretable terms ($R^2 = 0.977$, $R^2_{\text{CV}} = 0.941$; Section~\ref{sec:model}); and (4)~an FPGA frequency characterization identifying the two-tier structure and the 6-stage throughput optimum on this fabric (Section~\ref{sec:synth}).
+The two contributions are thus cleanly separated.
+\textbf{(1)~A controlled measurement study} that varies pipeline depth as the single controlled design parameter on FPGA (functional-unit RTL held constant, each split's side effects decomposed): it separates inherent from correctable CPI overhead, establishes the correctable part causally with the bimodal and 32$\times$ PHT controls, captures it in a first-principles CPI model ($R^2 = 0.977$, $R^2_{\text{CV}} = 0.941$), and characterizes the two-tier $F_{\max}$ structure and 6-stage throughput optimum (Sections~\ref{sec:results}--\ref{sec:causal}).
+\textbf{(2)~Speculative GHR Forwarding}, a ROB-free realization of speculative branch history for in-order FPGA soft cores that eliminates the correctable component (Section~\ref{sec:sgf}).
 
 \section{Background and Related Work}
 \label{sec:background}
@@ -98,10 +96,11 @@ Prior RISC-V FPGA implementations vary widely in scope. SERV \cite{serv2019} (bi
 
 \subsection{Speculative History in ASIC Processors}
 
-Speculative GHR updating is long established, Yeh and Patt \cite{yeh1991two} describe it in their two-level predictor, and it is standard in out-of-order ASICs (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}).
-Crucially, those recovery structures are inseparable from the out-of-order core: the R10000's branch stack checkpoints the register-rename map and the Alpha's recovery rides ROB squashing, so neither can be trimmed down and dropped into an in-order soft core.
-TAGE \cite{seznec2011tage} and perceptron \cite{seznec2006revisiting} predictors likewise rely on the ROB for rollback, and in tagged predictors stale GHR corrupts both index and tag, a different error profile than gshare, needing per-table checkpoints; Michaud et al.\ \cite{michaud1999trading} note that update latency compounds with PHT aliasing.
-On FPGA, with no ROB, in-order pipelines have no centralized checkpoint structure; SGF instead forwards GHR checkpoints through existing pipeline registers, so our contribution is an engineering realization and measurement study, not a new prediction algorithm.
+Speculative GHR updating with checkpoint rollback is long established and is \emph{not} what we claim as new.
+Yeh and Patt \cite{yeh1991two} describe speculative history in their two-level predictor; out-of-order ASICs recover it through the reorder buffer or a branch stack (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}), and in-order ASIC pipelines have long used a shift-register history with checkpoint/mask restore on misprediction.
+SGF's contribution is therefore the FPGA realization, not the rollback concept.
+The ASIC recovery structures either tie to out-of-order state (the R10000's branch stack checkpoints the register-rename map, the Alpha rides ROB squashing) or assume a custom ASIC datapath; SGF instead reuses the in-order soft core's \emph{existing} pipeline registers as the checkpoint-forwarding path, adding no dedicated recovery hardware, and we measure the effect it corrects under controlled conditions.
+In tagged predictors stale GHR corrupts both index and tag (a different error profile than gshare), needing per-table checkpoints \cite{seznec2011tage, seznec2006revisiting}; Michaud et al.\ \cite{michaud1999trading} note that update latency compounds with PHT aliasing.
 
 \subsection{FPGA Pipeline Studies}
 
@@ -437,8 +436,10 @@ This section presents Speculative GHR Forwarding (SGF), a lightweight microarchi
 
 The baseline gshare updates its GHR only at branch resolution in EX2, creating a 4-stage update latency on the 7/8-stage pipelines.
 When branches are separated by fewer than 4 instructions, the second branch uses a GHR that does not reflect the first's outcome.
-This inflates CoreMark mispredictions by 5.7\% at 6-stage and statemate by 10.0\% at 7/8-stage relative to the 4/5-stage baseline.
-These additional mispredictions compound with Mechanism~A's longer flush penalty, producing a superlinear CPI increase.
+
+A cycle-level trace makes the path concrete. Consider two correlated branches $B_1$, $B_2$ two instructions apart on the 7-stage pipeline, where $B_2$'s outcome depends on $B_1$'s. $B_1$ is predicted in IF2 at cycle $t$ and resolves in EX2 at cycle $t{+}4$, writing its outcome into the GHR there. $B_2$ enters IF2 at cycle $t{+}2$ and is therefore indexed with a GHR that still predates $B_1$, so PC$_{B_2}\oplus$GHR selects the PHT counter trained for the \emph{wrong} history context, mispredicting $B_2$. On the 4/5-stage pipeline the same pair has only a 2-stage update path, $B_1$ resolves at $t{+}2$ exactly as $B_2$ is indexed, so $B_2$ sees fresh history and predicts correctly. The extra misprediction exists purely because depth widened the resolution-to-prediction window: it is a control-path timing artifact, not a capacity or training deficiency, which is why neither a larger PHT nor more training removes it (Section~\ref{sec:causal}) but zeroing the update latency does.
+
+Aggregated over the workload this inflates CoreMark mispredictions by 5.7\% at 6-stage and statemate by 10.0\% at 7/8-stage relative to the 4/5-stage baseline, and these compound with Mechanism~A's longer flush penalty to produce a superlinear CPI increase.
 
 \subsection{Design: Dual-GHR Architecture}
 \label{sec:sgf_design}
@@ -453,15 +454,16 @@ On a misprediction, \texttt{spec\_ghr} is restored from \texttt{committed\_ghr},
 The speculative GHR is used for PHT indexing at prediction time, while the committed GHR provides the index for PHT updates at resolution time.
 This separation ensures that the predictor always sees the freshest available history for new predictions while maintaining correct training.
 
-\textbf{Why not simply update the GHR one stage earlier?}
-The simplest alternative to SGF is to move the GHR update from EX2 to EX1, reducing update latency by one stage without a dual-GHR mechanism.
-However, this approach has two limitations.
-First, it reduces update latency by only one cycle (from 4 to 3 on the 7/8-stage pipeline), which mitigates but does not eliminate Mechanism~B, any residual latency still permits stale-GHR mispredictions when branches are closely spaced.
-Second, the GHR update requires the actual branch outcome, which is computed by the branch comparator in EX2; moving the update to EX1 would require the comparator to also move to EX1, undoing the execute-stage split that produces the 56\% frequency improvement.
-SGF avoids both problems: it achieves zero effective update latency (the speculative GHR is updated in the same cycle as prediction) without moving any logic between pipeline stages.
+\textbf{Why not just update the GHR one stage earlier?}
+Moving the update from EX2 to EX1 cuts latency by only one cycle (4 to 3 on the 7/8-stage), which mitigates but does not eliminate Mechanism~B; worse, the update needs the actual outcome from the EX2 branch comparator, so relocating it to EX1 would drag the comparator along and undo the execute-stage split that gives the 56\% frequency gain.
+SGF instead reaches zero effective update latency without relocating any logic.
 
 For precise PHT indexing, a 6-bit GHR checkpoint is forwarded through the pipeline registers alongside each branch instruction, requiring 24 additional flip-flops across the four pipeline stages between IF2 and EX2.
 On misprediction, the checkpoint stored with the mispredicted branch provides the correct committed GHR state for rollback.
+The cost scales linearly in the GHR width $h$ and is bounded analytically: each pipeline stage between IF2 and EX2 carries an $h$-bit checkpoint ($h\!\times\!s$ flip-flops for $s$ stages), and rollback is a single $h$-bit 2:1 multiplexer (\texttt{spec\_ghr}~$\leftarrow$~\texttt{committed\_ghr}); both grow linearly, with no quadratic or fan-out-sensitive term.
+Concretely, a BRAM-backed gshare with a 2048-entry PHT and an 11-bit GHR, the configuration the reviewer-relevant ``free'' BRAM predictor implies, needs $11\!\times\!4=44$ checkpoint flip-flops and one 11-bit mux on the 7-stage, versus 24 flip-flops at 6 bits: still well under 0.5\% of the core.
+Moving the PHT into a BRAM tile removes its LUTs entirely, so SGF's \emph{relative} overhead actually shrinks as the predictor grows.
+Only multi-table predictors, which need a separate checkpoint per history length, grow the cost super-linearly (Section~\ref{sec:limitations}).
 
 \subsection{Integration}
 \label{sec:sgf_integration}
@@ -579,7 +581,7 @@ SGF eliminates Mechanism~B fully; the rest require structural changes addressabl
 \subsection{crc32 Edge Case and the Confidence-Filter Tradeoff}
 \label{sec:crc32}
 
-The crc32 pathology traces to a specific microarchitectural interaction that we dissect here to demonstrate architectural predictability of SGF's edge cases.
+One workload, crc32, shows a misprediction \emph{increase} under SGF. We treat it as a bounded, fully-explained edge case rather than a counterexample: the increase is 167 mispredictions out of 174{,}591 branches (0.096\%), it changes CPI by less than 0.01 (1.52 in both cases), and its cause is a single identifiable interaction described below. No workload, crc32 included, shows a CPI regression. We dissect it because predicting exactly where SGF is and is not neutral is part of characterizing the mechanism.
 
 \textbf{Structural mechanics.} The crc32 inner loop has one dominant branch (\texttt{if (crc \& 1)}), taken 99.8\% of iterations, so its PHT counter saturates and the committed GHR holds a long run of \texttt{1}s.
 Under the baseline, a rare not-taken misprediction does not reach the GHR until EX2, after the next iteration has already been predicted with clean (stale but accidentally accurate) history, so update latency acts as an accidental filter.
@@ -663,14 +665,15 @@ The model's $B(D)$ term is thus an \emph{upper bound} on the recoverable cost, o
 
 The combined NLP+SGF variant, measured directly, shows the two mechanisms are complementary: SGF+NLP reaches CPI 1.89, better than SGF (1.96) or NLP (1.97) alone, with a misprediction count (101{,}449) essentially equal to SGF alone (101{,}418), SGF's zero-latency speculative GHR absorbs the fetch-timing perturbation that raised the NLP's mispredictions in isolation, so the combined cycle saving (360{,}399) slightly \emph{exceeds} the sum of the parts (307{,}450).
 Even so, 1.89\,CPI remains above the 6-stage's 1.83, so the 6-stage stays throughput-optimal; recovering more of the 0.28\,CPI bound (a larger next-fetch table or next-line-and-set predictor) is future work.
+We evaluate the NLP for CPI only. Advancing the redirect into IF1 adds a PC\,$\rightarrow$\,next-fetch-table\,$\rightarrow$\,mux\,$\rightarrow$\,fetch-address path that can pressure $F_{\max}$ on FPGA, so a net-throughput claim for the NLP-augmented core requires its post-place-and-route $F_{\max}$, which we have not yet measured; the CPI gain reported here is therefore an upper bound on its throughput benefit, and confirming the frequency is required follow-up. This does not affect the SGF results, which are synthesized and show no $F_{\max}$ loss (Section~\ref{sec:sgf_synth}).
 
 \subsection{Anticipated Objections}
 \label{sec:objections}
 
-Three points bear on how the results should be read.
-\emph{Generality:} we claim it for the \emph{mechanism}, not the magnitudes, Mechanism~B arises whenever a global-history predictor's update latency exceeds zero (a structural property of in-order pipelines, established causally by the bimodal and PHT-sweep controls), so the Mechanism-A/B decomposition and the ROB-free construction transfer, but any specific percentage does not.
-\emph{Significance:} the 31\% misprediction reduction yields only a 3\% CPI gain (Mechanism~B is one of four CPI components, Section~\ref{sec:sgf_key}); the case for SGF is its cost-benefit ratio, an entire correctable error class removed at 0.5--0.7\% area with no frequency penalty, not a large speedup.
-\emph{Workload/tool dependence:} the \texttt{-O1} setting, benchmark set, and single-cycle memory are stated boundaries (Sections~\ref{sec:cache_miss},~\ref{sec:limitations}); we present the optimal-depth conclusion as the measured outcome under these conditions on this fabric, not as invariant to them.
+Three reading caveats.
+\emph{(i)~Generality} is claimed for the \emph{mechanism}, not the magnitudes: Mechanism~B arises for any global-history predictor with nonzero update latency (shown causally by the bimodal and PHT controls), so the decomposition and the ROB-free construction transfer while specific percentages do not.
+\emph{(ii)~Significance:} the 31\% misprediction cut is a 3\% CPI gain, so SGF's case is cost-benefit (sub-1\% area, no frequency penalty), not speedup.
+\emph{(iii)~Scope:} the \texttt{-O1} setting, benchmark set, and single-cycle memory are stated boundaries (Sections~\ref{sec:cache_miss},~\ref{sec:limitations}), and the optimal-depth conclusion is the measured outcome under these conditions, not invariant to them.
 
 \subsection{Design Guidance for Practitioners}
 \label{sec:guidance}
@@ -815,25 +818,17 @@ Whether the IBD-based heuristic survives aggressive optimization is therefore th
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper makes two contributions to the design of pipelined FPGA soft cores.
-First, a controlled depth experiment, five RV32IM pipeline variants from shared RTL on Artix-7, separates depth-dependent CPI overhead into an inherent component (Mechanism~A: flush penalty scaling) and a correctable component (Mechanism~B: stale-GHR misprediction inflation of up to 10\%).
-Causal isolation is established by two independent controls: a bimodal predictor (no GHR) produces identical misprediction counts across all five depths on the same workloads where gshare shows +5.7--10\% inflation, and a PHT capacity sweep from 32 to 1024 entries shows the inflation persists at every table size.
-A first-principles CPI model ($R^2 = 0.977$, cross-validated $R^2_{\text{CV}} = 0.941$) decomposes each cost into physically interpretable terms.
+This paper makes two contributions to pipelined FPGA soft-core design.
+First, a controlled depth experiment (five RV32IM variants from shared RTL on Artix-7) separates depth-dependent CPI into an inherent flush component (Mechanism~A) and a correctable stale-GHR component (Mechanism~B, up to 10\%), isolated causally by a no-GHR bimodal control (zero inflation) and a 32$\times$ PHT sweep (inflation at every size) and captured by a first-principles CPI model ($R^2 = 0.977$, $R^2_{\text{CV}} = 0.941$).
+It also identifies a two-tier $F_{\max}$ structure ($p < 0.001$, $d = 18.5$) whose sole knee is the execute-stage split, making the 6-stage the highest-throughput depth, a result we present as fabric- and tool-conditional, not universal.
 
-Second, Speculative GHR Forwarding (SGF) eliminates Mechanism~B by replacing the single committed GHR with a dual-GHR architecture that updates speculatively at prediction time and uses pipeline-register-forwarded checkpoints for rollback, requiring no reorder buffer.
-SGF reduces mispredictions by 31.4\% on CoreMark and 22.7\% on statemate in 7-stage pipelines at 0.7\% area cost with no frequency degradation.
-The zero-latency speculative update pushes deep-pipeline misprediction counts below the shallow-pipeline baseline, an effect not achievable by reducing update latency alone.
-No workload shows CPI degradation; the lone misprediction blip (on crc32) is CPI-neutral.
+Second, Speculative GHR Forwarding eliminates Mechanism~B with a ROB-free dual-GHR architecture that updates speculatively at prediction time and rolls back from pipeline-register checkpoints.
+It cuts 7-stage CoreMark mispredictions 31.4\% and statemate 22.7\% at 0.5--0.7\% area and no frequency penalty, pushing deep-pipeline accuracy below the shallow baseline; no workload shows CPI degradation (the crc32 blip is CPI-neutral).
+For practitioners, SGF is a low-risk addition to any gshare-class in-order pipeline with three or more stages of update latency.
 
-The experiment also identifies the 6-stage pipeline as the highest-throughput design point on Artix-7, driven by a two-tier frequency structure ($p < 0.001$, Cohen's $d = 18.5$) whose sole knee is the execute-stage split.
-This frequency result is specific to the 6-input LUT fabric and Vivado's placer; the optimal depth and the location of the knee may shift on other FPGA families or tools, so we present the 6-stage recommendation as fabric- and tool-conditional rather than universal.
-
-For practitioners building gshare-class predictors on FPGA soft cores, SGF is a low-risk addition: an in-order pipeline with three or more stages of predictor update latency stands to benefit, at a negligible 0.5--0.7\% area cost and no frequency penalty, for a 17--31\% misprediction reduction on branch-dense workloads.
-Whether the benefit carries to tournament/TAGE predictors, other FPGA fabrics, and richer memory hierarchies remains to be measured; what transfers without re-measurement is the Mechanism-A/B decomposition and the ROB-free dual-GHR construction, not the specific percentages.
-
-Future work includes extending SGF to tournament and TAGE \cite{seznec2011tage} predictors, where the longer global histories may make stale-history inflation more severe, and each history length needs its own speculative state and checkpoint; validating the two-tier frequency structure on Intel FPGA fabrics (Cyclone~V, Arria~10); and evaluating SGF across compiler optimization levels to characterize the interaction between branch density and speculative history accuracy.
-
-The complete RTL, testbenches, synthesis scripts, and benchmark programs are publicly available at \url{https://github.com/devanshjoshi08/RISCV-Pipeline-Research}.
+What transfers without re-measurement is the Mechanism-A/B decomposition and the ROB-free construction, not the specific percentages.
+Future work centers on a measured \texttt{-O2}/\texttt{-O3} robustness check (the key open question for the IBD heuristic), extension to tournament/TAGE \cite{seznec2011tage} predictors, and validation on other FPGA fabrics.
+The complete RTL, testbenches, synthesis scripts, and benchmark programs are available at \url{https://github.com/devanshjoshi08/RISCV-Pipeline-Research}.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
