@@ -15,7 +15,9 @@ module branch_predictor_tage_sgf #(
   parameter BTB_DEPTH  = 32,
   parameter RAS_DEPTH  = 4,
   parameter HIST       = 16,           // longest global-history length / checkpoint width
-  parameter CONF_FILTER = 1            // 1: suppress speculative shift on a saturated (high-confidence) provider
+  parameter CONF_FILTER = 0            // 1: hold speculative shift on a saturated provider.
+                                       // Measured to backfire on TAGE (worsens aha-mont64,
+                                       // erodes CoreMark), so off by default; see paper Sec. V-K.
 )(
   input  logic        clk, rst_n,
   input  logic [31:0] pc_if,
