@@ -23,8 +23,11 @@ EMBENCH_DIR = D:/embench-iot
 # Benchmarks to build (all pure integer, fit in 16KB imem + 4KB dmem)
 BENCHMARKS = aha-mont64 crc32 statemate edn
 
+# Optimization level. Default -O1 (paper baseline); override with `make OPT=-O2`.
+OPT ?= -O1
+
 # Compiler flags
-CFLAGS  = -march=rv32im_zicsr -mabi=ilp32 -O1 -nostdlib -nostartfiles -ffreestanding
+CFLAGS  = -march=rv32im_zicsr -mabi=ilp32 $(OPT) -nostdlib -nostartfiles -ffreestanding
 CFLAGS += -fno-builtin -Wno-implicit-function-declaration
 CFLAGS += -I$(EMBENCH_DIR)/support -I$(EMBENCH_DIR)/src
 CFLAGS += -DWARMUP_HEAT=1 -DCPU_MHZ=1 -DGLOBAL_SCALE_FACTOR=1

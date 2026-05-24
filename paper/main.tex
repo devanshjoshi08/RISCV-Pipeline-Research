@@ -502,6 +502,7 @@ This admits exactly two transitions for the resolving branch.
 (ii)~On a misprediction, the flush squashes \emph{all} younger branches together with their checkpoints in the same cycle, and \texttt{spec\_ghr} is restored once from \texttt{committed\_ghr}; no younger speculative state can survive to be ``partially'' rolled back.
 Because younger branches are never older than the one resolving, there is no out-of-order analogue in which an earlier branch's misprediction must selectively unwind a later branch's committed update.
 The single-restore invariant of the previous paragraph therefore covers every reachable state, and forwarded checkpoints are sufficient in all overlapping-branch scenarios, which is the formal reason SGF requires no ROB.
+These invariants are encoded as a SystemVerilog assertion suite (checkpoint-equals-spec-history, update-uses-checkpoint, no speculative shift during flush, the post-flush restore relation, and no back-to-back flush) bound into the predictor and checked across all benchmark simulations; the assertions are part of the released artifact.
 
 \subsection{Synthesis Results}
 \label{sec:sgf_synth}

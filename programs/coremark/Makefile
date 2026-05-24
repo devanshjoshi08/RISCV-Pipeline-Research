@@ -23,11 +23,14 @@ COREMARK_DIR ?= D:/coremark
 # Number of iterations for simulation (10 = fast, 100 = more accurate)
 ITERATIONS ?= 10
 
+# Optimization level. Default -O1 (paper baseline); override with `make OPT=-O2`.
+OPT ?= -O1
+
 # Compiler flags
-CFLAGS  = -march=rv32im_zicsr -mabi=ilp32 -O1 -nostdlib -nostartfiles -ffreestanding
+CFLAGS  = -march=rv32im_zicsr -mabi=ilp32 $(OPT) -nostdlib -nostartfiles -ffreestanding
 CFLAGS += -fno-builtin
 CFLAGS += -DITERATIONS=$(ITERATIONS) -DPERFORMANCE_RUN=1
-FLAGS_DESC = "-march=rv32im_zicsr -mabi=ilp32 -O1 -nostdlib -ffreestanding"
+FLAGS_DESC = "-march=rv32im_zicsr -mabi=ilp32 $(OPT) -nostdlib -ffreestanding"
 CFLAGS += -DFLAGS_STR='$(FLAGS_DESC)'
 CFLAGS += -I$(COREMARK_DIR) -I.
 LDFLAGS = -T link_coremark.ld -Wl,--no-relax -Wl,--gc-sections
