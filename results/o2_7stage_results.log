@@ -18,3 +18,21 @@ $finish called at time : 44309305 ns : File "D:/RISCV-Vivado/o2_7stage/tb/o2_bas
   CPI:            1.44
 $finish called at time : 40390365 ns : File "D:/RISCV-Vivado/o2_7stage/tb/o2_baseline_statemate_tb.sv" Line 33
 
+--- sgf / coremark (-O2) ---
+=== coremark: rv32i_pipeline_7stage_sgf_top (-O2) ===
+  Cycles:         4184309
+  Instructions:   2376016
+  Branches:       534330
+  Mispredictions: 79705
+  CPI:            1.76
+$finish called at time : 41895195 ns : File "D:/RISCV-Vivado/o2_7stage/tb/o2_sgf_coremark_tb.sv" Line 33
+
+--- sgf / statemate (-O2) ---
+=== statemate: rv32i_pipeline_7stage_sgf_top (-O2) ===
+  Cycles:         4006084
+  Instructions:   2797251
+  Branches:       372961
+  Mispredictions: 73267
+  CPI:            1.43
+$finish called at time : 40090605 ns : File "D:/RISCV-Vivado/o2_7stage/tb/o2_sgf_statemate_tb.sv" Line 33
+

@@ -108,6 +108,7 @@ Every code-backed claim in the paper, mapped to the source / script / committed 
 | Analytical CPI model R² = 0.977, R²_CV = 0.941 (LOWO) | `scripts/generate_plots_5depth.py` (fit + `cpi_vs_depth`); inputs are the benchmark logs above |
 | Workload-SAIF power *falls* with depth (0.235→0.217 W, opposite to uniform-toggle) | `scripts/run_saif_workload.tcl` → `results/saif_workload_results.log`; fig `scripts/regen_power_figs.py` |
 | NLP recovers part of the IF2 bubble; **SGF+NLP super-additive** (CPI 1.89) | `rtl_7stage/rv32i_pipeline_7stage_nlp_top.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_nlp_top.sv` → `results/nlp_results.log`, `results/sgf_nlp_results.log` |
+| SGF benefit survives `-O2` (CoreMark −43.6%, statemate −12.0%; IBD stays < 10) | `scripts/build_O2_benchmarks.sh`, `scripts/run_O2_7stage.tcl` → `results/o2_7stage_results.log` |
 | BRAM instr-memory lets 7/8-stage near-match 6-stage F_max | `rtl/rv32i_pipeline_bram_top.sv`, `rtl_7stage/rv32i_pipeline_7stage_bram_top.sv`, `vivado/synth_bram.tcl` → `vivado/bram_synth_results.log`; fig `scripts/regen_bram_fig.py` |
 | Determinism: identical instruction/branch counts + memory checksums across all depths | every benchmark log above; `tb/rv32i_benchmark_tb.sv`, `tb/rv32i_riscv_tests_tb.sv` |
 | Functional correctness (37 riscv-tests + 24-point bench) | `tb/rv32i_riscv_tests_tb.sv`, `tb/rv32i_comprehensive_tb.sv`, `scripts/run_all_tests.tcl` → `vivado/test_results.log` |
