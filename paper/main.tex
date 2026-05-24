@@ -300,7 +300,7 @@ Among the four Embench-IoT kernels, multiply-heavy aha-mont64 has the lowest CPI
 
 \begin{table}[t]
 \centering
-\caption{Measured CPI across all seven workloads and five pipeline depths ($f_b$ = branch frequency). Every variant executes identical instruction, branch, and misprediction counts per workload (determinism check). CoreMark and statemate additionally show depth-dependent misprediction inflation (Mechanism~B; see text and Fig.~\ref{fig:mispred}).}
+\caption{Measured CPI across all seven workloads and five pipeline depths ($f_b$ = branch frequency). Every variant executes identical instruction, branch, and misprediction counts per workload (determinism check). CoreMark and statemate also show depth-dependent misprediction inflation (Mechanism~B; see text and Fig.~\ref{fig:mispred}).}
 \label{tab:cpi_all}
 \small
 \begin{tabular}{@{}lccccc@{}}
@@ -460,7 +460,7 @@ For precise PHT indexing, a 6-bit GHR checkpoint is forwarded through the pipeli
 On misprediction, the checkpoint stored with the mispredicted branch provides the correct committed GHR state for rollback.
 The cost scales linearly in the GHR width $h$ and is bounded analytically. Each pipeline stage between IF2 and EX2 carries an $h$-bit checkpoint ($h\!\times\!s$ flip-flops for $s$ stages), and rollback is a single $h$-bit 2:1 multiplexer (\texttt{spec\_ghr}~$\leftarrow$~\texttt{committed\_ghr}). Both grow linearly, with no quadratic or fan-out-sensitive term.
 Concretely, a BRAM-backed gshare with a 2048-entry PHT and an 11-bit GHR (the configuration the ``free'' BRAM predictor implies) needs $11\!\times\!4=44$ checkpoint flip-flops and one 11-bit mux on the 7-stage, versus 24 flip-flops at 6 bits. That is still well under 0.5\% of the core.
-Moving the PHT into a BRAM tile removes its LUTs entirely, so SGF's \emph{relative} overhead actually shrinks as the predictor grows.
+Moving the PHT into a BRAM tile removes its LUTs entirely, so SGF's \emph{relative} overhead shrinks as the predictor grows.
 Only multi-table predictors, which need a separate checkpoint per history length, grow the cost super-linearly (Section~\ref{sec:limitations}).
 
 \subsection{Integration}
@@ -539,7 +539,7 @@ Diagnostic   & 69        & 69                 & 69        & 69                 &
 \footnotesize{$\Delta$\% column shows 7-stage/8-stage misprediction change (rounded). 8-stage baseline counts equal 7-stage (both have 4-stage update latency). \textbf{Hardware cost (7-stage, workload-independent):} +49 LUTs (+0.6\%), +57 FFs (+0.7\%), 0 DSP/BRAM, $F_{\max}$ 117.5 vs.\ 115.0\,MHz (no degradation). Net cycle savings: CoreMark $+$159{,}932, statemate $+$63{,}222, aha-mont64 $+$89{,}044 (others 0).}
 \end{table*}
 
-The results demonstrate three distinct SGF behaviors:
+The results show three distinct SGF behaviors:
 
 \textbf{Strong reduction on branch-dense workloads.}
 CoreMark mispredictions drop from 147{,}760 to 101{,}418 on the 7-stage ($-$31.4\%) and from 147{,}760 to 102{,}053 on the 8-stage ($-$30.9\%).
@@ -625,7 +625,7 @@ The magnitude tracks how history-dependent each predictor is. The tournament red
 
 The biased-branch edge case of Section~\ref{sec:crc32} also generalizes, but it relocates with predictor structure rather than staying on one workload. On gshare it raises crc32 mispredictions. On TAGE it instead raises aha-mont64 ($+5.0\%$, CPI-neutral), whose biased loops let the speculative shift pollute the history-indexed tables, while crc32 itself improves. The same one-comparator confidence filter (Section~\ref{sec:crc32}), which holds the speculative shift on a saturated provider, suppresses it; we report the unfiltered counts here.
 
-The hardware cost, in contrast, does not generalize uniformly, and the measurements confirm the multi-table caveat of Section~\ref{sec:sgf_design}. On the tournament predictor SGF stays cheap: $+50$ LUTs ($0.6\%$), $+44$ flip-flops ($0.5\%$), and no frequency penalty ($112.6$ vs.\ $111.7$\,MHz across three seeds), since one forwarded global checkpoint corrects both the global PHT and the chooser. On TAGE the checkpoint flip-flops stay modest ($+74$), but LUTs grow $+2{,}434$ ($+21\%$). Each of the three geometric-history tables hashes its index and tag from the speculative history for the read and from the forwarded checkpoint for the write, and that per-table dual hashing does not share. This is the super-linear growth anticipated in Section~\ref{sec:sgf_design}, now measured. TAGE is moreover expensive before SGF (about $1.5\times$ the gshare core's LUTs and a frequency tier slower, $\sim$94\,MHz), so it is not the predictor a resource-constrained soft core would choose on this fabric. SGF delivers a misprediction reduction at negligible cost on the single-global-history predictors (gshare, tournament) that suit such cores; on a multi-table predictor the benefit persists but the low cost does not.
+The hardware cost, in contrast, does not generalize uniformly, and the measurements confirm the multi-table caveat of Section~\ref{sec:sgf_design}. On the tournament predictor SGF stays cheap: $+50$ LUTs ($0.6\%$), $+44$ flip-flops ($0.5\%$), and no frequency penalty ($112.6$ vs.\ $111.7$\,MHz across three seeds), since one forwarded global checkpoint corrects both the global PHT and the chooser. On TAGE the checkpoint flip-flops stay modest ($+74$), but LUTs grow $+2{,}434$ ($+21\%$). Each of the three geometric-history tables hashes its index and tag from the speculative history for the read and from the forwarded checkpoint for the write, and that per-table dual hashing does not share. This is the super-linear growth anticipated in Section~\ref{sec:sgf_design}, now measured. TAGE is also expensive before SGF (about $1.5\times$ the gshare core's LUTs and a frequency tier slower, $\sim$94\,MHz), so it is not the predictor a resource-constrained soft core would choose on this fabric. SGF delivers a misprediction reduction at negligible cost on the single-global-history predictors (gshare, tournament) that suit such cores; on a multi-table predictor the benefit persists but the low cost does not.
 
 \begin{table}[t]
 \centering
@@ -736,7 +736,7 @@ No PHT capacity from 32 to 1024 entries closes the depth gap. This is the expect
 \textbf{CoreMark (high-aliasing corroboration).}
 CoreMark has the densest branch pattern of any workload (IBD~=~4.0) and therefore the highest aliasing pressure. Its absolute baseline counts swing non-monotonically with table size (145K--172K; the 64-entry table happens to alias favorably, the 256-entry table unfavorably).
 This aliasing noise partially masks the depth effect, so we deliberately do \emph{not} rest the causal claim on CoreMark's inflation magnitude.
-Two depth-robust facts nonetheless survive the aliasing: the 6-stage exceeds the 4/5-stage baseline at \emph{every} one of the six table sizes, and the 7/8-stage exhibits a consistent +0.7--1.9\% inflation at every size.
+Two facts nonetheless survive the aliasing: the 6-stage exceeds the 4/5-stage baseline at \emph{every} one of the six table sizes, and the 7/8-stage shows a consistent +0.7--1.9\% inflation at every size.
 The contrast between the two workloads is itself diagnostic.
 The table-size-dependent baseline swing isolates the \emph{aliasing} axis, while the table-size-invariant depth gap isolates the \emph{staleness} axis; the two are orthogonal.
 A larger table reduces absolute mispredictions but does not correct the stale-GHR inflation that SGF targets, and only the latter is the subject of this paper.
