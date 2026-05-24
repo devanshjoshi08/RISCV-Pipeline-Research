@@ -72,6 +72,8 @@ Two controls establish that Mechanism~B is causal rather than correlational: a b
 Second, we propose Speculative GHR Forwarding (SGF), a lightweight dual-GHR mechanism that eliminates Mechanism~B without a ROB: it updates the history register speculatively at prediction time and forwards GHR checkpoints through existing pipeline registers for rollback.
 On the 7-stage pipeline it cuts mispredictions 31.4\% on CoreMark and 22.7\% on statemate, pushing deep-pipeline counts \emph{below} the shallow-pipeline baseline, an effect unreachable by merely shortening the update path.
 
+The value of this is a favorable cost-benefit tradeoff, not a large speedup, and it is worth stating plainly up front. Because Mechanism~B is only one of several depth costs, the 31\% misprediction cut is a roughly 3\% CPI gain, and SGF does not make a deeper pipeline out-throughput a shallower one (the 6-stage remains the highest-throughput depth even against a 7-stage with SGF). SGF earns its place in a different situation: when depth is \emph{already forced} by a timing constraint, such as a registered-BRAM instruction fetch that mandates the IF1/IF2 split. There the stale-GHR penalty is an unavoidable tax on a decision made for frequency, and SGF removes it for under 1\% area and no frequency loss. It is therefore a low-risk addition to any gshare-class in-order pipeline carrying three or more stages of update latency, exactly where deep FPGA soft cores already operate.
+
 The experiment also reveals a two-tier frequency structure on Artix-7. Shallow pipelines (4/5-stage) cluster at 70--74\,MHz; deep pipelines (6/7/8-stage) cluster at 115--118\,MHz ($p < 0.001$, Cohen's $d = 18.5$). The execute-stage split at depth~6 is the sole significant frequency knee, a directly actionable design rule for any RV32IM-class FPGA soft core independent of SGF.
 
 The two contributions are thus cleanly separated.
@@ -684,7 +686,7 @@ For RV32IM-class soft cores on Artix-7, the data support four guidelines.
 The 6-stage is the highest-throughput depth here (64.1\,MIPS CoreMark): it captures the full execute-split frequency benefit at moderate CPI.
 The 5-stage is dominated, sharing the 4-stage frequency ceiling while adding load-use stalls, so it helps only when area is binding (a conclusion conditional on the \texttt{-O1} mix).
 The 7/8-stage match the 6-stage on frequency but pay higher CPI, justified only when the IF split resolves a genuine timing bottleneck such as synchronous BRAM instruction memory.
-Crucially, SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF reaches $115.0/1.96 = 58.7$\,MIPS vs.\ 64.1): it is not a way to win throughput by going deeper but the right fix once depth is \emph{already forced} by a timing constraint, removing the resulting stale-GHR penalty at any depth with $\geq$3 stages of update latency (including the 6-stage, $-$23.9\% CoreMark) for a 0.5--0.7\% area cost against a 17--31\% misprediction reduction.
+Consistent with the cost-benefit framing of Section~\ref{sec:intro}, SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF reaches $115.0/1.96 = 58.7$\,MIPS vs.\ 64.1); it is worth adding at any forced depth carrying $\geq$3 stages of update latency, including the 6-stage itself ($-$23.9\% CoreMark), for a 0.5--0.7\% area cost against a 17--31\% misprediction reduction.
 
 \section{Causal Isolation and Supporting Analyses}
 \label{sec:supplementary}
