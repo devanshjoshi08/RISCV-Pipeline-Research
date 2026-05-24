@@ -1,0 +1,75 @@
+=== TAGE predictor: baseline vs SGF (7-stage) ===
+=== Sun May 24 15:10:05 -0500 2026 ===
+DETERMINISM GATE: Instructions and Branches must match base vs sgf per workload.
+--- base / coremark ---
+=== coremark: rv32i_pipeline_7stage_tage_top ===
+  Cycles:         5720931
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 110045
+  CPI:            1.97
+$finish called at time : 57261455 ns : File "D:/RISCV-Vivado/vivado_tage/tb/tage_base_coremark_tb.sv" Line 33
+
+--- base / statemate ---
+=== statemate: rv32i_pipeline_7stage_tage_top ===
+  Cycles:         4705377
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 59942
+  CPI:            1.48
+$finish called at time : 47085695 ns : File "D:/RISCV-Vivado/vivado_tage/tb/tage_base_statemate_tb.sv" Line 33
+
+--- base / aha-mont64 ---
+=== aha-mont64: rv32i_pipeline_7stage_tage_top ===
+  Cycles:         5723653
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 84985
+  CPI:            1.28
+$finish called at time : 57373365 ns : File "D:/RISCV-Vivado/vivado_tage/tb/tage_base_aha-mont64_tb.sv" Line 33
+
+--- base / crc32 ---
+=== crc32: rv32i_pipeline_7stage_tage_top ===
+  Cycles:         6102230
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 342
+  CPI:            1.52
+$finish called at time : 61393885 ns : File "D:/RISCV-Vivado/vivado_tage/tb/tage_base_crc32_tb.sv" Line 33
+
+--- sgf / coremark ---
+=== coremark: rv32i_pipeline_7stage_tage_sgf_top ===
+  Cycles:         5649960
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 87905
+  CPI:            1.95
+$finish called at time : 56551745 ns : File "D:/RISCV-Vivado/vivado_tage/tb/tage_sgf_coremark_tb.sv" Line 33
+
+--- sgf / statemate ---
+=== statemate: rv32i_pipeline_7stage_tage_sgf_top ===
+  Cycles:         4682138
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 53305
+  CPI:            1.48
+$finish called at time : 46853335 ns : File "D:/RISCV-Vivado/vivado_tage/tb/tage_sgf_statemate_tb.sv" Line 33
+
+--- sgf / aha-mont64 ---
+=== aha-mont64: rv32i_pipeline_7stage_tage_sgf_top ===
+  Cycles:         5764941
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 95340
+  CPI:            1.29
+$finish called at time : 57785895 ns : File "D:/RISCV-Vivado/vivado_tage/tb/tage_sgf_aha-mont64_tb.sv" Line 33
+
+--- sgf / crc32 ---
+=== crc32: rv32i_pipeline_7stage_tage_sgf_top ===
+  Cycles:         6101561
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 175
+  CPI:            1.52
+$finish called at time : 61387195 ns : File "D:/RISCV-Vivado/vivado_tage/tb/tage_sgf_crc32_tb.sv" Line 33
+

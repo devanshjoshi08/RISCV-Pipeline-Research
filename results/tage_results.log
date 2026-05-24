@@ -1,0 +1,59 @@
+=== TAGE predictor: baseline vs SGF (7-stage) ===
+=== Sun May 24 12:15:38 -0500 2026 ===
+DETERMINISM GATE: Instructions and Branches must match base vs sgf per workload.
+--- base / coremark ---
+=== coremark: rv32i_pipeline_7stage_tage_top ===
+  Cycles:         5720931
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 110045
+  CPI:            1.97
+--- base / statemate ---
+=== statemate: rv32i_pipeline_7stage_tage_top ===
+  Cycles:         4705377
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 59942
+  CPI:            1.48
+--- base / aha-mont64 ---
+=== aha-mont64: rv32i_pipeline_7stage_tage_top ===
+  Cycles:         5723653
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 84985
+  CPI:            1.28
+--- base / crc32 ---
+=== crc32: rv32i_pipeline_7stage_tage_top ===
+  Cycles:         6102230
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 342
+  CPI:            1.52
+--- sgf / coremark ---
+=== coremark: rv32i_pipeline_7stage_tage_sgf_top ===
+  Cycles:         5605683
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 75813
+  CPI:            1.93
+--- sgf / statemate ---
+=== statemate: rv32i_pipeline_7stage_tage_sgf_top ===
+  Cycles:         4682078
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 53285
+  CPI:            1.48
+--- sgf / aha-mont64 ---
+=== aha-mont64: rv32i_pipeline_7stage_tage_sgf_top ===
+  Cycles:         5740273
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 89266
+  CPI:            1.28
+--- sgf / crc32 ---
+=== crc32: rv32i_pipeline_7stage_tage_sgf_top ===
+  Cycles:         6101571
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 175
+  CPI:            1.52
