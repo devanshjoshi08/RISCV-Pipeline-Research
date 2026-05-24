@@ -97,8 +97,8 @@ Every code-backed claim in the paper, mapped to the source / script / committed 
 | Paper claim | Code / artifact |
 |---|---|
 | Two-tier F_max (70–74 vs 115–118 MHz, *p* < 0.001, *d* = 18.5); execute-stage split is the only knee | `vivado/synth_seeds.tcl`, `vivado/synth_all.tcl` → `vivado/seed_results.log`, `vivado/synth_results.log`; fig `scripts/regen_throughput_published.py` |
-| 6-stage is throughput- and energy-optimal on this fabric (64.1 MIPS, lowest EDP) | CPI from `vivado/coremark_official_results.log` × F_max above; fig `scripts/regen_throughput_published.py` |
-| Depth splits into Mechanism A (all workloads) + Mechanism B (CoreMark +5.7%, statemate +10%) | `vivado/coremark_official_results.log`, `vivado/embench_official_results.log`, `vivado/dhrystone_results.log`, `vivado/diagnostic_results.log` |
+| 6-stage is throughput- and energy-optimal on this fabric (64.1 MIPS, lowest EDP) | CPI from `vivado/coremark_official_results.log` (4/5/6-stage) and `vivado/7s8s_rerun_results.log` (canonical 7/8-stage, fixed-hex) × F_max above; fig `scripts/regen_throughput_published.py` |
+| Depth splits into Mechanism A (all workloads) + Mechanism B (CoreMark +5.7%, statemate +10%) | 4/5/6-stage: `vivado/coremark_official_results.log`, `vivado/embench_official_results.log`, `vivado/dhrystone_results.log`, `vivado/diagnostic_results.log`; **7/8-stage baseline: `vivado/7s8s_rerun_results.log`** (canonical 2,893,145-instr CoreMark; the 7/8-stage rows in `*_official_results.log` are a superseded pre-fixed-hex run) |
 | Mechanism B **requires** a GHR (bimodal control: zero depth inflation, 85,493/63,272 at every depth) | `rtl/branch_predictor_bimodal.sv` → `results/bimodal_coremark_results.log` |
 | Mechanism B is **not** PHT aliasing (32→1024 sweep, inflation persists) | `results/pht_sweep_coremark_results.log` |
 | SGF: −31.4% CoreMark / −22.7% statemate, +0.7% area, no F_max loss | `rtl/branch_predictor_sgf.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_top.sv` → `results/sgf_benchmark_results.log`, `results/sgf_synth_10seeds_results.log` (10-seed F_max) |

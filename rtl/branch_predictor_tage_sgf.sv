@@ -14,7 +14,8 @@ module branch_predictor_tage_sgf #(
   parameter PHT_DEPTH  = 64,
   parameter BTB_DEPTH  = 32,
   parameter RAS_DEPTH  = 4,
-  parameter HIST       = 16            // longest global-history length / checkpoint width
+  parameter HIST       = 16,           // longest global-history length / checkpoint width
+  parameter CONF_FILTER = 1            // 1: suppress speculative shift on a saturated (high-confidence) provider
 )(
   input  logic        clk, rst_n,
   input  logic [31:0] pc_if,
@@ -117,6 +118,17 @@ module branch_predictor_tage_sgf #(
   logic is_conditional_branch;
   assign is_conditional_branch = btb_hit && (btb_type[btb_pidx] == BTB_BRANCH);
 
+  // Confidence filter: the providing component is saturated, so the prediction
+  // is near-certain and barely history-dependent. On such biased branches the
+  // baseline's update latency was an accidental filter; shifting the predicted
+  // bit speculatively only pollutes the history-indexed tables on the rare
+  // wrong prediction. When enabled, we hold the speculative history instead.
+  logic prov_saturated;
+  assign prov_saturated = hit2 ? (t2_ctr[idx2] == 3'b000 || t2_ctr[idx2] == 3'b111) :
+                          hit1 ? (t1_ctr[idx1] == 3'b000 || t1_ctr[idx1] == 3'b111) :
+                          hit0 ? (t0_ctr[idx0] == 3'b000 || t0_ctr[idx0] == 3'b111) :
+                                 (bim[bidx]    == 2'b00  || bim[bidx]    == 2'b11);
+
   // --- update: folds use the per-branch checkpoint (precise history) ---
   logic [PHT_IDX-1:0] ubidx, uidx0, uidx1, uidx2, btb_uidx;
   logic [7:0]         utag0, utag1, utag2;
@@ -156,8 +168,9 @@ module branch_predictor_tage_sgf #(
       for (i = 0; i < BTB_DEPTH; i++) btb_valid[i] <= 0;
       for (i = 0; i < RAS_DEPTH; i++) ras[i] <= 0;
     end else begin
-      // Speculative history advances at prediction time.
-      if (is_conditional_branch && !flush)
+      // Speculative history advances at prediction time, unless the confidence
+      // filter holds it on a saturated (near-certain) provider.
+      if (is_conditional_branch && !flush && !(CONF_FILTER && prov_saturated))
         spec_ghr <= {spec_ghr[HIST-2:0], predict_taken};
 
       // Committed history advances at resolution.
