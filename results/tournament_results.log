@@ -1,0 +1,75 @@
+=== Tournament predictor: baseline vs SGF (7-stage) ===
+=== Sun May 24 10:15:24 -0500 2026 ===
+DETERMINISM GATE: Instructions and Branches must match base vs sgf per workload.
+--- base / coremark ---
+=== coremark: rv32i_pipeline_7stage_tournament_top ===
+  Cycles:         5649513
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 87992
+  CPI:            1.95
+$finish called at time : 56547275 ns : File "D:/RISCV-Vivado/vivado_tournament/tb/tour_base_coremark_tb.sv" Line 33
+
+--- base / statemate ---
+=== statemate: rv32i_pipeline_7stage_tournament_top ===
+  Cycles:         4712045
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 63274
+  CPI:            1.49
+$finish called at time : 47152585 ns : File "D:/RISCV-Vivado/vivado_tournament/tb/tour_base_statemate_tb.sv" Line 33
+
+--- base / aha-mont64 ---
+=== aha-mont64: rv32i_pipeline_7stage_tournament_top ===
+  Cycles:         5787303
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 102901
+  CPI:            1.29
+$finish called at time : 58009575 ns : File "D:/RISCV-Vivado/vivado_tournament/tb/tour_base_aha-mont64_tb.sv" Line 33
+
+--- base / crc32 ---
+=== crc32: rv32i_pipeline_7stage_tournament_top ===
+  Cycles:         6102235
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 344
+  CPI:            1.52
+$finish called at time : 61394055 ns : File "D:/RISCV-Vivado/vivado_tournament/tb/tour_base_crc32_tb.sv" Line 33
+
+--- sgf / coremark ---
+=== coremark: rv32i_pipeline_7stage_tournament_sgf_top ===
+  Cycles:         5639015
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 85300
+  CPI:            1.94
+$finish called at time : 56442295 ns : File "D:/RISCV-Vivado/vivado_tournament/tb/tour_sgf_coremark_tb.sv" Line 33
+
+--- sgf / statemate ---
+=== statemate: rv32i_pipeline_7stage_tournament_sgf_top ===
+  Cycles:         4692080
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 56619
+  CPI:            1.48
+$finish called at time : 46952905 ns : File "D:/RISCV-Vivado/vivado_tournament/tb/tour_sgf_statemate_tb.sv" Line 33
+
+--- sgf / aha-mont64 ---
+=== aha-mont64: rv32i_pipeline_7stage_tournament_sgf_top ===
+  Cycles:         5776915
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 100068
+  CPI:            1.29
+$finish called at time : 57905385 ns : File "D:/RISCV-Vivado/vivado_tournament/tb/tour_sgf_aha-mont64_tb.sv" Line 33
+
+--- sgf / crc32 ---
+=== crc32: rv32i_pipeline_7stage_tournament_sgf_top ===
+  Cycles:         6101571
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 178
+  CPI:            1.52
+$finish called at time : 61387415 ns : File "D:/RISCV-Vivado/vivado_tournament/tb/tour_sgf_crc32_tb.sv" Line 33
+

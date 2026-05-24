@@ -76,7 +76,7 @@ The experiment also reveals a two-tier frequency structure on Artix-7: shallow p
 
 The two contributions are thus cleanly separated.
 \textbf{(1)~A controlled measurement study} that varies pipeline depth as the single controlled design parameter on FPGA (functional-unit RTL held constant, each split's side effects decomposed): it separates inherent from correctable CPI overhead, establishes the correctable part causally with the bimodal and 32$\times$ PHT controls, captures it in a first-principles CPI model ($R^2 = 0.977$, $R^2_{\text{CV}} = 0.941$), and characterizes the two-tier $F_{\max}$ structure and 6-stage throughput optimum (Sections~\ref{sec:results}--\ref{sec:causal}).
-\textbf{(2)~Speculative GHR Forwarding}, whose novelty is architectural, not algorithmic (Section~\ref{sec:sgf}). Speculative history with checkpoint restore is established, but SGF shows that an in-order, single-issue pipeline collapses the usual recovery machinery to \emph{zero} added storage: we prove such a pipeline admits no nested or out-of-order rollback (Section~\ref{sec:sgf_integration}), so a single GHR checkpoint forwarded through the \emph{existing} pipeline registers is provably sufficient, replacing the reorder buffer or branch stack ASIC schemes require, at 49~LUTs / 57~FFs (0.7\% area, no frequency loss). To our knowledge this is also the first controlled measurement of stale-GHR inflation on FPGA fabric.
+\textbf{(2)~Speculative GHR Forwarding}, whose novelty is architectural, not algorithmic (Section~\ref{sec:sgf}). Speculative history with checkpoint restore is established, but SGF shows that an in-order, single-issue pipeline collapses the usual recovery machinery to \emph{zero} added storage: we prove such a pipeline admits no nested or out-of-order rollback (Section~\ref{sec:sgf_integration}), so a single GHR checkpoint forwarded through the \emph{existing} pipeline registers is provably sufficient, replacing the reorder buffer or branch stack ASIC schemes require, at 49~LUTs / 57~FFs (0.7\% area, no frequency loss). We further measure that both Mechanism~B and SGF's sub-1\% cost reproduce on a second predictor family, a global/local tournament predictor (Section~\ref{sec:generalization}), so the result is not gshare-specific. To our knowledge this is also the first controlled measurement of stale-GHR inflation on FPGA fabric.
 
 \section{Background and Related Work}
 \label{sec:background}
@@ -611,14 +611,34 @@ SGF is therefore beneficial at every depth with nonzero update latency, and most
 \label{sec:o2}
 A key robustness question is whether aggressive optimization, by unrolling and inlining, widens inter-branch distance enough to dissolve Mechanism~B. We rebuilt CoreMark and statemate at \texttt{-O2} and re-ran the 7-stage baseline and SGF.
 \texttt{-O2} reshapes the workloads (CoreMark branches $-$25.8\%, IBD 4.0$\to$4.5; statemate IBD 8.4$\to$7.5) but both stay under the IBD~$\approx$~10 threshold, so Mechanism~B persists and SGF still helps: CoreMark $141{,}212\to79{,}705$ ($-$43.6\%, CPI 1.86$\to$1.76) and statemate $83{,}257\to73{,}267$ ($-$12.0\%, 1.44$\to$1.43).
-The CoreMark reduction is in fact \emph{larger} than at \texttt{-O1} ($-$31.4\%); optimization does not remove SGF's use case for these branch-dense kernels (\texttt{-O3} and FP/OS workloads remain untested).
+The CoreMark reduction is in fact \emph{larger} than at \texttt{-O1} ($-$31.4\%), so optimization does not remove SGF's use case for these branch-dense kernels.
 
 \subsection{Generalization to Other Correlation Predictors}
 \label{sec:generalization}
-SGF is measured on gshare, but its principle is predictor-agnostic and projects analytically to richer correlation topologies. The only requirement is that a prediction read a history register the branch updates after some latency; the fix is a speculative copy updated at prediction, forwarded as a per-branch checkpoint, and restored on misprediction. Two properties carry over unchanged: the in-order single-issue pipeline still admits no nested rollback (Section~\ref{sec:sgf_integration}), so one checkpoint per in-flight branch remains sufficient and no ROB is needed; and the cost stays linear in the \emph{total speculative-history width} carried per branch (that width times the IF2-to-EX2 span in flip-flops, plus one same-width rollback multiplexer). The projections differ only in that width.
-\emph{Tournament (local/global) predictors:} the global component is gshare-like and takes SGF directly; a globally-indexed chooser is corrected by the same forwarded global history at no extra checkpoint; only a local-history component adds cost, needing its own speculative register and per-branch checkpoint, and it helps whenever a branch recurs within its own resolution latency.
-\emph{TAGE:} a single forwarded global history feeds every table's index \emph{and} tag hash, so one checkpoint corrects all tables at once, though the checkpoint widens to the sum of the geometric history lengths.
-In each case recovery remains ROB-free and the only growing term is checkpoint width, which stays modest for the downscaled predictors realistic on a $\sim$7{,}500-LUT soft core. These are analytical projections; only gshare is measured here, and a measured tournament/TAGE evaluation is future work.
+SGF is developed on gshare, but its mechanism is predictor-agnostic: it applies wherever a prediction reads a history register the branch updates only after some latency, and the fix is always the same speculative copy, updated at prediction, forwarded as a per-branch checkpoint, and restored on misprediction. Two properties carry across topologies unchanged. The in-order single-issue pipeline admits no nested rollback (Section~\ref{sec:sgf_integration}), so one checkpoint per in-flight branch suffices and no ROB is needed; and the cost stays linear in the speculative-history width carried per branch (that width across the IF2-to-EX2 span, plus one same-width rollback multiplexer).
+
+To test this beyond gshare, we implemented and measured a second predictor family: a tournament predictor pairing a global gshare PHT with a PC-indexed local PHT, arbitrated per branch by a GHR-indexed chooser, in baseline and SGF variants on the 7-stage pipeline. Only the global PHT and the chooser are history-indexed, so a single forwarded global checkpoint corrects both at once; the PC-indexed component is staleness-immune and needs no checkpoint, so SGF adds nothing beyond the gshare cost. Table~\ref{tab:tournament} reports the outcome. Mechanism~B reproduces on this richer predictor and SGF removes part of it on every workload, with instruction and branch counts bit-identical across variants (the predictor is performance-only), so the deltas are exact. The reductions are smaller than standalone gshare's because the chooser routes a share of branches to the staleness-immune local component, leaving less stale-history headroom. statemate is the clearest case: stale history had pinned the global component at bimodal accuracy ($63{,}274$ vs.\ the $63{,}272$ bimodal control of Section~\ref{sec:bimodal}), and SGF lifts it to $56{,}619$, below the bimodal baseline and within eight mispredictions of standalone gshare+SGF ($56{,}627$, Section~\ref{sec:bimodal}); SGF recovers on the tournament's global component essentially the same accuracy it recovers on gshare alone. Synthesis confirms the cost claim transfers: across three seeds SGF adds 50 LUTs ($0.6\%$) and 44 flip-flops ($0.5\%$) with no frequency penalty ($112.6$ vs.\ $111.7$\,MHz mean, within seed variance).
+
+\emph{TAGE} remains a projection on the same principle: a single forwarded global history feeds every table's index \emph{and} tag hash, so one checkpoint corrects all tables at once, with the checkpoint widening to the sum of the geometric history lengths. Recovery stays ROB-free and the only growing term is checkpoint width, which remains modest for the downscaled predictors realistic on a $\sim$7{,}500-LUT soft core; a measured TAGE evaluation is future work.
+
+\begin{table}[t]
+\centering
+\caption{Measured SGF on a second predictor family, a 7-stage tournament predictor (global gshare PHT, PC-indexed local PHT, GHR-indexed chooser) on Artix-7. Instruction and branch counts are identical across variants, so misprediction deltas are exact. Mechanism~B reproduces and SGF reduces mispredictions on every workload at the same sub-1\% area cost as on gshare.}
+\label{tab:tournament}
+\small
+\begin{tabular}{@{}l rrr@{}}
+\toprule
+\textbf{Workload} & \textbf{Baseline} & \textbf{SGF} & \textbf{$\Delta$} \\
+\midrule
+CoreMark   & 87{,}992  & 85{,}300  & $-3.1\%$ \\
+statemate  & 63{,}274  & 56{,}619  & $-10.5\%$ \\
+aha-mont64 & 102{,}901 & 100{,}068 & $-2.8\%$ \\
+crc32      & 344       & 178       & $-48.3\%$\,\textsuperscript{$\dagger$} \\
+\bottomrule
+\end{tabular}
+\\[2pt]
+{\footnotesize \textsuperscript{$\dagger$}crc32 is $\sim$0.2\% mispredicted; the relative drop is large but the absolute saving (166 mispredictions, 664 cycles) is negligible.}
+\end{table}
 
 \section{Discussion}
 \label{sec:discussion}
@@ -782,7 +802,7 @@ All workloads fit in 16\,KB of instruction memory at near-100\% hit rate; the ca
 The model (Eq.~\ref{eq:cpi_model}) predicts the depth-dependent terms from architectural parameters but its per-workload base $\gamma_w$ is fitted empirically (it remains descriptive, not first-principles), and the model is validated only on the seven workloads used for fitting.
 
 \textbf{Predictor scope.}
-SGF is demonstrated on single-table gshare, the appropriate point for resource-constrained soft cores, but the stale-GHR effect is not gshare-specific: any global-history-indexed predictor incurs it, and TAGE \cite{seznec2011tage}, with longer histories, is plausibly \emph{more} sensitive. Section~\ref{sec:generalization} projects analytically how SGF extends to tournament and TAGE predictors at a checkpoint cost linear in total history width; a \emph{measured} evaluation on those, and on perceptron \cite{jimenez2001dynamic} and local-history \cite{yeh1991two} predictors, is future work. The crc32 confidence filter (Section~\ref{sec:crc32}) ships off by default.
+SGF is measured on two predictor families, single-table gshare and a global/local tournament predictor (Section~\ref{sec:generalization}), spanning the range appropriate for resource-constrained soft cores; the stale-GHR effect is not gshare-specific, as any global-history-indexed predictor incurs it, and TAGE \cite{seznec2011tage}, with longer histories, is plausibly \emph{more} sensitive. A measured evaluation on TAGE, perceptron \cite{jimenez2001dynamic}, and local-history \cite{yeh1991two} predictors, where the checkpoint cost grows with total history width, is future work. The crc32 confidence filter (Section~\ref{sec:crc32}) ships off by default.
 
 \textbf{Benchmark and compiler scope.}
 The seven workloads span synthetic, industry-standard, and embedded categories (branch frequency 4.4--26.3\%, 1.4K--4.5M instructions) but exclude floating-point, OS-level, and multi-threaded code; the IBD indicator (Table~\ref{tab:ibd}) is a preliminary correlate of Mechanism~B susceptibility, derived from only two positive workloads and not validated out-of-sample.
@@ -800,8 +820,8 @@ Second, Speculative GHR Forwarding eliminates Mechanism~B with a ROB-free dual-G
 It cuts 7-stage CoreMark mispredictions 31.4\% and statemate 22.7\% at 0.5--0.7\% area and no frequency penalty, pushing deep-pipeline accuracy below the shallow baseline; no workload shows CPI degradation (the crc32 blip is CPI-neutral).
 For practitioners, SGF is a low-risk addition to any gshare-class in-order pipeline with three or more stages of update latency.
 
-What transfers without re-measurement is the Mechanism-A/B decomposition and the ROB-free construction, not the specific percentages.
-An \texttt{-O2} re-measurement (Section~\ref{sec:o2}) confirms Mechanism~B and SGF's benefit survive aggressive optimization; future work extends this to \texttt{-O3} and floating-point/OS workloads, to tournament/TAGE \cite{seznec2011tage} predictors, and to other FPGA fabrics and physical-hardware power/cycle validation.
+What transfers without re-measurement is the Mechanism-A/B decomposition and the ROB-free construction, not the specific percentages; a measured tournament predictor (Section~\ref{sec:generalization}) confirms Mechanism~B and SGF reproduce on a second predictor family at the same sub-1\% cost.
+An \texttt{-O2} re-measurement (Section~\ref{sec:o2}) confirms Mechanism~B and SGF's benefit survive aggressive optimization; future work extends this to \texttt{-O3} and floating-point/OS workloads, to TAGE \cite{seznec2011tage} and perceptron predictors, and to other FPGA fabrics and physical-hardware power/cycle validation.
 The complete RTL, testbenches, synthesis scripts, and benchmark programs are available at \url{https://github.com/devanshjoshi08/RISCV-Pipeline-Research}.
 
 \bibliographystyle{IEEEtran}
