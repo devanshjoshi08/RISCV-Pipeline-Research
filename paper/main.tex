@@ -372,7 +372,7 @@ crc32      & 23.0 & Highly biased   & No \\
 \end{tabular}
 \end{table}
 
-SGF eliminates precisely this unpredictable amplification on susceptible workloads; Section~\ref{sec:causal} isolates Mechanism~B causally with the bimodal and PHT-sweep controls.
+SGF eliminates precisely this unpredictable amplification on susceptible workloads. Two controls in Section~\ref{sec:causal} confirm the cause is GHR staleness, not an artifact: a no-GHR bimodal predictor shows \emph{zero} depth-dependent inflation on the same workloads, and a 32$\times$ PHT capacity sweep shows the inflation persists at every table size, excluding aliasing.
 
 \subsection{Analytical CPI Model}
 \label{sec:model}
@@ -686,7 +686,7 @@ The 5-stage is dominated, sharing the 4-stage frequency ceiling while adding loa
 The 7/8-stage match the 6-stage on frequency but pay higher CPI, justified only when the IF split resolves a genuine timing bottleneck such as synchronous BRAM instruction memory.
 Crucially, SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF reaches $115.0/1.96 = 58.7$\,MIPS vs.\ 64.1): it is not a way to win throughput by going deeper but the right fix once depth is \emph{already forced} by a timing constraint, removing the resulting stale-GHR penalty at any depth with $\geq$3 stages of update latency (including the 6-stage, $-$23.9\% CoreMark) for a 0.5--0.7\% area cost against a 17--31\% misprediction reduction.
 
-\section{Causal Isolation and Additional Analyses}
+\section{Causal Isolation and Supporting Analyses}
 \label{sec:supplementary}
 
 \subsection{Causal Isolation of Mechanism~B}
