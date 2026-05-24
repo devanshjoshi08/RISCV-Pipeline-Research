@@ -1,0 +1,51 @@
+=== NLP-augmented 7-stage vs baseline 7-stage ===
+=== Sat May 23 11:10:48 -0500 2026 ===
+
+--- base7_coremark ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_7stage_top ===
+  Cycles:         5856929
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 147760
+  Iterations:     10
+  CPI:            2.02
+  Mispredict%:    20.52%
+$finish called at time : 58621435 ns : File "D:/RISCV-Vivado/vivado_nlp/base7_coremark/base7_coremark_tb.sv" Line 45
+
+--- nlp7_coremark ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_7stage_nlp_top ===
+  Cycles:         5709411
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 151987
+  Iterations:     10
+  CPI:            1.97
+  Mispredict%:    21.11%
+$finish called at time : 57146255 ns : File "D:/RISCV-Vivado/vivado_nlp/nlp7_coremark/nlp7_coremark_tb.sv" Line 45
+
+--- base7_statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_7stage_top ===
+  Cycles:         4742011
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 73263
+  Iterations:     0
+  CPI:            1.50
+  Mispredict%:    19.46%
+$finish called at time : 47452245 ns : File "D:/RISCV-Vivado/vivado_nlp/base7_statemate/base7_statemate_tb.sv" Line 45
+
+--- nlp7_statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_7stage_nlp_top ===
+  Cycles:         4505592
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 69934
+  Iterations:     0
+  CPI:            1.42
+  Mispredict%:    18.58%
+$finish called at time : 45087495 ns : File "D:/RISCV-Vivado/vivado_nlp/nlp7_statemate/nlp7_statemate_tb.sv" Line 45
+

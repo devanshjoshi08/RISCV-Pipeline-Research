@@ -101,13 +101,13 @@ Every code-backed claim in the paper, mapped to the source / script / committed 
 | Two-tier F_max (70–74 vs 115–118 MHz, *p* < 0.001, *d* = 18.5); execute-stage split is the only knee | `vivado/synth_seeds.tcl`, `vivado/synth_all.tcl` → `vivado/seed_results.log`, `vivado/synth_results.log`; fig `scripts/regen_throughput_published.py` |
 | 6-stage is throughput- and energy-optimal on this fabric (64.1 MIPS, lowest EDP) | CPI from `vivado/coremark_official_results.log` × F_max above; fig `scripts/regen_throughput_published.py` |
 | Depth splits into Mechanism A (all workloads) + Mechanism B (CoreMark +5.7%, statemate +10%) | `vivado/coremark_official_results.log`, `vivado/embench_official_results.log`, `vivado/dhrystone_results.log`, `vivado/diagnostic_results.log` |
-| Mechanism B **requires** a GHR (bimodal control: zero depth inflation) | `rtl/branch_predictor_bimodal.sv`, `vivado/run_bimodal.tcl` → `vivado/bimodal_results.log` |
-| Mechanism B is **not** PHT aliasing (32→1024 sweep, inflation persists) | `vivado/run_predictor_sweep.tcl` → `vivado/predictor_sweep_results.log` |
-| SGF: −31.4% CoreMark / −22.7% statemate, +0.7% area, no F_max loss | `rtl/branch_predictor_sgf.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_top.sv`, `vivado/run_sgf_eval.tcl` → `vivado/sgf_benchmark_results.log`, `vivado/sgf_synth_results.log` |
-| SGF on the 6-stage (−23.9% CoreMark) | `rtl/rv32i_pipeline_sgf_top.sv`, `scripts/run_sgf_6stage.tcl` |
+| Mechanism B **requires** a GHR (bimodal control: zero depth inflation, 85,493/63,272 at every depth) | `rtl/branch_predictor_bimodal.sv` → `results/bimodal_coremark_results.log` |
+| Mechanism B is **not** PHT aliasing (32→1024 sweep, inflation persists) | `results/pht_sweep_coremark_results.log` |
+| SGF: −31.4% CoreMark / −22.7% statemate, +0.7% area, no F_max loss | `rtl/branch_predictor_sgf.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_top.sv` → `results/sgf_benchmark_results.log`, `results/sgf_synth_10seeds_results.log` (10-seed F_max) |
+| SGF on the 6-stage (−23.9% CoreMark) | `rtl/rv32i_pipeline_sgf_top.sv`, `scripts/run_sgf_6stage.tcl` → `results/sgf_6stage_results.log` |
 | Analytical CPI model R² = 0.977, R²_CV = 0.941 (LOWO) | `scripts/generate_plots_5depth.py` (fit + `cpi_vs_depth`); inputs are the benchmark logs above |
-| Workload-SAIF power *falls* with depth (opposite to uniform-toggle) | `scripts/run_saif_workload.tcl` → `vivado/supplementary_4s8s_results.log`; fig `scripts/regen_power_figs.py` |
-| NLP recovers part of the IF2 bubble; **SGF+NLP super-additive** (CPI 1.89) | `rtl_7stage/rv32i_pipeline_7stage_nlp_top.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_nlp_top.sv`, `scripts/run_nlp_7stage.tcl`, `scripts/run_sgf_nlp.tcl` |
+| Workload-SAIF power *falls* with depth (0.235→0.217 W, opposite to uniform-toggle) | `scripts/run_saif_workload.tcl` → `results/saif_workload_results.log`; fig `scripts/regen_power_figs.py` |
+| NLP recovers part of the IF2 bubble; **SGF+NLP super-additive** (CPI 1.89) | `rtl_7stage/rv32i_pipeline_7stage_nlp_top.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_nlp_top.sv` → `results/nlp_results.log`, `results/sgf_nlp_results.log` |
 | BRAM instr-memory lets 7/8-stage near-match 6-stage F_max | `rtl/rv32i_pipeline_bram_top.sv`, `rtl_7stage/rv32i_pipeline_7stage_bram_top.sv`, `vivado/synth_bram.tcl` → `vivado/bram_synth_results.log`; fig `scripts/regen_bram_fig.py` |
 | Determinism: identical instruction/branch counts + memory checksums across all depths | every benchmark log above; `tb/rv32i_benchmark_tb.sv`, `tb/rv32i_riscv_tests_tb.sv` |
 | Functional correctness (37 riscv-tests + 24-point bench) | `tb/rv32i_riscv_tests_tb.sv`, `tb/rv32i_comprehensive_tb.sv`, `scripts/run_all_tests.tcl` → `vivado/test_results.log` |

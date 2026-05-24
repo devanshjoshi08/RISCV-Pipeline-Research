@@ -1,0 +1,123 @@
+=== Bimodal Predictor: CoreMark + statemate (all 5 depths) ===
+=== Fri May 22 22:09:37 -0500 2026 ===
+
+--- bim_4s_CoreMark ---
+Time resolution is 1 ps
+=== Bimodal CoreMark: rv32i_pipeline_4stage_top ===
+  Cycles:         4361050
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 85493
+  Iterations:     10
+  CPI:            1.50
+  Mispredict%:    11.87%
+$finish called at time : 43652245 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_4s_CoreMark_tb.sv" Line 51
+
+--- bim_4s_statemate ---
+Time resolution is 1 ps
+=== Bimodal statemate: rv32i_pipeline_4stage_top ===
+  Cycles:         3836231
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 63272
+  Correct:        0
+  CPI:            1.21
+  Mispredict%:    16.81%
+$finish called at time : 38389775 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_4s_statemate_tb.sv" Line 51
+
+--- bim_5s_CoreMark ---
+Time resolution is 1 ps
+=== Bimodal CoreMark: rv32i_pipeline_5stage_top ===
+  Cycles:         4630549
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 85493
+  Iterations:     10
+  CPI:            1.60
+  Mispredict%:    11.87%
+$finish called at time : 46347275 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_5s_CoreMark_tb.sv" Line 51
+
+--- bim_5s_statemate ---
+Time resolution is 1 ps
+=== Bimodal statemate: rv32i_pipeline_5stage_top ===
+  Cycles:         4115951
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 63272
+  Correct:        0
+  CPI:            1.30
+  Mispredict%:    16.81%
+$finish called at time : 41187795 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_5s_statemate_tb.sv" Line 51
+
+--- bim_6s_CoreMark ---
+Time resolution is 1 ps
+=== Bimodal CoreMark: rv32i_pipeline_top ===
+  Cycles:         5104620
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 85493
+  Iterations:     10
+  CPI:            1.76
+  Mispredict%:    11.87%
+$finish called at time : 51093165 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_6s_CoreMark_tb.sv" Line 51
+
+--- bim_6s_statemate ---
+Time resolution is 1 ps
+=== Bimodal statemate: rv32i_pipeline_top ===
+  Cycles:         4315760
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 63272
+  Correct:        0
+  CPI:            1.36
+  Mispredict%:    16.81%
+$finish called at time : 43187495 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_6s_statemate_tb.sv" Line 51
+
+--- bim_7s_CoreMark ---
+Time resolution is 1 ps
+=== Bimodal CoreMark: rv32i_pipeline_7stage_top ===
+  Cycles:         5638746
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 85493
+  Iterations:     10
+  CPI:            1.94
+  Mispredict%:    11.87%
+$finish called at time : 56439605 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_7s_CoreMark_tb.sv" Line 51
+
+--- bim_7s_statemate ---
+Time resolution is 1 ps
+=== Bimodal statemate: rv32i_pipeline_7stage_top ===
+  Cycles:         4712039
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 63272
+  Correct:        0
+  CPI:            1.49
+  Mispredict%:    16.81%
+$finish called at time : 47152345 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_7s_statemate_tb.sv" Line 51
+
+--- bim_8s_CoreMark ---
+Time resolution is 1 ps
+=== Bimodal CoreMark: rv32i_pipeline_8stage_top ===
+  Cycles:         6104886
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 85493
+  Iterations:     10
+  CPI:            2.11
+  Mispredict%:    11.87%
+$finish called at time : 61101045 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_8s_CoreMark_tb.sv" Line 51
+
+--- bim_8s_statemate ---
+Time resolution is 1 ps
+=== Bimodal statemate: rv32i_pipeline_8stage_top ===
+  Cycles:         5341410
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 63272
+  Correct:        0
+  CPI:            1.69
+  Mispredict%:    16.81%
+$finish called at time : 53448005 ns : File "D:/RISCV-Vivado/vivado_bimodal_cm2/bim_8s_statemate_tb.sv" Line 51
+

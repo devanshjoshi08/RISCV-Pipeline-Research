@@ -1,0 +1,74 @@
+=== Workload-Specific SAIF Power (CoreMark) ===
+=== Sat May 23 13:06:10 -0500 2026 ===
+
+------------------------------------------------------------
+  wl_4s (rv32i_pipeline_4stage_top) -- workload-SAIF: CoreMark
+------------------------------------------------------------
+  | Total On-Chip Power (W)  | 0.235                                                                         |
+  | Dynamic (W)              | 0.167                                                                         |
+  | Device Static (W)        | 0.069                                                                         |
+  | Clocks                   |     0.042 |        3 |       --- |             --- |
+  | Slice Logic              |     0.052 |    18085 |       --- |             --- |
+  |   LUT as Logic           |     0.044 |     6232 |     20800 |           29.96 |
+  | Signals                  |     0.066 |    13253 |       --- |             --- |
+  | DSPs                     |     0.006 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+  | Overall confidence level    | Medium     |                                                |                                                                                                            |
+
+------------------------------------------------------------
+  wl_5s (rv32i_pipeline_5stage_top) -- workload-SAIF: CoreMark
+------------------------------------------------------------
+  | Total On-Chip Power (W)  | 0.231                                                                         |
+  | Dynamic (W)              | 0.162                                                                         |
+  | Device Static (W)        | 0.069                                                                         |
+  | Clocks                   |     0.044 |        3 |       --- |             --- |
+  | Slice Logic              |     0.047 |    18514 |       --- |             --- |
+  |   LUT as Logic           |     0.039 |     6394 |     20800 |           30.74 |
+  | Signals                  |     0.065 |    13491 |       --- |             --- |
+  | DSPs                     |     0.006 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+  | Overall confidence level    | Medium     |                                                |                                                                                                            |
+
+------------------------------------------------------------
+  wl_6s (rv32i_pipeline_top) -- workload-SAIF: CoreMark
+------------------------------------------------------------
+  | Total On-Chip Power (W)  | 0.224                                                                         |
+  | Dynamic (W)              | 0.155                                                                         |
+  | Device Static (W)        | 0.069                                                                         |
+  | Clocks                   |     0.046 |        3 |       --- |             --- |
+  | Slice Logic              |     0.046 |    19025 |       --- |             --- |
+  |   LUT as Logic           |     0.039 |     6622 |     20800 |           31.84 |
+  | Signals                  |     0.058 |    13995 |       --- |             --- |
+  | DSPs                     |     0.005 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+  | Overall confidence level    | Medium     |                                                |                                                                                                            |
+
+------------------------------------------------------------
+  wl_7s (rv32i_pipeline_7stage_top) -- workload-SAIF: CoreMark
+------------------------------------------------------------
+  | Total On-Chip Power (W)  | 0.225                                                                         |
+  | Dynamic (W)              | 0.157                                                                         |
+  | Device Static (W)        | 0.069                                                                         |
+  | Clocks                   |     0.047 |        3 |       --- |             --- |
+  | Slice Logic              |     0.046 |    19249 |       --- |             --- |
+  |   LUT as Logic           |     0.039 |     6719 |     20800 |           32.30 |
+  | Signals                  |     0.059 |    14152 |       --- |             --- |
+  | DSPs                     |     0.005 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+  | Overall confidence level    | Medium     |                                                |                                                                                                            |
+
+------------------------------------------------------------
+  wl_8s (rv32i_pipeline_8stage_top) -- workload-SAIF: CoreMark
+------------------------------------------------------------
+  | Total On-Chip Power (W)  | 0.217                                                                         |
+  | Dynamic (W)              | 0.149                                                                         |
+  | Device Static (W)        | 0.069                                                                         |
+  | Clocks                   |     0.048 |        3 |       --- |             --- |
+  | Slice Logic              |     0.041 |    19479 |       --- |             --- |
+  |   LUT as Logic           |     0.035 |     6794 |     20800 |           32.66 |
+  | Signals                  |     0.055 |    14345 |       --- |             --- |
+  | DSPs                     |     0.004 |       12 |        90 |           13.33 |
+  | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
+  | Overall confidence level    | Medium     |                                                |                                                                                                            |
+
+------------------------------------------------------------

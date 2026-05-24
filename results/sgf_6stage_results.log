@@ -1,0 +1,63 @@
+=== SGF 6-Stage Benchmark Results ===
+=== Sat May 23 12:34:37 -0500 2026 ===
+
+--- 6s_sgf_CoreMark ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_sgf_top ===
+  Cycles:         5199762
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 117207
+  Iterations:     10
+  CPI:            1.79
+  Mispredict%:    16.28%
+$finish called at time : 52044585 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_CoreMark_tb.sv" Line 51
+
+--- 6s_sgf_statemate ---
+Time resolution is 1 ps
+=== statemate: rv32i_pipeline_sgf_top ===
+  Cycles:         4288931
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 54329
+  Correct:        0
+  CPI:            1.35
+  Mispredict%:    14.43%
+$finish called at time : 42919385 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_statemate_tb.sv" Line 51
+
+--- 6s_sgf_aha-mont64 ---
+Time resolution is 1 ps
+=== aha-mont64: rv32i_pipeline_sgf_top ===
+  Cycles:         5617086
+  Instructions:   4453858
+  Branches:       512593
+  Mispredictions: 143240
+  Correct:        1
+  CPI:            1.26
+  Mispredict%:    27.94%
+$finish called at time : 56303035 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_aha-mont64_tb.sv" Line 51
+
+--- 6s_sgf_crc32 ---
+Time resolution is 1 ps
+=== crc32: rv32i_pipeline_sgf_top ===
+  Cycles:         5579470
+  Instructions:   4008648
+  Branches:       174591
+  Mispredictions: 511
+  Correct:        1
+  CPI:            1.39
+  Mispredict%:    0.29%
+$finish called at time : 56135355 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_crc32_tb.sv" Line 51
+
+--- 6s_sgf_edn ---
+Time resolution is 1 ps
+=== edn: rv32i_pipeline_sgf_top ===
+  Cycles:         4963731
+  Instructions:   2972527
+  Branches:       338986
+  Mispredictions: 11246
+  Correct:        1
+  CPI:            1.66
+  Mispredict%:    3.31%
+$finish called at time : 50354195 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_edn_tb.sv" Line 51
+

@@ -1,0 +1,20 @@
+=== -O2 Compiler-Sensitivity Run (7-stage baseline + SGF) ===
+=== Sun May 24 00:42:27 -0500 2026 ===
+--- baseline / coremark (-O2) ---
+=== coremark: rv32i_pipeline_7stage_top (-O2) ===
+  Cycles:         4425720
+  Instructions:   2376016
+  Branches:       534330
+  Mispredictions: 141212
+  CPI:            1.86
+$finish called at time : 44309305 ns : File "D:/RISCV-Vivado/o2_7stage/tb/o2_baseline_coremark_tb.sv" Line 33
+
+--- baseline / statemate (-O2) ---
+=== statemate: rv32i_pipeline_7stage_top (-O2) ===
+  Cycles:         4036054
+  Instructions:   2797251
+  Branches:       372961
+  Mispredictions: 83257
+  CPI:            1.44
+$finish called at time : 40390365 ns : File "D:/RISCV-Vivado/o2_7stage/tb/o2_baseline_statemate_tb.sv" Line 33
+

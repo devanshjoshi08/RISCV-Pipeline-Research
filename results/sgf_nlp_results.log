@@ -1,0 +1,43 @@
+=== Orthogonality: baseline / SGF / NLP / SGF+NLP (7-stage CoreMark) ===
+=== Sat May 23 14:28:42 -0500 2026 ===
+
+--- base7 ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_7stage_top ===
+  Cycles:         5856929
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 147760
+  CPI:            2.02
+$finish called at time : 58621435 ns : File "D:/RISCV-Vivado/vivado_sgfnlp/base7/base7_tb.sv" Line 32
+
+--- sgf7 ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_7stage_sgf_top ===
+  Cycles:         5696997
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 101418
+  CPI:            1.96
+$finish called at time : 57022115 ns : File "D:/RISCV-Vivado/vivado_sgfnlp/sgf7/sgf7_tb.sv" Line 32
+
+--- nlp7 ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_7stage_nlp_top ===
+  Cycles:         5709411
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 151987
+  CPI:            1.97
+$finish called at time : 57146255 ns : File "D:/RISCV-Vivado/vivado_sgfnlp/nlp7/nlp7_tb.sv" Line 32
+
+--- sgfnlp7 ---
+Time resolution is 1 ps
+=== CoreMark: rv32i_pipeline_7stage_sgf_nlp_top ===
+  Cycles:         5496530
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 101449
+  CPI:            1.89
+$finish called at time : 55017445 ns : File "D:/RISCV-Vivado/vivado_sgfnlp/sgfnlp7/sgfnlp7_tb.sv" Line 32
+
