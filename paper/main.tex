@@ -572,7 +572,7 @@ Mechanism~B is thus the depth-dependent slice of a larger latency cost; SGF's be
 
 \textbf{CPI impact.}
 The 31\% misprediction reduction yields a 3\% CPI improvement (2.02$\to$1.96 on the 7-stage) because Mechanism~B is one of four CPI components alongside Mechanism~A ($\sim$0.20 CPI), the IF2 bubble ($\sim$0.28), and load-use stalls ($\sim$0.15).
-SGF eliminates Mechanism~B fully; the rest require structural changes addressable by orthogonal techniques (e.g., the next-line predictor of Section~\ref{sec:counterfactual}).
+SGF eliminates Mechanism~B fully; the remaining components are inherent to the pipeline structure and lie outside SGF's scope.
 
 \subsection{crc32 Edge Case and the Confidence-Filter Tradeoff}
 \label{sec:crc32}
@@ -640,24 +640,6 @@ All benchmarks execute from single-cycle memory (near-100\% hit). In production,
 SGF's \emph{absolute} cycle saving on 7-stage CoreMark (159{,}932 flush cycles) is miss-rate-independent, so its \emph{relative} benefit shrinks as memory stalls grow: 3.0\% at zero misses, to 2.7\% (1\%/20-cycle), 2.0\% (2\%/50-cycle), and 0.9\% (5\%/100-cycle).
 SGF is thus most valuable in embedded systems with tightly coupled memories, the primary FPGA-soft-core use case, and least where cache-miss penalties dominate.
 
-\subsection{Recovering the IF2 Bubble: A Measured Next-Line Predictor}
-\label{sec:counterfactual}
-
-The 7-stage CPI penalty relative to the 6-stage is larger than the branch penalty alone would predict.
-On the diagnostic workload, CPI increases from 1.66 (6-stage) to 1.89 (7-stage), a delta of 0.23\,CPI.
-The IF2 prediction bubble, where IF1's speculative sequential fetch is discarded on a correctly predicted taken branch, accounts for an estimated 0.15\,CPI (65\% of the delta), computed from the model's $\beta \cdot f_b = 1.12 \times 0.263$.
-
-\textbf{Measured NLP-augmented variant.}
-To measure how much of this bubble cost is actually recoverable, we implemented a next-line predictor (NLP): a tagged 64-entry next-fetch table, looked up with the IF1 PC and trained as a shadow of the IF2 gshare/BTB taken prediction.
-When the NLP correctly anticipates a taken branch the redirect occurs in IF1 and the bubble is avoided; an incorrect NLP redirect is detected in IF2 and corrected before the wrong-path instruction can reach execute.
-The NLP modifies no gshare/GHR/BTB/RAS state, so it is purely a fetch-timing optimization, confirmed by identical instruction and branch counts to the baseline (2{,}893{,}145 / 719{,}810 on CoreMark).
-
-The measured benefit is real but smaller than the idealized projection: the NLP lowers 7-stage CoreMark CPI 2.02$\to$1.97 and statemate 1.50$\to$1.43 (0.05--0.07\,CPI), against the $\sim$0.28\,CPI that complete bubble elimination would remove.
-Two effects explain the gap: a 64-entry table avoids the bubble only on stable loop back-edges (CoreMark's branch working set exceeds it), and advancing the redirect into IF1 perturbs GHR staleness, slightly raising CoreMark mispredictions (147{,}760$\to$151{,}987) while lowering statemate's (73{,}263$\to$69{,}934).
-The perturbation is a timing shift, not a new error source: pulling the redirect one cycle earlier into IF1 makes the \emph{next} branch reach IF2 one cycle sooner relative to the prior branch's EX2 resolution, widening the resolution-to-prediction gap so the committed-GHR baseline reads slightly staler history (hence 151{,}987). SGF is immune because \texttt{spec\_ghr} updates at the IF2 prediction itself, independent of fetch timing, so SGF+NLP keeps the savings without the extra mispredictions. The model's $B(D)$ term is thus an \emph{upper bound}, of which a lightweight NLP realizes roughly one-fifth.
-
-The combined NLP+SGF variant is complementary: CPI 1.89 (vs SGF 1.96, NLP 1.97 alone), with mispredictions (101{,}449) essentially equal to SGF alone (101{,}418), so the combined cycle saving (360{,}399) slightly \emph{exceeds} the sum of the parts. Even so, 1.89 stays above the 6-stage's 1.83, so the 6-stage remains throughput-optimal. We evaluate the NLP for CPI only: its IF1 redirect adds a PC$\to$table$\to$mux$\to$fetch path that could pressure $F_{\max}$, so the NLP-augmented core's frequency is unmeasured and its throughput benefit an upper bound (the SGF results, synthesized, show no $F_{\max}$ loss).
-
 \subsection{Anticipated Objections}
 \label{sec:objections}
 
@@ -673,7 +655,7 @@ For RV32IM-class soft cores on Artix-7, the data support four guidelines.
 The 6-stage is the highest-throughput depth here (64.1\,MIPS CoreMark): it captures the full execute-split frequency benefit at a moderate CPI penalty.
 The 5-stage is dominated, it shares the 4-stage's frequency ceiling while adding load-use stalls, so it offers no advantage unless area is binding (a conclusion conditional on the \texttt{-O1} mix, since higher optimization shifts branch and load-use frequencies).
 The 7/8-stage match the 6-stage on frequency but pay higher CPI; they are justified only when the IF split resolves a genuine timing bottleneck (e.g., synchronous BRAM instruction memory).
-Crucially, SGF does \emph{not} make a deeper pipeline out-throughput the 6-stage: on CoreMark the 6-stage reaches 64.1\,MIPS, whereas the 7-stage with SGF reaches $115.0/1.96 = 58.7$\,MIPS and even with SGF+NLP only $115.0/1.89 = 60.8$\,MIPS.
+Crucially, SGF does \emph{not} make a deeper pipeline out-throughput the 6-stage: on CoreMark the 6-stage reaches 64.1\,MIPS, whereas the 7-stage with SGF reaches $115.0/1.96 = 58.7$\,MIPS.
 SGF is therefore not a way to win throughput by going deeper; it is the right choice when depth is \emph{already forced} by a timing constraint (e.g., a registered-BRAM fetch mandating the IF split), where it removes the resulting stale-GHR penalty.
 At such a forced depth SGF is worth adding to any pipeline with $\geq$3 stages of update latency, including the 6-stage ($-$23.9\% CoreMark mispredictions), its 0.5--0.7\% area cost negligible against a 17--31\% misprediction reduction.
 

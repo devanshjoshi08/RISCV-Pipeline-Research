@@ -72,8 +72,6 @@ source vivado/run_predictor_sweep.tcl  ;# 32..1024 PHT sweep -> vivado/predictor
 source vivado/run_sgf_eval.tcl         ;# SGF 7/8-stage bench + synth
                                        ;#   -> vivado/sgf_benchmark_results.log, vivado/sgf_synth_results.log
 source scripts/run_sgf_6stage.tcl      ;# SGF on the 6-stage (recommended depth)
-source scripts/run_nlp_7stage.tcl      ;# baseline vs next-line predictor (IF2-bubble recovery)
-source scripts/run_sgf_nlp.tcl         ;# SGF / NLP / SGF+NLP orthogonality
 
 # --- Power ---
 source scripts/run_saif_workload.tcl   ;# workload-specific (CoreMark) SAIF power, all depths
@@ -107,7 +105,6 @@ Every code-backed claim in the paper, mapped to the source / script / committed 
 | SGF on the 6-stage (−23.9% CoreMark) | `rtl/rv32i_pipeline_sgf_top.sv`, `scripts/run_sgf_6stage.tcl` → `results/sgf_6stage_results.log` |
 | Analytical CPI model R² = 0.977, R²_CV = 0.941 (LOWO) | `scripts/generate_plots_5depth.py` (fit + `cpi_vs_depth`); inputs are the benchmark logs above |
 | Workload-SAIF power *falls* with depth (0.235→0.217 W, opposite to uniform-toggle) | `scripts/run_saif_workload.tcl` → `results/saif_workload_results.log`; fig `scripts/regen_power_figs.py` |
-| NLP recovers part of the IF2 bubble; **SGF+NLP super-additive** (CPI 1.89) | `rtl_7stage/rv32i_pipeline_7stage_nlp_top.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_nlp_top.sv` → `results/nlp_results.log`, `results/sgf_nlp_results.log` |
 | SGF benefit survives `-O2` (CoreMark −43.6%, statemate −12.0%; IBD stays < 10) | `scripts/build_O2_benchmarks.sh`, `scripts/run_O2_7stage.tcl` → `results/o2_7stage_results.log` |
 | BRAM instr-memory lets 7/8-stage near-match 6-stage F_max | `rtl/rv32i_pipeline_bram_top.sv`, `rtl_7stage/rv32i_pipeline_7stage_bram_top.sv`, `vivado/synth_bram.tcl` → `vivado/bram_synth_results.log`; fig `scripts/regen_bram_fig.py` |
 | Determinism: identical instruction/branch counts + memory checksums across all depths | every benchmark log above; `tb/rv32i_benchmark_tb.sv`, `tb/rv32i_riscv_tests_tb.sv` |
@@ -136,8 +133,10 @@ the CPI model rather than claiming depth varies in complete isolation.
 | 7-stage | IF1, IF2, ID, EX1, EX2, MEM, WB | fetch split (registered PC); 1-cycle IF2 bubble |
 | 8-stage | IF1, IF2, ID, EX1, EX2, MEM1, MEM2, WB | memory split |
 
-Variant tops with the contribution applied: **SGF** (`*_sgf_top.sv`), **NLP**
-(`*_nlp_top.sv`), and the combined **SGF+NLP** (`*_sgf_nlp_top.sv`).
+Variant tops with the contribution applied: **SGF** (`*_sgf_top.sv`). (The repo
+also retains exploratory next-line-predictor tops, `*_nlp_top.sv`, which the paper
+does not use: on this fabric the next-line predictor's IF1 redirect lowers
+frequency below the deep tier, a net throughput loss.)
 
 ## Synthesis results (Artix-7 XC7A35T, 10-seed mean)
 
