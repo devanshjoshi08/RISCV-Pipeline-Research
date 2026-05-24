@@ -623,7 +623,7 @@ To test this beyond gshare, we implemented and measured a second predictor famil
 
 \begin{table}[t]
 \centering
-\caption{Measured SGF on a second predictor family, a 7-stage tournament predictor (global gshare PHT, PC-indexed local PHT, GHR-indexed chooser) on Artix-7. Instruction and branch counts are identical across variants, so misprediction deltas are exact. Mechanism~B reproduces and SGF reduces mispredictions on every workload at the same sub-1\% area cost as on gshare.}
+\caption{Measured SGF on a second predictor family, a 7-stage tournament predictor (global gshare PHT, PC-indexed local PHT, GHR-indexed chooser) on Artix-7. Instruction and branch counts are identical across variants, so misprediction deltas are exact. crc32's large relative drop is on a $\sim$0.2\% base (166 mispredictions, 664 cycles), negligible in absolute terms.}
 \label{tab:tournament}
 \small
 \begin{tabular}{@{}l rrr@{}}
@@ -633,11 +633,9 @@ To test this beyond gshare, we implemented and measured a second predictor famil
 CoreMark   & 87{,}992  & 85{,}300  & $-3.1\%$ \\
 statemate  & 63{,}274  & 56{,}619  & $-10.5\%$ \\
 aha-mont64 & 102{,}901 & 100{,}068 & $-2.8\%$ \\
-crc32      & 344       & 178       & $-48.3\%$\,\textsuperscript{$\dagger$} \\
+crc32      & 344       & 178       & $-48.3\%$ \\
 \bottomrule
 \end{tabular}
-\\[2pt]
-{\footnotesize \textsuperscript{$\dagger$}crc32 is $\sim$0.2\% mispredicted; the relative drop is large but the absolute saving (166 mispredictions, 664 cycles) is negligible.}
 \end{table}
 
 \section{Discussion}
@@ -679,12 +677,10 @@ Three reading caveats.
 \label{sec:guidance}
 
 For RV32IM-class soft cores on Artix-7, the data support four guidelines.
-The 6-stage is the highest-throughput depth here (64.1\,MIPS CoreMark): it captures the full execute-split frequency benefit at a moderate CPI penalty.
-The 5-stage is dominated, it shares the 4-stage's frequency ceiling while adding load-use stalls, so it offers no advantage unless area is binding (a conclusion conditional on the \texttt{-O1} mix, since higher optimization shifts branch and load-use frequencies).
-The 7/8-stage match the 6-stage on frequency but pay higher CPI; they are justified only when the IF split resolves a genuine timing bottleneck (e.g., synchronous BRAM instruction memory).
-Crucially, SGF does \emph{not} make a deeper pipeline out-throughput the 6-stage: on CoreMark the 6-stage reaches 64.1\,MIPS, whereas the 7-stage with SGF reaches $115.0/1.96 = 58.7$\,MIPS.
-SGF is therefore not a way to win throughput by going deeper; it is the right choice when depth is \emph{already forced} by a timing constraint (e.g., a registered-BRAM fetch mandating the IF split), where it removes the resulting stale-GHR penalty.
-At such a forced depth SGF is worth adding to any pipeline with $\geq$3 stages of update latency, including the 6-stage ($-$23.9\% CoreMark mispredictions), its 0.5--0.7\% area cost negligible against a 17--31\% misprediction reduction.
+The 6-stage is the highest-throughput depth here (64.1\,MIPS CoreMark): it captures the full execute-split frequency benefit at moderate CPI.
+The 5-stage is dominated, sharing the 4-stage frequency ceiling while adding load-use stalls, so it helps only when area is binding (a conclusion conditional on the \texttt{-O1} mix).
+The 7/8-stage match the 6-stage on frequency but pay higher CPI, justified only when the IF split resolves a genuine timing bottleneck such as synchronous BRAM instruction memory.
+Crucially, SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF reaches $115.0/1.96 = 58.7$\,MIPS vs.\ 64.1): it is not a way to win throughput by going deeper but the right fix once depth is \emph{already forced} by a timing constraint, removing the resulting stale-GHR penalty at any depth with $\geq$3 stages of update latency (including the 6-stage, $-$23.9\% CoreMark) for a 0.5--0.7\% area cost against a 17--31\% misprediction reduction.
 
 \section{Causal Isolation and Additional Analyses}
 \label{sec:supplementary}
