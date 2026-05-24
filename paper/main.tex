@@ -38,7 +38,7 @@ Email: \{devansh.jos, shafin.ula\}@utexas.edu}
 \maketitle
 
 \begin{abstract}
-Deeper pipelines raise an FPGA soft core's clock frequency, but they make every branch misprediction more costly. One component is easily overlooked. As depth grows, the global history register (GHR) of a correlation-based branch predictor takes longer to update. The register grows stale and inflates mispredictions, though the predictor hardware is unchanged. We eliminate this penalty with Speculative GHR Forwarding (SGF). Its key idea is that an in-order pipeline's existing stage registers already hold the per-branch state required for rollback. Recovery therefore needs no reorder buffer, unlike the out-of-order schemes that inspired it. We evaluate SGF on five RISC-V pipelines of four to eight stages, from identical functional-unit hardware and synthesized on a Xilinx Artix-7 device. The experiment separates this cost into an inherent flush penalty and a correctable stale-history penalty. A history-free control predictor and a thirty-two-fold capacity sweep confirm the latter causally. On the seven-stage pipeline, SGF reduces mispredictions by 31 percent at under 1 percent area and no frequency penalty. The cycles-per-instruction gain is modest: SGF is a favorable cost-benefit tradeoff, not a large speedup. The same experiment exposes a two-tier frequency structure, where only the execute-stage split raises frequency, making a six-stage pipeline throughput-optimal.
+Deeper pipelines raise an FPGA soft core's clock frequency, but they make every branch misprediction more costly. As depth grows, the global history register (GHR) of a correlation-based branch predictor takes longer to update. The register grows stale and inflates mispredictions, though the predictor hardware is unchanged. We eliminate this penalty with Speculative GHR Forwarding (SGF). Its key idea is that an in-order pipeline's existing stage registers already hold the per-branch state required for rollback. Recovery therefore needs no reorder buffer, unlike the out-of-order schemes that inspired it. We evaluate SGF on five RISC-V pipelines of four to eight stages, from identical functional-unit hardware on a Xilinx Artix-7 device. The experiment separates this cost into an inherent flush penalty and a correctable stale-history penalty. A history-free control predictor and a thirty-two-fold capacity sweep confirm the latter causally. On the seven-stage pipeline, SGF reduces mispredictions by 31 percent at under 1 percent area on single-history predictors, with no frequency penalty; on multi-table predictors like TAGE it is higher. The cycles-per-instruction gain is modest: SGF is a favorable cost-benefit tradeoff, not a large speedup. The same experiment finds the execute-stage split to be the only frequency knee, making a six-stage pipeline throughput-optimal.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -72,7 +72,7 @@ Two controls establish that Mechanism~B is causal rather than correlational: a b
 Second, we propose Speculative GHR Forwarding (SGF), a lightweight dual-GHR mechanism that eliminates Mechanism~B without a ROB: it updates the history register speculatively at prediction time and forwards GHR checkpoints through existing pipeline registers for rollback.
 On the 7-stage pipeline it cuts mispredictions 31.4\% on CoreMark and 22.7\% on statemate, pushing deep-pipeline counts \emph{below} the shallow-pipeline baseline, an effect unreachable by merely shortening the update path.
 
-The value is a favorable cost-benefit tradeoff, not a large speedup. Mechanism~B is only one of several depth costs, so the 31\% misprediction cut is a roughly 3\% CPI gain. SGF also does not make a deeper pipeline out-throughput a shallower one: the 6-stage stays the highest-throughput depth even against a 7-stage with SGF. Its benefit appears when depth is \emph{already forced} by a timing constraint, such as a registered-BRAM instruction fetch that mandates the IF1/IF2 split. There the stale-GHR penalty is an unavoidable cost of a decision made for frequency. SGF removes it for under 1\% area and no frequency loss, so it is a low-risk addition to any gshare-class in-order pipeline with three or more stages of update latency.
+The value is a favorable cost-benefit tradeoff, not a large speedup. Mechanism~B is only one of several depth costs, so the 31\% misprediction cut is a roughly 3\% CPI gain. SGF also does not make a deeper pipeline out-throughput a shallower one: the 6-stage stays the highest-throughput depth even against a 7-stage with SGF. Its benefit appears when depth is \emph{already forced} by a timing constraint, such as a registered-BRAM instruction fetch that mandates the IF1/IF2 split. There the stale-GHR penalty is an unavoidable cost of a decision made for frequency. SGF removes it for under 1\% area and no frequency loss, so it is a low-risk addition to any gshare-class in-order pipeline with three or more stages of update latency. The gain is largest with tightly coupled instruction and data memory, the common embedded soft-core case; cache-miss stalls dilute it, and the area cost rises on multi-table predictors (Sections~\ref{sec:cache_miss}, \ref{sec:generalization}).
 
 The experiment also reveals a two-tier frequency structure on Artix-7. Shallow pipelines (4/5-stage) cluster at 70--74\,MHz; deep pipelines (6/7/8-stage) cluster at 115--118\,MHz ($p < 0.001$, Cohen's $d = 18.5$). The execute-stage split at depth~6 is the sole significant frequency knee, a directly actionable design rule for any RV32IM-class FPGA soft core independent of SGF.
 
@@ -159,7 +159,7 @@ Each split targets a specific combinational path:
 
 \textbf{6-stage} (IF, ID, EX1, EX2, MEM, WB): Splits the execute phase, separating the forwarding multiplexer (EX1) from ALU and branch comparator (EX2). Three forwarding sources. Branch penalty: 3 cycles. This split targets the dominant critical path in the 4/5-stage designs.
 
-\textbf{7-stage} (IF1, IF2, ID, EX1, EX2, MEM, WB): Splits instruction fetch, placing branch prediction in IF2 with a registered PC. Introduces a 1-cycle IF2 bubble on every correctly predicted taken branch (IF1's speculative fetch is discarded). Branch penalty: 4 cycles. This split targets BRAM read latency. An industrial pipeline might deploy a zero-delay Next-Line Predictor (NLP) or BTB directly in IF1 to eliminate this bubble. We do not, because embedding specialized routing paths in IF1 would alter the physical timing paths unevenly across the 4-to-8-stage variants. The bubble is a deliberate control-variable constraint that preserves strict structural invariants across all depths.
+\textbf{7-stage} (IF1, IF2, ID, EX1, EX2, MEM, WB): Splits instruction fetch, placing branch prediction in IF2 with a registered PC. Introduces a 1-cycle IF2 bubble on every correctly predicted taken branch (IF1's speculative fetch is discarded). Branch penalty: 4 cycles. This split targets BRAM read latency. An industrial pipeline might deploy a zero-delay Next-Line Predictor (NLP) or BTB directly in IF1 to eliminate this bubble. We do not, because embedding specialized routing paths in IF1 would alter the physical timing paths unevenly across the 4-to-8-stage variants. The bubble is a deliberate control-variable constraint that preserves strict structural invariants across all depths. It is also orthogonal to SGF: an IF1 next-line predictor changes only \emph{where} the next fetch address is produced, not \emph{when} the GHR is updated at resolution. It would remove the fetch bubble (the $\beta\,B(D)\,f_b$ term) but leave the stale-GHR window, and hence SGF's misprediction reduction, unchanged. Its effect would be to lower the baseline CPI that SGF is measured against, which shrinks SGF's \emph{relative} CPI gain slightly without changing its misprediction counts.
 
 \textbf{8-stage} (IF1, IF2, ID, EX1, EX2, MEM1, MEM2, WB): Splits memory access, creating a dual load-use stall (loads not available until MEM2). Branch penalty: 4 cycles.
 
@@ -194,7 +194,7 @@ The claim is not that depth alone causes CPI increase, but that each split's Mec
 \label{sec:synth_method}
 
 To quantify placement-dependent variance in $F_{\max}$, each variant is synthesized and implemented 10 times with different placement and routing directive combinations (Default, Explore, ExtraNetDelay\_high/low, ExtraPostPlacementOpt, NoTimingRelaxation, and AggressiveExplore in various pairings).
-This produces 50 independent implementation runs (5 variants $\times$ 10 seeds).
+This produces 50 independent implementation runs (5 variants $\times$ 10 directive combinations).
 The target device is Xilinx Artix-7 XC7A35TCPG236-1.
 All syntheses use Vivado 2025.2 in out-of-context (OOC) mode with a 5\,ns clock constraint (200\,MHz target) to drive the tools toward maximum optimization effort.
 The reported $F_{\max}$ values are means with standard deviations and 95\% confidence intervals computed via Student's $t$-distribution with 9 degrees of freedom.
@@ -245,7 +245,7 @@ Fig.~\ref{fig:fmax} shows the frequency comparison with error bars.
 
 \begin{table*}[t]
 \centering
-\caption{Post-place-and-route synthesis results on Artix-7 XC7A35T (mean $\pm$ std from 10 placement seeds, 50 runs total). 95\% confidence intervals computed via Student's $t$ with 9 d.f. Tier gap: two-sample $t$-test $p < 0.001$, Cohen's $d = 18.5$.}
+\caption{Post-place-and-route synthesis results on Artix-7 XC7A35T (mean $\pm$ std from 10 synthesis directive combinations, 50 runs total). 95\% confidence intervals computed via Student's $t$ with 9 d.f. Tier gap: two-sample $t$-test $p < 0.001$, Cohen's $d = 18.5$.}
 \label{tab:results}
 \begin{tabular}{@{}lccccc@{}}
 \toprule
@@ -264,7 +264,7 @@ DSP48E1           & 12    & 12     & 12     & 12     & 12 \\
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fmax_comparison.png}
-\caption{Maximum clock frequency ($F_{\max}$) for each pipeline variant. Error bars show standard deviation from 10 placement seeds. The 44\,MHz tier gap has $p < 0.001$ (Cohen's $d = 18.5$).}
+\caption{Maximum clock frequency ($F_{\max}$) for each pipeline variant. Error bars show standard deviation from 10 synthesis directive combinations. The 44\,MHz tier gap has $p < 0.001$ (Cohen's $d = 18.5$).}
 \label{fig:fmax}
 \end{figure}
 
@@ -401,7 +401,7 @@ We also note the model's status precisely: because the branch-flush term takes t
 This model achieves $R^2 = 0.977$ across all 35 data points (adjusted $R^2_{\text{adj}} = 0.969$, accounting for the 9 fitted parameters; mean absolute error 0.033\,CPI, maximum residual 0.086\,CPI), capturing 97.7\% of the variance compared to 67\% for a simple linear regression.
 
 The model's value is its decomposability: the branch-flush term carries measured (Mechanism A+B) misprediction counts, $\alpha = 0.145$ is the CPI cost per load-use stall cycle, and $\beta = 1.12$ scales the IF2-bubble cost by branch frequency.
-The per-workload base $\gamma_w$ ranges from $-0.01$ (multiply-dominated aha-mont64) to $0.48$ (load-heavy edn), capturing instruction-mix effects orthogonal to depth.
+The per-workload base $\gamma_w$ ranges from $-0.01$ (multiply-dominated aha-mont64) to $0.48$ (load-heavy edn), capturing instruction-mix effects orthogonal to depth. Because it is orthogonal to depth, $\gamma_w$ is in principle estimable before implementation from the static instruction profile of the compiled binary (its load, multiply-divide, and branch frequencies) rather than from cycle-accurate simulation; validating such a static estimator is future work, and until then $\gamma_w$ is fitted.
 The 4-stage merges MEM/WB, eliminating load-use stalls (it enters the model with $L(D)=0$) at the cost of a longer critical path; that lengthening is a \emph{frequency} effect (in $F_{\max}$), not a CPI term, and the 4-stage residual stays $\leq$0.04\,CPI.
 
 \textbf{Cross-validation and status.}
@@ -418,7 +418,7 @@ Summed, these predict measured CPI within the model residual ($\leq$0.09) at eve
 
 Effective throughput (MIPS) is $F_{\max} / \text{CPI}$.
 This combines two separately obtained quantities: post-place-and-route $F_{\max}$ from static timing analysis and CPI from behavioral simulation. It is therefore a valid figure of merit for architectural comparison across our variants, but not a single end-to-end measurement on running silicon. The two were not co-measured on one physical system, and the product assumes the simulated cycle stream executes at the timing-closed clock.
-Computed from 10-seed mean $F_{\max}$ and CoreMark CPI, the 6-stage achieves the highest throughput on this fabric (64.1\,MIPS on CoreMark, 70.7\,MIPS on Diagnostic): its 67\% frequency advantage over the 4-stage more than compensates for its higher CPI.
+Computed from 10-directive mean $F_{\max}$ and CoreMark CPI, the 6-stage achieves the highest throughput on this fabric (64.1\,MIPS on CoreMark, 70.7\,MIPS on Diagnostic): its 67\% frequency advantage over the 4-stage more than compensates for its higher CPI.
 The 7-stage reaches 56.9\,MIPS (11\% below the 6-stage) and the 8-stage 53.9\,MIPS, confirming that stages beyond 6 degrade net throughput on this Artix-7 fabric.
 
 \section{Speculative GHR Forwarding}
@@ -427,7 +427,7 @@ The 7-stage reaches 56.9\,MIPS (11\% below the 6-stage) and the 8-stage 53.9\,MI
 Section~\ref{sec:mispred} established that deeper pipelines degrade branch prediction accuracy through two distinct mechanisms.
 Mechanism~A, higher per-misprediction flush penalty, is inherent to pipeline depth and cannot be reduced without changing the pipeline structure.
 Mechanism~B, inflated misprediction count from stale GHR state, is a deficiency in the predictor's update path, inflating mispredictions by 5.7--10\% on branch-dense workloads.
-This section presents Speculative GHR Forwarding (SGF), a lightweight microarchitectural mechanism that eliminates Mechanism~B entirely.
+This section presents Speculative GHR Forwarding (SGF), a lightweight microarchitectural mechanism that removes the stale-GHR component (Mechanism~B) on the workloads that exhibit it.
 
 \subsection{Problem: Stale GHR in Deep Pipelines}
 \label{sec:sgf_problem}
@@ -454,7 +454,7 @@ This separation ensures that the predictor always sees the freshest available hi
 
 \textbf{Why not just update the GHR one stage earlier?}
 Moving the update from EX2 to EX1 cuts latency by only one cycle (4 to 3 on the 7/8-stage), which mitigates but does not eliminate Mechanism~B; worse, the update needs the actual outcome from the EX2 branch comparator, so relocating it to EX1 would drag the comparator along and undo the execute-stage split that gives the 56\% frequency gain.
-SGF instead reaches zero effective update latency without relocating any logic.
+SGF instead gives the predictor a zero-latency speculative history without relocating any logic.
 
 For precise PHT indexing, a 6-bit GHR checkpoint is forwarded through the pipeline registers alongside each branch instruction, requiring 24 additional flip-flops across the four pipeline stages between IF2 and EX2.
 On misprediction, the checkpoint stored with the mispredicted branch provides the correct committed GHR state for rollback.
@@ -505,8 +505,8 @@ These invariants are encoded as a SystemVerilog assertion suite (checkpoint-equa
 \subsection{Synthesis Results}
 \label{sec:sgf_synth}
 
-SGF produces no $F_{\max}$ degradation under the same 10-seed methodology (Section~\ref{sec:synth_method}): the 7-stage SGF achieves $117.5 \pm 2.4$\,MHz vs.\ the baseline's $115.0 \pm 2.0$, and the 8-stage SGF $118.6 \pm 1.7$ vs.\ $117.5 \pm 1.8$.
-The nominal 2.5\,MHz uptick on the 7-stage is within the seed-to-seed standard deviation ($\sim$2\,MHz), and the baseline and SGF 95\% confidence intervals overlap. We therefore read it as placement-and-routing noise rather than a real speedup; the defensible claim is that SGF adds no measurable critical-path delay.
+SGF produces no $F_{\max}$ degradation under the same 10-directive methodology (Section~\ref{sec:synth_method}): the 7-stage SGF achieves $117.5 \pm 2.4$\,MHz vs.\ the baseline's $115.0 \pm 2.0$, and the 8-stage SGF $118.6 \pm 1.7$ vs.\ $117.5 \pm 1.8$.
+The nominal 2.5\,MHz uptick on the 7-stage is within the run-to-run standard deviation ($\sim$2\,MHz), and the baseline and SGF 95\% confidence intervals overlap. We therefore read it as placement-and-routing noise rather than a real speedup; the defensible claim is that SGF adds no measurable critical-path delay.
 The area cost is negligible: $+$49 LUTs / $+$57 FFs (0.6/0.7\%) on the 7-stage and $+$36 LUTs / $+$21 FFs (0.5/0.2\%) on the 8-stage, with unchanged DSP usage. The speculative-update and checkpoint logic is absorbed by the existing predictor datapath without creating new critical paths.
 
 \subsection{Benchmark Results}
@@ -674,8 +674,8 @@ SGF is thus most valuable in embedded systems with tightly coupled memories, the
 \subsection{Anticipated Objections}
 \label{sec:objections}
 
-Three reading caveats.
-\emph{(i)~Generality} is claimed for the \emph{mechanism}, not the magnitudes: Mechanism~B arises for any global-history predictor with nonzero update latency (shown causally by the bimodal and PHT controls), so the decomposition and the ROB-free construction transfer while specific percentages do not.
+Three reading caveats, separating what generalizes from what does not.
+\emph{(i)~Architectural fact vs.\ workload-specific result vs.\ heuristic.} The \emph{architectural fact} is the mechanism: Mechanism~B arises for any global-history predictor with nonzero update latency, shown causally by the bimodal and PHT controls, so the decomposition and the ROB-free construction transfer. The \emph{magnitudes} are workload- and predictor-specific: the percentages reported here hold for this benchmark set and predictor, not universally. The IBD threshold is a \emph{heuristic}, not a validated rule, grounded in only two positive workloads (Section~\ref{sec:mispred}).
 \emph{(ii)~Significance:} the 31\% misprediction cut is a 3\% CPI gain, so SGF's case is cost-benefit (sub-1\% area, no frequency penalty), not speedup.
 \emph{(iii)~Scope:} the \texttt{-O1} setting, benchmark set, and single-cycle memory are stated boundaries (Sections~\ref{sec:cache_miss},~\ref{sec:limitations}), and the optimal-depth conclusion is the measured outcome under these conditions, not invariant to them.
 
@@ -749,11 +749,11 @@ The bimodal predictor produces \emph{exactly} the same misprediction count at ev
 The only architectural difference is the presence of a GHR in the prediction index.
 
 \textbf{Causal conclusion.}
-These two experiments close the causal chain:
+Together these two controlled experiments isolate the cause:
 \begin{enumerate}
-\item The bimodal control proves that Mechanism~B \emph{requires} a GHR, without one, no depth-dependent misprediction variation occurs on any workload.
-\item The PHT capacity sweep proves that Mechanism~B is \emph{not} an aliasing artifact, the inflation persists at every table size from 32 to 1024 entries.
-\item Therefore, Mechanism~B is caused specifically by stale GHR update latency in the pipeline, and SGF, which eliminates this latency, is the correct fix.
+\item The bimodal control shows that Mechanism~B \emph{requires} a GHR: without one, no depth-dependent misprediction variation occurs on any workload.
+\item The PHT capacity sweep shows that Mechanism~B is \emph{not} an aliasing artifact: the inflation persists at every table size from 32 to 1024 entries.
+\item These two controls rule out the alternative explanations, leaving stale GHR update latency as the cause; SGF removes that latency and is the matching fix.
 \end{enumerate}
 
 \textbf{Is SGF better than abandoning global history?}
@@ -789,12 +789,31 @@ As a sanity check, our 70--118\,MHz range sits in a realistic mid-range among Ar
 \section{Limitations}
 \label{sec:limitations}
 
-The boundaries of this study constrain every conclusion drawn above and must be stated precisely.
+The boundaries of this study constrain every conclusion drawn above and must be stated precisely. Table~\ref{tab:threats} summarizes them; the paragraphs below give detail.
+
+\begin{table}[t]
+\centering
+\caption{Threats to validity and scope of the conclusions.}
+\label{tab:threats}
+\small
+\begin{tabular}{@{}p{0.21\columnwidth} p{0.71\columnwidth}@{}}
+\toprule
+\textbf{Dimension} & \textbf{Scope, and what would change the result} \\
+\midrule
+Fabric \& tool & Artix-7, Vivado 2025.2 only. $F_{\max}$ tiers and absolute area/power need re-synthesis on other fabrics or tools. \\
+Validation & Behavioral simulation (cycles) plus static timing ($F_{\max}$); no silicon measurement. Hardware cycle/power validation is future work. \\
+Memory & Single-cycle, tightly coupled, near-100\% hit. Cache misses dilute SGF's relative gain (Section~\ref{sec:cache_miss}). \\
+Predictor & gshare, tournament, and TAGE measured. SGF cost is sub-1\% on single-history predictors, $+21\%$ on multi-table TAGE. \\
+Compiler \& workloads & \texttt{-O1} and \texttt{-O2}, seven workloads; no FP, OS, or multi-threaded code. The IBD indicator rests on two positive workloads. \\
+CPI model & Decomposition with a fitted $\gamma_w$ and measured $M_w(D)$; the depth terms are validated out-of-sample. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \textbf{Fabric and tool dependence.}
 All synthesis, timing, and power data are from Artix-7 XC7A35TCPG236-1 with Vivado 2025.2.
 The two-tier $F_{\max}$ structure is a property of the 6-input LUT fabric and Vivado's placer/router. A different LUT architecture (e.g., Intel ALM), routing topology, process node, or tool (Quartus, Yosys+nextpnr) could shift the execute-split knee to a different depth or eliminate it, and the absolute $F_{\max}$/area/power figures do not transfer without re-synthesis.
-The 10-seed methodology mitigates single-seed bias within Vivado but does not address cross-tool variation.
+The 10-directive methodology mitigates single-run bias within Vivado but does not address cross-tool variation.
 
 \textbf{Single microarchitecture and memory scope.}
 The core is a research vehicle lacking the C extension, out-of-order execution, multi-level caches, TLB/MMU, and I/O. A different forwarding topology, tournament predictor, superscalar issue, or deeper memory hierarchy could yield a different optimal depth and SGF impact.
