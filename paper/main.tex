@@ -811,26 +811,7 @@ As a sanity check, our 70--118\,MHz range sits in a realistic mid-range among th
 \section{Limitations}
 \label{sec:limitations}
 
-The boundaries of this study constrain every conclusion drawn above and must be stated precisely. Table~\ref{tab:threats} summarizes them; the paragraphs below give detail.
-
-\begin{table}[t]
-\centering
-\caption{Threats to validity and scope of the conclusions.}
-\label{tab:threats}
-\small
-\begin{tabular}{@{}p{0.21\columnwidth} p{0.71\columnwidth}@{}}
-\toprule
-\textbf{Dimension} & \textbf{Scope, and what would change the result} \\
-\midrule
-Fabric \& tool & Artix-7, Vivado 2025.2 only. $F_{\max}$ tiers and absolute area/power need re-synthesis on other fabrics or tools. \\
-Validation & Behavioral simulation (cycles) plus static timing ($F_{\max}$); no silicon measurement. Hardware cycle/power validation is future work. \\
-Memory & Single-cycle, tightly coupled, near-100\% hit. Cache misses dilute SGF's relative gain (Section~\ref{sec:cache_miss}). \\
-Predictor & gshare, tournament, and TAGE measured. SGF cost is sub-1\% on single-history predictors, $+21\%$ on multi-table TAGE. \\
-Compiler \& workloads & \texttt{-O1} and \texttt{-O2}, seven workloads; no FP, OS, or multi-threaded code. The IBD indicator rests on two positive workloads. \\
-CPI model & Decomposition with a fitted $\gamma_w$ and measured $M_w(D)$; the depth terms are validated out-of-sample. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The boundaries of this study constrain every conclusion drawn above and must be stated precisely.
 
 \textbf{Fabric and tool dependence.}
 All synthesis, timing, and power data are from Artix-7 XC7A35TCPG236-1 with Vivado 2025.2.
