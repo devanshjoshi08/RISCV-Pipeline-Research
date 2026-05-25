@@ -1,16 +1,15 @@
-# synth_seeds_extended.tcl - 10 placement/routing directive combinations per variant.
-# 5 variants x 10 runs = 50 synthesis runs total.
-# Based on the proven synth_seeds.tcl structure.
+# synth_seeds.tcl - Based on the PROVEN working version that completed all 15 runs.
+# Only change: different placement/routing directives per run for variation.
 
 set project_dir [file normalize [file dirname [info script]]]
-set rtl_dir     "$project_dir/rtl"
+set rtl_dir     "$project_dir/_synth_rtl"
 set github_dir  [file normalize [file dirname [file dirname [info script]]]]
-set log_file    "$project_dir/seed_results_extended.log"
+set log_file    "$project_dir/seed_results.log"
 set part        "xc7a35tcpg236-1"
 set clk_xdc     "$project_dir/synth_clk_only.xdc"
 
 set fd [open $log_file w]
-puts $fd "=== Multi-Run Extended Synthesis Results (10 seeds) ==="
+puts $fd "=== Multi-Run Synthesis Results ==="
 puts $fd "=== [clock format [clock seconds]] ==="
 puts $fd "variant,run,Fmax_MHz,WNS_ns,LUTs,FFs"
 close $fd
@@ -24,31 +23,10 @@ set shared_rtl [list \
     "$rtl_dir/pipe_mem_wb.sv" \
 ]
 
-# Place/route directives for each of the 10 runs
-set place_directives [list \
-    "Default" \
-    "Explore" \
-    "Default" \
-    "ExtraNetDelay_high" \
-    "SpreadLogic_high" \
-    "ExtraPostPlacementOpt" \
-    "AltSpreadLogic_high" \
-    "ExtraNetDelay_low" \
-    "Default" \
-    "Explore" \
-]
-set route_directives [list \
-    "Default" \
-    "Explore" \
-    "NoTimingRelaxation" \
-    "Explore" \
-    "Default" \
-    "AggressiveExplore" \
-    "NoTimingRelaxation" \
-    "Explore" \
-    "AggressiveExplore" \
-    "NoTimingRelaxation" \
-]
+# Place/route directives for each of the 3 runs
+# These are the ONLY change from the original working script
+set place_directives [list "Default" "Explore" "Default"]
+set route_directives [list "Default" "Explore" "NoTimingRelaxation"]
 
 proc synth_one {name work_dir top_module rtl_files run_num} {
     global part clk_xdc log_file place_directives route_directives
@@ -150,12 +128,12 @@ foreach variant $variants {
     set vrtl  [lindex $variant 2]
 
     puts "\n=== $vname ==="
-    for {set r 1} {$r <= 10} {incr r} {
-        synth_one $vname "$project_dir/vivado_seeds_ext/${vname}_r${r}" $vtop $vrtl $r
+    for {set r 1} {$r <= 3} {incr r} {
+        synth_one $vname "$project_dir/vivado_seeds/${vname}_r${r}" $vtop $vrtl $r
     }
 }
 
 puts "\n================================================================"
-puts "  ALL 50 EXTENDED SYNTHESIS RUNS COMPLETE"
+puts "  ALL SYNTHESIS RUNS COMPLETE"
 puts "  Results in: $log_file"
 puts "================================================================\n"

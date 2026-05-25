@@ -3,7 +3,7 @@
 # Results APPEND to existing logs (does NOT overwrite 4s/5s/6s results).
 
 set project_dir [file normalize [file dirname [info script]]]
-set rtl_dir     "$project_dir/rtl"
+set rtl_dir     "$project_dir/_synth_rtl"
 set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set asm_dir     "$github_dir/programs/asm"
 set tb_dir      "$project_dir/vivado_7s8s_rerun"

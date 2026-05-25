@@ -8,7 +8,7 @@
 # Output: benchmark_results_all.log (appended for each run)
 
 set project_dir [file normalize [file dirname [info script]]]
-set rtl_dir     "$project_dir/rtl"
+set rtl_dir     "$project_dir/_synth_rtl"
 set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set asm_dir     "$project_dir/programs/asm"
 set log_file    "$project_dir/benchmark_results_all.log"

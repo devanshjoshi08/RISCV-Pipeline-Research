@@ -3,7 +3,7 @@
 # Results go to embench_official_results.log (does NOT overwrite embench_results.log).
 
 set project_dir [file normalize [file dirname [info script]]]
-set rtl_dir     "$project_dir/rtl"
+set rtl_dir     "$project_dir/_synth_rtl"
 set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set asm_dir     "$github_dir/programs/asm"
 set log_file    "$project_dir/embench_official_results.log"

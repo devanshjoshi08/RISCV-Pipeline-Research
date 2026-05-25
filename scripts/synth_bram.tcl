@@ -2,7 +2,7 @@
 # Results saved to bram_synth_results.log.
 
 set project_dir [file normalize [file dirname [info script]]]
-set rtl_dir     "$project_dir/rtl"
+set rtl_dir     "$project_dir/_synth_rtl"
 set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set log_file    "$project_dir/bram_synth_results.log"
 set part        "xc7a35tcpg236-1"

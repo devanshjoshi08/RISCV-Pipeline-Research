@@ -1,15 +1,15 @@
-# synth_seeds.tcl - Based on the PROVEN working version that completed all 15 runs.
-# Only change: different placement/routing directives per run for variation.
+# synth_ultrascale.tcl - Kintex UltraScale synthesis for all 5 pipeline variants, 3 seeds each.
+# Same structure as synth_seeds.tcl but targeting xcku035 (Kintex UltraScale).
 
 set project_dir [file normalize [file dirname [info script]]]
-set rtl_dir     "$project_dir/rtl"
+set rtl_dir     "$project_dir/_synth_rtl"
 set github_dir  [file normalize [file dirname [file dirname [info script]]]]
-set log_file    "$project_dir/seed_results.log"
-set part        "xc7a35tcpg236-1"
+set log_file    "$project_dir/ultrascale_results.log"
+set part        "xcku035-fbva676-1-c"
 set clk_xdc     "$project_dir/synth_clk_only.xdc"
 
 set fd [open $log_file w]
-puts $fd "=== Multi-Run Synthesis Results ==="
+puts $fd "=== Kintex UltraScale (xcku035) Multi-Run Synthesis Results ==="
 puts $fd "=== [clock format [clock seconds]] ==="
 puts $fd "variant,run,Fmax_MHz,WNS_ns,LUTs,FFs"
 close $fd
@@ -24,7 +24,6 @@ set shared_rtl [list \
 ]
 
 # Place/route directives for each of the 3 runs
-# These are the ONLY change from the original working script
 set place_directives [list "Default" "Explore" "Default"]
 set route_directives [list "Default" "Explore" "NoTimingRelaxation"]
 
@@ -129,11 +128,11 @@ foreach variant $variants {
 
     puts "\n=== $vname ==="
     for {set r 1} {$r <= 3} {incr r} {
-        synth_one $vname "$project_dir/vivado_seeds/${vname}_r${r}" $vtop $vrtl $r
+        synth_one $vname "$project_dir/vivado_kintex/${vname}_r${r}" $vtop $vrtl $r
     }
 }
 
 puts "\n================================================================"
-puts "  ALL SYNTHESIS RUNS COMPLETE"
+puts "  ALL KINTEX-7 SYNTHESIS RUNS COMPLETE"
 puts "  Results in: $log_file"
 puts "================================================================\n"

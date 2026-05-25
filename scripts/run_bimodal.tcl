@@ -2,7 +2,7 @@
 # Compares against gshare results to show effect persists across predictor architectures.
 
 set project_dir [file normalize [file dirname [info script]]]
-set rtl_dir     "$project_dir/rtl"
+set rtl_dir     "$project_dir/_synth_rtl"
 set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set asm_dir     "$github_dir/programs/asm"
 set log_file    "$project_dir/bimodal_results.log"

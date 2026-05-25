@@ -51,5 +51,15 @@ paper/submission.zip
 .DS_Store
 Thumbs.db
 
-# Keep result logs and Vivado TCL logs
-!vivado/*.log
+# Harness runtime output written into scripts/ on re-run (committed evidence
+# lives in results/, not here). The bundled synthesis RTL snapshot
+# scripts/_synth_rtl/ IS committed; its generated projects are not.
+scripts/vivado_*/
+scripts/.Xil/
+scripts/*.jou
+scripts/*.log
+scripts/tb/
+
+# Stray Vivado build artifacts at repo root
+dfx_runtime.txt
+vivado_*stage/

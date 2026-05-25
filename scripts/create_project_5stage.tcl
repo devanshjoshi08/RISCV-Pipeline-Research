@@ -5,7 +5,7 @@
 
 set project_name "RISCV-5stage"
 set project_dir  [file normalize [file dirname [info script]]]
-set rtl_dir      "$project_dir/rtl"
+set rtl_dir      "$project_dir/_synth_rtl"
 set rtl5_dir     "$project_dir/rtl_5stage"
 set tb5_dir      "$project_dir/tb_5stage"
 set prog_dir     "$project_dir/programs/asm"
