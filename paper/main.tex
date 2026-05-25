@@ -1,49 +1,67 @@
-\documentclass[10pt,journal]{IEEEtran}
+\documentclass[manuscript,screen,review]{acmart}
 
-\usepackage{cite}
-\usepackage{amsmath,amssymb,amsfonts}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{booktabs}
+% acmart provides graphicx, booktabs, hyperref, xcolor, url, amsmath.
+\usepackage{amssymb}
 \usepackage{multirow}
-\usepackage{url}
-\usepackage{hyperref}
-\usepackage{xcolor}
-\usepackage{siunitx}
 
 \graphicspath{{figures/}}
 
-% Tighter float packing: lets floats fill more of a page and reduces the
-% whitespace gaps that otherwise appear when a large float is deferred.
-\renewcommand{\topfraction}{0.92}
-\renewcommand{\bottomfraction}{0.85}
-\renewcommand{\textfraction}{0.06}
-\renewcommand{\floatpagefraction}{0.80}
-\renewcommand{\dbltopfraction}{0.92}
-\renewcommand{\dblfloatpagefraction}{0.80}
-\setcounter{topnumber}{3}
-\setcounter{totalnumber}{5}
+\acmJournal{TRETS}
+\setcopyright{rightsretained}
 
 \begin{document}
 
 \title{Speculative GHR Forwarding: Eliminating Stale Branch-Predictor State in Deep FPGA Pipelines}
 
-\author{
-\IEEEauthorblockN{Devansh Joshi and Shafin Ula}
-\IEEEauthorblockA{Department of Electrical and Computer Engineering,\\
-The University of Texas at Austin\\
-Email: \{devansh.jos, shafin.ula\}@utexas.edu}
-}
+\author{Devansh Joshi}
+\affiliation{%
+  \institution{The University of Texas at Austin}
+  \department{Department of Electrical and Computer Engineering}
+  \city{Austin}
+  \state{Texas}
+  \country{USA}}
+\email{devansh.jos@utexas.edu}
 
-\maketitle
+\author{Shafin Ula}
+\affiliation{%
+  \institution{The University of Texas at Austin}
+  \department{Department of Electrical and Computer Engineering}
+  \city{Austin}
+  \state{Texas}
+  \country{USA}}
+\email{shafin.ula@utexas.edu}
 
 \begin{abstract}
 Deeper pipelines raise an FPGA soft core's clock frequency, but they make every branch misprediction more costly. As depth grows, the global history register (GHR) of a correlation-based branch predictor takes longer to update. The register grows stale and inflates mispredictions, though the predictor hardware is unchanged. We eliminate this penalty with Speculative GHR Forwarding (SGF). Its key idea is that an in-order pipeline's existing stage registers already hold the per-branch state required for rollback. Recovery therefore needs no reorder buffer, unlike the out-of-order schemes that inspired it. We evaluate SGF on five RISC-V pipelines of four to eight stages, from identical functional-unit hardware on a Xilinx Artix-7 device. The experiment separates this cost into an inherent flush penalty and a correctable stale-GHR penalty. A history-free control predictor and a thirty-two-fold capacity sweep confirm the latter causally. On the seven-stage pipeline, SGF reduces mispredictions by 31 percent at under 1 percent area on single-history predictors, with no frequency penalty; on multi-table predictors like TAGE it is higher. The cycles-per-instruction gain is modest: SGF is a favorable cost-benefit tradeoff, not a large speedup. The same experiment finds the execute-stage split to be the only frequency knee, making a six-stage pipeline throughput-optimal.
 \end{abstract}
 
-\begin{IEEEkeywords}
-RISC-V, pipeline depth, FPGA, Artix-7, RV32IM, branch prediction, gshare, speculative GHR forwarding, microarchitecture
-\end{IEEEkeywords}
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10010583.10010600.10010628</concept_id>
+<concept_desc>Hardware~Reconfigurable logic and FPGAs</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10010520.10010521.10010525</concept_id>
+<concept_desc>Computer systems organization~Reduced instruction set computing</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10010520.10010521.10010522</concept_id>
+<concept_desc>Computer systems organization~Pipeline computing</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Hardware~Reconfigurable logic and FPGAs}
+\ccsdesc[500]{Computer systems organization~Reduced instruction set computing}
+\ccsdesc[300]{Computer systems organization~Pipeline computing}
+
+\keywords{RISC-V, pipeline depth, FPGA, Artix-7, branch prediction, gshare, speculative GHR forwarding, microarchitecture, reconfigurable computing}
+
+\maketitle
 
 \section{Introduction}
 \label{sec:intro}
@@ -999,7 +1017,7 @@ What transfers without re-measurement is the Mechanism-A/B decomposition and the
 An \texttt{-O2} re-measurement (Section~\ref{sec:o2}) confirms Mechanism~B and SGF's benefit survive aggressive optimization. Future work extends this to \texttt{-O3} and floating-point/OS workloads, to perceptron and local-history predictors, and to other FPGA fabrics and physical-hardware power/cycle validation.
 The complete RTL, testbenches, synthesis scripts, and benchmark programs are available at \url{https://github.com/devanshjoshi08/RISCV-Pipeline-Research}.
 
-\bibliographystyle{IEEEtran}
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
 
 \end{document}
