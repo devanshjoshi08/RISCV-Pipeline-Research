@@ -760,6 +760,23 @@ Subsequent IF/MEM splits yield no gain because those paths are routing-dominated
 All benchmarks execute from single-cycle memory (near-100\% hit). In production, cache misses add a depth-independent term $\text{CPI}_{\text{total}} = \text{CPI}_{\text{core}} + r_{\text{miss}}\,p_{\text{miss}}$ (miss rate $\times$ penalty) that dilutes branch-prediction gains.
 SGF's \emph{absolute} cycle saving on 7-stage CoreMark (159{,}932 flush cycles) is miss-rate-independent, so its \emph{relative} benefit shrinks as memory stalls grow: 3.0\% at zero misses, to 2.7\% (1\%/20-cycle), 2.0\% (2\%/50-cycle), and 0.9\% (5\%/100-cycle).
 SGF is thus most valuable in embedded systems with tightly coupled memories, the primary FPGA-soft-core use case, and least where cache-miss penalties dominate.
+Table~\ref{tab:cache_sensitivity} works the 7-stage CoreMark case through four miss scenarios.
+
+\begin{table*}[t]
+\centering
+\caption{SGF throughput improvement under modeled cache-miss rates (7-stage CoreMark). The absolute cycle saving from SGF (159{,}932 cycles) is constant, so the relative improvement decreases as memory stalls grow to dominate CPI.}
+\label{tab:cache_sensitivity}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Miss scenario} & \textbf{Miss CPI} & \textbf{Total CPI (base)} & \textbf{Total CPI (SGF)} & \textbf{$\Delta$CPI} & \textbf{Rel.\ improvement} \\
+\midrule
+No misses (this study)      & 0    & 2.02 & 1.96 & $-$0.06 & 3.0\% \\
+1\% miss, 20-cycle penalty  & 0.20 & 2.22 & 2.16 & $-$0.06 & 2.7\% \\
+2\% miss, 50-cycle penalty  & 1.00 & 3.02 & 2.96 & $-$0.06 & 2.0\% \\
+5\% miss, 100-cycle penalty & 5.00 & 7.02 & 6.96 & $-$0.06 & 0.9\% \\
+\bottomrule
+\end{tabular}
+\end{table*}
 
 \subsection{Anticipated Objections}
 \label{sec:objections}
@@ -834,8 +851,26 @@ A larger table reduces absolute mispredictions but does not correct the stale-GH
 \label{sec:bimodal}
 
 To confirm that Mechanism~B requires a GHR, we replaced the gshare predictor with a bimodal predictor that indexes the PHT using only the PC (no global history register). We ran CoreMark and statemate on all five pipeline depths.
-The bimodal predictor produces \emph{exactly} the same misprediction count at every depth on both workloads: 85{,}493 (CoreMark) and 63{,}272 (statemate), not a single additional misprediction at any depth. On the same workloads and pipelines, gshare shows $+$5.7\% inflation on CoreMark at 6-stage and $+$10.0\% on statemate at 7/8-stage (Table~\ref{tab:phtsweep}).
+The bimodal predictor produces \emph{exactly} the same misprediction count at every depth on both workloads: 85{,}493 (CoreMark) and 63{,}272 (statemate), not a single additional misprediction at any depth (Table~\ref{tab:bimodal}). On the same workloads and pipelines, gshare shows $+$5.7\% inflation on CoreMark at 6-stage and $+$10.0\% on statemate at 7/8-stage (Table~\ref{tab:phtsweep}).
 The only architectural difference is the presence of a GHR in the prediction index.
+
+\begin{table}[t]
+\centering
+\caption{Bimodal predictor (no GHR) misprediction counts on CoreMark and statemate. The counts are identical across all five depths: zero Mechanism~B inflation.}
+\label{tab:bimodal}
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Depth} & \textbf{CoreMark} & \textbf{statemate} \\
+\midrule
+4-stg & 85{,}493 & 63{,}272 \\
+5-stg & 85{,}493 & 63{,}272 \\
+6-stg & 85{,}493 & 63{,}272 \\
+7-stg & 85{,}493 & 63{,}272 \\
+8-stg & 85{,}493 & 63{,}272 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \textbf{Causal conclusion.}
 Together these two controlled experiments isolate the cause:
@@ -858,6 +893,14 @@ To test whether the 7-stage IF split becomes beneficial with synchronous memory,
 With BRAM the deep tier rises to 121.5\,MHz (6-stage), 120.9\,MHz (7-stage), and 121.2\,MHz (8-stage). The 7/8-stage improve from their LUT-memory 115.0/117.5\,MHz to nearly match the 6-stage, while the shallow tier holds (4-stage 69.3, 5-stage 73.7\,MHz). The 4-stage dips slightly because the registered BRAM output lengthens its already-critical execute path.
 The IF1/IF2 boundary naturally absorbs the BRAM's 1-cycle read latency, making the 7-stage frequency-competitive; but its deeper-pipeline CPI overhead remains, so it still needs SGF and moderate-branch-density workloads to match the 6-stage's throughput.
 This also answers the memory-mapping concern: the main study uses distributed LUT RAM to hold memory organization \emph{invariant} across depths, and these BRAM variants are the measured counterfactual with true synchronous-read primitives. Mapping to BRAM shifts frequency but not the CPI ordering, so the 6-stage stays the throughput optimum and a real-BRAM mapping strengthens rather than invalidates it.
+Fig.~\ref{fig:bram} compares the two memory mappings across depths.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{bram_comparison.png}
+\caption{$F_{\max}$ with LUT-RAM versus BRAM instruction memory across the five depths. The IF1/IF2 split absorbs the BRAM read latency, so the 7/8-stage rise to near the 6-stage; the 4/5-stage tier is unchanged.}
+\label{fig:bram}
+\end{figure}
 
 \subsection{Power and Efficiency}
 \label{sec:power}
@@ -869,11 +912,34 @@ This trend is opposite to a uniform-toggle approximation, which only a workload-
 
 From energy $E = P_{\text{dyn}}\cdot\text{Cycles}/F_{\max}$ and $\text{EDP} = E\cdot\text{Cycles}/F_{\max}$, the 6-stage achieves the lowest energy per CoreMark run (7.0\,mJ) and the lowest EDP (318\,mJ$\cdot$ms), versus 10.6\,mJ/675 for the 4-stage and 8.0\,mJ/432 for the 8-stage. It also has the highest efficiency: 286\,MIPS/W, versus 253/248 for the 7/8-stage and 195/197 for the 4/5-stage.
 The 6-stage is thus the most energy-efficient depth as well as the highest-throughput, though we present EDP as a relative comparison, not a measured criterion. SGF's $+$49 LUT/$+$57 FF add $<$1\% to dynamic power.
+Fig.~\ref{fig:power} shows the power breakdown across depths, and Fig.~\ref{fig:efficiency} the resulting efficiency.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{power_comparison.png}
+\caption{On-chip power (dynamic and static) across the five depths under workload-specific (CoreMark SAIF) switching activity. Total power falls with depth as lower IPC reduces average toggling.}
+\label{fig:power}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{efficiency_comparison.png}
+\caption{Power efficiency (MIPS/W) across the five depths, from SAIF-based power and CoreMark throughput. The 6-stage is the most efficient at 286\,MIPS/W.}
+\label{fig:efficiency}
+\end{figure}
 
 \subsection{Published Cores Context}
 \label{sec:published}
 
 As a sanity check, our 70--118\,MHz range sits in a realistic mid-range among the Artix-7 RISC-V soft cores of Table~\ref{tab:cores}. We make no cross-project performance claim: those cores differ in ISA subset, execution model, predictor, and memory, so their frequency gaps reflect those confounders, not pipeline depth.
+Fig.~\ref{fig:published} places our variants against the published cores.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{published_cores_comparison.png}
+\caption{$F_{\max}$ of our five variants against published Artix-7 RISC-V soft cores. Included only to confirm our research vehicle sits in a realistic design-space region; the cores differ in too many variables to support a cross-project performance comparison.}
+\label{fig:published}
+\end{figure}
 
 \section{Limitations}
 \label{sec:limitations}
