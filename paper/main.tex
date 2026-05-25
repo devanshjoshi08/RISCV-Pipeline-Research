@@ -167,7 +167,7 @@ The predictor update latency, the number of stages between prediction and resolu
 
 \begin{table*}[t]
 \centering
-\caption{Pipeline structure and hazard costs across depths. Predictor update latency (bottom row) is the central variable for Mechanism~B.}
+\caption{Pipeline structure and per-event hazard costs across depths (architectural parameters, not measured data). Predictor update latency (bottom row) is the central variable for Mechanism~B.}
 \label{tab:hazard}
 \begin{tabular}{@{}lccccc@{}}
 \toprule
@@ -262,7 +262,7 @@ DSP48E1           & 12    & 12     & 12     & 12     & 12 \\
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fmax_comparison.png}
-\caption{Maximum clock frequency ($F_{\max}$) for each pipeline variant. Error bars show standard deviation from 10 synthesis directive combinations. The 44\,MHz tier gap has $p < 0.001$ (Cohen's $d = 18.5$).}
+\caption{Maximum clock frequency ($F_{\max}$, post-place-and-route static timing) for each pipeline variant. Error bars show standard deviation from 10 synthesis directive combinations. The 44\,MHz tier gap has $p < 0.001$ (Cohen's $d = 18.5$).}
 \label{fig:fmax}
 \end{figure}
 
@@ -298,7 +298,7 @@ Among the four Embench-IoT kernels, multiply-heavy aha-mont64 has the lowest CPI
 
 \begin{table}[t]
 \centering
-\caption{Measured CPI across all seven workloads and five pipeline depths ($f_b$ = branch frequency). Every variant executes identical instruction, branch, and misprediction counts per workload (determinism check). CoreMark and statemate also show depth-dependent misprediction inflation (Mechanism~B; see text and Fig.~\ref{fig:mispred}).}
+\caption{CPI from RTL simulation across all seven workloads and five pipeline depths ($f_b$ = branch frequency). Every variant executes identical instruction, branch, and misprediction counts per workload (determinism check). CoreMark and statemate also show depth-dependent misprediction inflation (Mechanism~B; see text and Fig.~\ref{fig:mispred}).}
 \label{tab:cpi_all}
 \small
 \begin{tabular}{@{}lccccc@{}}
@@ -341,7 +341,7 @@ On statemate, the 7/8-stage pipelines produce 73{,}263 versus 66{,}603 for the 4
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{mispred_comparison.png}
-\caption{Branch misprediction rate (\%) on CoreMark and statemate across five depths. The rate climbs with depth, CoreMark at the 6-stage (20.2\%$\to$21.4\%), statemate at the 7/8-stage (17.7\%$\to$19.5\%), which is the Mechanism~B inflation. The five other workloads (not shown) hold a constant rate at all depths (Mechanism~A only).}
+\caption{Branch misprediction rate (\%, RTL simulation) on CoreMark and statemate across five depths. The rate climbs with depth, CoreMark at the 6-stage (20.2\%$\to$21.4\%), statemate at the 7/8-stage (17.7\%$\to$19.5\%), which is the Mechanism~B inflation. The five other workloads (not shown) hold a constant rate at all depths (Mechanism~A only).}
 \label{fig:mispred}
 \end{figure}
 
@@ -704,7 +704,7 @@ Table~\ref{tab:phtsweep} presents four representative sizes (the 32$\times$ extr
 
 \begin{table*}[t]
 \centering
-\caption{Misprediction counts across PHT sizes and pipeline depths on CoreMark and statemate (gshare predictor). $\Delta$ shows inflation relative to the 4/5-stage baseline at each PHT size.}
+\caption{Misprediction counts (RTL simulation) across PHT sizes and pipeline depths on CoreMark and statemate (gshare predictor). $\Delta$ shows inflation relative to the 4/5-stage baseline at each PHT size.}
 \label{tab:phtsweep}
 \small
 \begin{tabular}{@{}l rr rr rr rr@{}}
