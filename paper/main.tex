@@ -56,7 +56,7 @@ Prior RISC-V soft cores differ in ISA support, predictor design, memory architec
 We are not aware of a published study that varies pipeline depth as the single controlled design parameter on a common FPGA target while holding the RTL of all other microarchitectural modules constant. Each stage split does carry structural side effects (an added load-use stall, a fetch bubble, an extra forwarding source), which we make explicit and decompose rather than assume away.
 
 A subtler cost compounds the explicit penalty of deeper pipelines: the predictor's global history register (GHR) becomes stale because the latency between branch resolution and the next prediction spans more cycles.
-Speculative history updating is itself an established technique: Yeh and Patt's two-level adaptive predictor \cite{yeh1991two} already updates history speculatively, and ASIC out-of-order processors (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}) recover it on misprediction through the reorder buffer (ROB) or a dedicated branch stack; Gonzalez and Horowitz quantified the staleness cost in ASIC simulations \cite{gonzalez1999power}.
+Speculative history updating is itself an established technique. Yeh and Patt's two-level adaptive predictor \cite{yeh1991two} already updates history speculatively, and ASIC out-of-order processors (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}) recover it on misprediction through the reorder buffer (ROB) or a dedicated branch stack. Gonzalez and Horowitz quantified the staleness cost in ASIC simulations \cite{gonzalez1999power}.
 These recovery mechanisms are tied to the out-of-order substrate, however: the R10000's branch stack checkpoints the register-map alias table and the Alpha's recovery rides the ROB. These are centralized structures that an in-order FPGA soft core lacks and could not add cheaply (the structures alone would dwarf the predictor they protect).
 To our knowledge, the effect itself has not been measured under controlled conditions on FPGA fabric, and no lightweight in-order realization of speculative history has been demonstrated there.
 
@@ -103,17 +103,17 @@ Prior RISC-V FPGA implementations vary widely in scope. SERV \cite{serv2019} (bi
 Speculative GHR updating with checkpoint rollback is long established and is \emph{not} what we claim as new.
 Yeh and Patt \cite{yeh1991two} describe speculative history in their two-level predictor; out-of-order ASICs recover it through the reorder buffer or a branch stack (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}), and in-order ASIC pipelines have long used a shift-register history with checkpoint/mask restore on misprediction.
 SGF's contribution is therefore the FPGA realization, not the rollback concept.
-The ASIC recovery structures either tie to out-of-order state (the R10000's branch stack checkpoints the register-rename map, the Alpha rides ROB squashing) or assume a custom ASIC datapath; SGF instead reuses the in-order soft core's \emph{existing} pipeline registers as the checkpoint-forwarding path, adding no dedicated recovery hardware, and we measure the effect it corrects under controlled conditions.
+The ASIC recovery structures either tie to out-of-order state (the R10000's branch stack checkpoints the register-rename map, the Alpha rides ROB squashing) or assume a custom ASIC datapath. SGF instead reuses the in-order soft core's \emph{existing} pipeline registers as the checkpoint-forwarding path, adding no dedicated recovery hardware. We also measure the effect it corrects under controlled conditions.
 In tagged predictors stale GHR corrupts both index and tag (a different error profile than gshare), needing per-table checkpoints \cite{seznec2011tage, seznec2006revisiting}; Michaud et al.\ \cite{michaud1999trading} note that update latency compounds with PHT aliasing.
 
 \subsection{FPGA Pipeline Studies}
 
 Prior surveys have cataloged pipelining techniques across RISC families \cite{biglari2019pipelining}, and configurable generators such as Rocket Chip \cite{asanovic2016rocket} offer parameterizable pipelines with branch-prediction front-ends.
-Such generators and other in-order soft cores do carry lightweight branch-recovery state (PC redirect and BTB/RAS checkpoints), but none, to our knowledge, speculatively checkpoints and forwards the \emph{global history register} of a correlation predictor in an in-order FPGA pipeline; the out-of-order designs that recover speculative history do so through the ROB or a branch stack, the centralized structures an in-order soft core lacks.
+Such generators and other in-order soft cores do carry lightweight branch-recovery state (PC redirect and BTB/RAS checkpoints). But none, to our knowledge, speculatively checkpoints and forwards the \emph{global history register} of a correlation predictor in an in-order FPGA pipeline. The out-of-order designs that recover speculative history do so through the ROB or a branch stack, the centralized structures an in-order soft core lacks.
 Neither line of work isolates pipeline depth as a controlled FPGA variable, nor addresses the stale-GHR effect.
 The FPGA-specific study of Kuon and Rose \cite{kuon2007measuring} characterizes the LUT-routing delay gap that makes FPGA pipelining fundamentally different from ASIC pipelining, but does not examine branch-prediction interactions.
 
-To our knowledge the gap is twofold: no published controlled experiment varies pipeline depth as the single controlled design parameter on a single FPGA device (holding functional-unit RTL constant and decomposing each split's side effects rather than claiming them away), and no lightweight mechanism corrects the stale-GHR degradation such an experiment reveals.
+To our knowledge the gap is twofold. No published controlled experiment varies pipeline depth as the single controlled design parameter on a single FPGA device, holding functional-unit RTL constant and decomposing each split's side effects rather than claiming them away. And no lightweight mechanism corrects the stale-GHR degradation such an experiment reveals.
 
 \section{Experimental Setup}
 \label{sec:methodology}
@@ -135,7 +135,7 @@ All five pipeline variants share the following modules, instantiated from identi
 This configuration consumes 128 LUT bits (64 $\times$ 2-bit counters) and occupies $<$1\% of the Artix-7 fabric.
 Larger predictors (e.g., 1024--4096-entry PHTs with 10--12-bit GHRs) are standard in high-performance ASIC processors but would dominate the area budget of a $\sim$7{,}500-LUT soft core.
 Two controls in Section~\ref{sec:causal} establish that the depth effect we attribute to this predictor is caused by update latency rather than its small size: a 32$\times$ PHT sweep (Section~\ref{sec:predsweep}) and a no-GHR bimodal predictor (Section~\ref{sec:bimodal}).
-A 6-bit history is short relative to high-performance gshare but representative of low-end embedded cores, which use minimal or no global history (e.g., Ibex's bimodal-style predictor, SweRV's modest branch-history table); it also bounds the speculative-forwarding checkpoint to 6 bits per in-flight branch.
+A 6-bit history is short relative to high-performance gshare but representative of low-end embedded cores, which use minimal or no global history (e.g., Ibex's bimodal-style predictor, SweRV's modest branch-history table). It also bounds the speculative-forwarding checkpoint to 6 bits per in-flight branch.
 
 \textbf{CSR Unit.} Machine-mode control and status registers including \texttt{mstatus}, \texttt{mtvec}, \texttt{mepc}, \texttt{mcause}, \texttt{mscratch}, and 64-bit hardware performance counters for cycles (\texttt{mcycle}), retired instructions (\texttt{minstret}), total branches, and branch mispredictions. Each benchmark reads these counters to obtain cycle counts, instruction counts, branch counts, and misprediction counts.
 
@@ -290,11 +290,11 @@ Dhrystone and Diagnostic produce \emph{identical} misprediction counts at all de
 The 5-stage CPI exceeds the 4-stage despite an identical branch penalty because of its 1-cycle load-use stall (absent in the 4-stage merged MEM/WB).
 
 CoreMark, by contrast, exhibits a depth-dependent rise in misprediction count, the signature of Mechanism~B.
-The 6-stage produces 154{,}077 mispredictions (21.4\%) versus 145{,}735 (20.2\%) at 4/5-stage (a 5.7\% increase from the longer update latency), with the 7- and 8-stage \emph{identical} at 147{,}760 (20.5\%): the two deepest pipelines share the same 4-stage predictor update latency, so the 8-stage's extra MEM split adds flush-penalty cycles (Mechanism~A) but no new staleness (Mechanism~B).
+The 6-stage produces 154{,}077 mispredictions (21.4\%) versus 145{,}735 (20.2\%) at 4/5-stage, a 5.7\% increase from the longer update latency. The 7- and 8-stage are \emph{identical} at 147{,}760 (20.5\%): the two deepest pipelines share the same 4-stage predictor update latency, so the 8-stage's extra MEM split adds flush-penalty cycles (Mechanism~A) but no new staleness (Mechanism~B).
 All five variants execute identical instruction (2{,}893{,}145) and branch (719{,}810) counts, and the official CoreMark/MHz score ranges from 2.23 (4-stage) to 1.58 (8-stage).
 This inflation is the specific target of SGF.
 
-Among the four Embench-IoT kernels, multiply-heavy aha-mont64 has the lowest CPI (few branches, MDU-bound); crc32 has almost zero mispredictions (344 across all depths, 0.19\%) on its highly predictable inner loop; statemate shows the strongest depth-dependent effect (66{,}603 mispredictions at 4/5-stage vs.\ 73{,}263 at 7/8-stage, $+$10.0\%) from data-dependent state transitions; and edn has moderate CPI with a low (3.1\%) misprediction rate.
+Among the four Embench-IoT kernels, multiply-heavy aha-mont64 has the lowest CPI (few branches, MDU-bound). crc32 has almost zero mispredictions (344 across all depths, 0.19\%) on its highly predictable inner loop. statemate shows the strongest depth-dependent effect (66{,}603 mispredictions at 4/5-stage vs.\ 73{,}263 at 7/8-stage, $+$10.0\%) from data-dependent state transitions. edn has moderate CPI with a low 3.1\% misprediction rate.
 
 \begin{table}[t]
 \centering
@@ -388,19 +388,19 @@ Unlike an empirical regression, each term corresponds to a specific physical mec
 \label{eq:cpi_model}
 \end{equation}
 where $D$ is pipeline depth, $w$ indexes the workload, $M_w(D)/N_w$ is the misprediction rate (mispredictions per instruction; may vary with $D$ due to Mechanism~B), $P(D)$ is the flush penalty in cycles (2, 2, 3, 4, 4 for depths 4--8), $L(D)$ is the load-use stall cycles (0, 1, 1, 1, 1.5), $B(D)$ is the IF2 bubble indicator (0, 0, 0, 1, 1), $f_b$ is branch frequency, and $\gamma_w$ captures workload-specific base overhead from instruction mix, MDU stalls, and data hazards not attributable to pipeline depth.
-The 8-stage's $L(D) = 1.5$ is a structural average, not a single per-instruction value: its MEM1/MEM2 split makes a load-use hazard cost 1 cycle when the dependent use is one slot downstream and 2 cycles when adjacent, so the effective stall lies between 1 and 2 over the load-use mix; we use the midpoint, and the 8-stage residual ($\leq$0.04\,CPI) confirms it suffices.
+The 8-stage's $L(D) = 1.5$ is a structural average, not a single per-instruction value. Its MEM1/MEM2 split makes a load-use hazard cost 1 cycle when the dependent use is one slot downstream and 2 cycles when adjacent, so the effective stall lies between 1 and 2 over the load-use mix. We use the midpoint, and the 8-stage residual ($\leq$0.04\,CPI) confirms it suffices.
 
 The general form would add a memory-stall term $\Pi_{\text{mem}} = r_{\text{imiss}} p_{\text{imiss}} + r_{\text{dmiss}} p_{\text{dmiss}}$, which is 0 here (single-cycle memories) but would contribute a depth-independent offset in cache-based systems (Section~\ref{sec:cache_miss}).
 
 The shared $\alpha$ (load-use) and $\beta$ (IF2 bubble) are fitted across all 35 points and $\gamma_w$ per workload (9 parameters for 35 observations), giving $\alpha = 0.145$, $\beta = 1.12$.
 Here $\alpha$ is the per-instruction \emph{frequency} of load-use hazards, not a per-stall cost, so $\alpha < 1$ simply reflects that only $\sim$15\% of instructions are loads immediately consumed by the next operation ($\alpha\,L(D)$ multiplies this frequency by the stall cycles each such hazard incurs); three-source forwarding resolves the remaining loads at zero penalty.
-We also note the model's status precisely: because the branch-flush term takes the \emph{measured} $M_w(D)$ as input, the model \emph{decomposes} observed CPI rather than predicting it ab initio on the two Mechanism-B workloads where $M_w$ varies with $D$; on the five workloads with depth-invariant $M_w$ it is genuinely predictive from architectural parameters, and the LOWO test below isolates the depth-term accuracy from the $\gamma_w$ offset.
+We note the model's status precisely. Because the branch-flush term takes the \emph{measured} $M_w(D)$ as input, the model \emph{decomposes} observed CPI rather than predicting it ab initio on the two Mechanism-B workloads where $M_w$ varies with $D$. On the five workloads with depth-invariant $M_w$ it is genuinely predictive from architectural parameters. The LOWO test below isolates the depth-term accuracy from the $\gamma_w$ offset.
 
 This model achieves $R^2 = 0.977$ across all 35 data points (adjusted $R^2_{\text{adj}} = 0.969$, accounting for the 9 fitted parameters; mean absolute error 0.033\,CPI, maximum residual 0.086\,CPI), capturing 97.7\% of the variance compared to 67\% for a simple linear regression.
 
 The model's value is its decomposability: the branch-flush term carries measured (Mechanism A+B) misprediction counts, $\alpha = 0.145$ is the CPI cost per load-use stall cycle, and $\beta = 1.12$ scales the IF2-bubble cost by branch frequency.
-The per-workload base $\gamma_w$ ranges from $-0.01$ (multiply-dominated aha-mont64) to $0.48$ (load-heavy edn), capturing instruction-mix effects orthogonal to depth. Because it is orthogonal to depth, $\gamma_w$ is in principle estimable before implementation from the static instruction profile of the compiled binary (its load, multiply-divide, and branch frequencies) rather than from cycle-accurate simulation; validating such a static estimator is future work, and until then $\gamma_w$ is fitted.
-The 4-stage merges MEM/WB, eliminating load-use stalls (it enters the model with $L(D)=0$) at the cost of a longer critical path; that lengthening is a \emph{frequency} effect (in $F_{\max}$), not a CPI term, and the 4-stage residual stays $\leq$0.04\,CPI.
+The per-workload base $\gamma_w$ ranges from $-0.01$ (multiply-dominated aha-mont64) to $0.48$ (load-heavy edn), capturing instruction-mix effects orthogonal to depth. Because it is orthogonal to depth, $\gamma_w$ is in principle estimable before implementation from the static instruction profile of the compiled binary (its load, multiply-divide, and branch frequencies) rather than from cycle-accurate simulation. Validating such a static estimator is future work; until then $\gamma_w$ is fitted.
+The 4-stage merges MEM/WB, eliminating load-use stalls (it enters the model with $L(D)=0$) at the cost of a longer critical path. That lengthening is a \emph{frequency} effect (in $F_{\max}$), not a CPI term, and the 4-stage residual stays $\leq$0.04\,CPI.
 
 \textbf{Cross-validation and status.}
 Leave-one-workload-out (LOWO) cross-validation refits on 30 points per fold and predicts the held-out workload from the depth-dependent terms, with $\gamma_w$ set to the training mean. It gives $R^2_{\text{CV}} = 0.941$ (MAE 0.052\,CPI), with $\alpha$ and $\beta$ stable across folds ($0.14 \pm 0.01$, $1.10 \pm 0.05$). The largest errors fall on edn and Diagnostic, at the extremes of the instruction-mix distribution.
@@ -451,7 +451,7 @@ The speculative GHR is used for PHT indexing at prediction time, while the commi
 This separation ensures that the predictor always sees the freshest available history for new predictions while maintaining correct training.
 
 \textbf{Why not just update the GHR one stage earlier?}
-Moving the update from EX2 to EX1 cuts latency by only one cycle (4 to 3 on the 7/8-stage), which mitigates but does not eliminate Mechanism~B; worse, the update needs the actual outcome from the EX2 branch comparator, so relocating it to EX1 would drag the comparator along and undo the execute-stage split that gives the 56\% frequency gain.
+Moving the update from EX2 to EX1 cuts latency by only one cycle (4 to 3 on the 7/8-stage), which mitigates but does not eliminate Mechanism~B. Worse, the update needs the actual outcome from the EX2 branch comparator. Relocating it to EX1 would drag the comparator along and undo the execute-stage split that gives the 56\% frequency gain.
 SGF instead gives the predictor a zero-latency speculative history without relocating any logic.
 
 For precise PHT indexing, a 6-bit GHR checkpoint is forwarded through the pipeline registers alongside each branch instruction, requiring 24 additional flip-flops across the four pipeline stages between IF2 and EX2.
@@ -603,7 +603,7 @@ Because the 6-stage is the highest-throughput depth on this fabric (Section~\ref
 On CoreMark, SGF reduces 6-stage mispredictions from 154{,}077 to 117{,}207 ($-$23.9\%, CPI 1.83$\to$1.79); on statemate, from 69{,}933 to 54{,}329 ($-$22.3\%, CPI 1.37$\to$1.35).
 Instruction and branch counts are identical to the baseline, confirming the implementation is performance-only.
 
-The reduction is substantial at the recommended design point, though smaller than at 7/8-stage ($-$31.4\% on 7-stage CoreMark) because the 6-stage's 3-stage update latency leaves less stale-GHR inflation to correct than the 4-stage latency of the deeper pipelines, consistent with Mechanism~B scaling with depth.
+The reduction is substantial at the recommended design point, though smaller than at 7/8-stage ($-$31.4\% on 7-stage CoreMark). The 6-stage's 3-stage update latency leaves less stale-GHR inflation to correct than the 4-stage latency of the deeper pipelines, consistent with Mechanism~B scaling with depth.
 On the workloads that exhibit no Mechanism~B (aha-mont64, crc32, edn), the 6-stage SGF shows small, CPI-neutral misprediction increases on highly biased branches, the same edge case discussed in Section~\ref{sec:crc32}.
 SGF is therefore beneficial at every depth with nonzero update latency, and most where Mechanism~B is largest.
 
@@ -684,7 +684,7 @@ For RV32IM-class soft cores on Artix-7, the data support four guidelines.
 The 6-stage is the highest-throughput depth here (64.1\,MIPS CoreMark): it captures the full execute-split frequency benefit at moderate CPI.
 The 5-stage is dominated, sharing the 4-stage frequency ceiling while adding load-use stalls, so it helps only when area is binding (a conclusion conditional on the \texttt{-O1} mix).
 The 7/8-stage match the 6-stage on frequency but pay higher CPI, justified only when the IF split resolves a genuine timing bottleneck such as synchronous BRAM instruction memory.
-Consistent with the cost-benefit framing of Section~\ref{sec:intro}, SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF reaches $115.0/1.96 = 58.7$\,MIPS vs.\ 64.1); it is worth adding at any forced depth carrying $\geq$3 stages of update latency, including the 6-stage itself ($-$23.9\% CoreMark), for a 0.5--0.7\% area cost against a 17--31\% misprediction reduction.
+Consistent with the cost-benefit framing of Section~\ref{sec:intro}, SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF reaches $115.0/1.96 = 58.7$\,MIPS vs.\ 64.1). It is worth adding at any forced depth carrying $\geq$3 stages of update latency, including the 6-stage itself ($-$23.9\% CoreMark), for a 0.5--0.7\% area cost against a 17--31\% misprediction reduction.
 
 \section{Causal Isolation and Supporting Analyses}
 \label{sec:supplementary}
@@ -764,25 +764,25 @@ The guidance is thus not universal: SGF is worth it when global history helps; w
 \label{sec:bram}
 
 To test whether the 7-stage IF split becomes beneficial with synchronous memory, we synthesized BRAM variants of all five pipelines using a registered-output instruction memory that infers Block RAM.
-With BRAM the deep tier rises to 121.5\,MHz (6-stage), 120.9\,MHz (7-stage), and 121.2\,MHz (8-stage), the 7/8-stage improving from their LUT-memory 115.0/117.5\,MHz to nearly match the 6-stage, while the shallow tier holds (4-stage 69.3, 5-stage 73.7\,MHz; the 4-stage dips slightly because the registered BRAM output lengthens its already-critical execute path).
+With BRAM the deep tier rises to 121.5\,MHz (6-stage), 120.9\,MHz (7-stage), and 121.2\,MHz (8-stage). The 7/8-stage improve from their LUT-memory 115.0/117.5\,MHz to nearly match the 6-stage, while the shallow tier holds (4-stage 69.3, 5-stage 73.7\,MHz). The 4-stage dips slightly because the registered BRAM output lengthens its already-critical execute path.
 The IF1/IF2 boundary naturally absorbs the BRAM's 1-cycle read latency, making the 7-stage frequency-competitive; but its deeper-pipeline CPI overhead remains, so it still needs SGF and moderate-branch-density workloads to match the 6-stage's throughput.
 This also answers the memory-mapping concern: the main study uses distributed LUT RAM to hold memory organization \emph{invariant} across depths, and these BRAM variants are the measured counterfactual with true synchronous-read primitives. Mapping to BRAM shifts frequency but not the CPI ordering, so the 6-stage stays the throughput optimum and a real-BRAM mapping strengthens rather than invalidates it.
 
 \subsection{Power and Efficiency}
 \label{sec:power}
 
-Power is estimated with Vivado's \texttt{report\_power} on each out-of-context--synthesized variant, annotated with workload-specific switching activity captured as a Switching Activity Interchange Format (SAIF) file from a behavioral CoreMark simulation of that variant.
-These are Vivado vector-based estimates at ``Medium'' confidence, not physical measurements, and can differ from silicon by roughly $\pm$20--30\%; we therefore rely on the \emph{relative ordering across depths}, not the absolute watts, and report no hardware-power validation.
+Power is estimated with Vivado's \texttt{report\_power} on each out-of-context--synthesized variant. The estimate is annotated with workload-specific switching activity, captured as a Switching Activity Interchange Format (SAIF) file from a behavioral CoreMark simulation of that variant.
+These are Vivado vector-based estimates at ``Medium'' confidence, not physical measurements, and can differ from silicon by roughly $\pm$20--30\%. We therefore rely on the \emph{relative ordering across depths}, not the absolute watts, and report no hardware-power validation.
 Under workload-specific activity, total on-chip power \emph{falls} with depth, from 0.235\,W (4-stage) to 0.217\,W (8-stage); static power is constant at 0.069\,W and dynamic power drops from 0.167\,W to 0.149\,W.
-This trend is opposite to a uniform-toggle approximation: although deeper pipelines add registers, their lower IPC, more bubbles and stalls per cycle, reduces average switching activity, so on the same workload they draw \emph{less} dynamic power, an effect only a workload-derived SAIF can capture.
+This trend is opposite to a uniform-toggle approximation. Although deeper pipelines add registers, their lower IPC (more bubbles and stalls per cycle) reduces average switching activity, so on the same workload they draw \emph{less} dynamic power. Only a workload-derived SAIF captures this effect.
 
-From energy $E = P_{\text{dyn}}\cdot\text{Cycles}/F_{\max}$ and $\text{EDP} = E\cdot\text{Cycles}/F_{\max}$, the 6-stage achieves the lowest energy per CoreMark run (7.0\,mJ) and EDP (318\,mJ$\cdot$ms) versus 10.6\,mJ/675 for the 4-stage and 8.0\,mJ/432 for the 8-stage, and the highest efficiency (286\,MIPS/W vs 253/248 for 7/8-stage and 195/197 for 4/5-stage).
+From energy $E = P_{\text{dyn}}\cdot\text{Cycles}/F_{\max}$ and $\text{EDP} = E\cdot\text{Cycles}/F_{\max}$, the 6-stage achieves the lowest energy per CoreMark run (7.0\,mJ) and the lowest EDP (318\,mJ$\cdot$ms), versus 10.6\,mJ/675 for the 4-stage and 8.0\,mJ/432 for the 8-stage. It also has the highest efficiency: 286\,MIPS/W, versus 253/248 for the 7/8-stage and 195/197 for the 4/5-stage.
 On these estimates the 6-stage is the most energy-efficient depth as well as the highest-throughput; we present EDP as an estimated relative comparison, not a measured optimization criterion, and SGF's $+$49 LUT/$+$57 FF add $<$1\% to dynamic power.
 
 \subsection{Published Cores Context}
 \label{sec:published}
 
-As a sanity check, our 70--118\,MHz range sits in a realistic mid-range among Artix-7 RISC-V soft cores; we make no cross-project performance claim, since cores like SERV \cite{serv2019} ($\sim$300\,MHz) and PicoRV32 \cite{picorv32} ($\sim$250\,MHz) differ in ISA subset, execution model, predictor, and memory, so their frequency gaps reflect those confounders, not pipeline depth.
+As a sanity check, our 70--118\,MHz range sits in a realistic mid-range among Artix-7 RISC-V soft cores. We make no cross-project performance claim: cores like SERV \cite{serv2019} ($\sim$300\,MHz) and PicoRV32 \cite{picorv32} ($\sim$250\,MHz) differ in ISA subset, execution model, predictor, and memory, so their frequency gaps reflect those confounders, not pipeline depth.
 
 \section{Limitations}
 \label{sec:limitations}
