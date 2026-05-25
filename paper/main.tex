@@ -440,7 +440,29 @@ Residuals have mean 0 and standard deviation 0.038\,CPI with no depth pattern; t
 
 Decomposing CoreMark CPI into the four additive terms of Eq.~\ref{eq:cpi_model} isolates each architectural cost on top of the ideal 1.00: a depth-invariant base ($\gamma_w = 0.45$); a branch-flush term that grows with depth (0.10 at 4/5-stage to 0.16 at 6-stage and 0.20 at 7/8-stage, Mechanism~A, including the Mechanism~B count rise at depth~6); a load-use term (0 at 4-stage, 0.15 at 5/6/7-stage, 0.22 at 8-stage); and an IF2-bubble term (0.28, only at 7/8-stage).
 Summed, these predict measured CPI within the model residual ($\leq$0.09) at every depth across all 35 points.
+Table~\ref{tab:ablation} gives this per-depth decomposition for CoreMark.
 Fig.~\ref{fig:cpimodel} overlays the model on the measured CPI for all seven workloads, and Fig.~\ref{fig:cpiresid} shows the residuals carry no depth-dependent bias.
+
+\begin{table*}[t]
+\centering
+\caption{CPI ablation for CoreMark: decomposition into the architectural cost components of Eq.~\ref{eq:cpi_model} at each pipeline depth. Each row is one term. The sum matches measured CPI within the model residual ($\leq$0.09).}
+\label{tab:ablation}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{CPI component} & \textbf{4-stg} & \textbf{5-stg} & \textbf{6-stg} & \textbf{7-stg} & \textbf{8-stg} \\
+\midrule
+Ideal throughput                       & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+Branch flush ($M \cdot P / N$)         & 0.10 & 0.10 & 0.16 & 0.20 & 0.20 \\
+Load-use stall ($\alpha \cdot L$)      & 0.00 & 0.15 & 0.15 & 0.15 & 0.22 \\
+IF2 bubble ($\beta \cdot B \cdot f_b$) & 0.00 & 0.00 & 0.00 & 0.28 & 0.28 \\
+Workload base ($\gamma_w$)             & \multicolumn{5}{c}{0.45 (depth-invariant)} \\
+\midrule
+\textbf{Model prediction}              & \textbf{1.55} & \textbf{1.70} & \textbf{1.76} & \textbf{2.08} & \textbf{2.15} \\
+\textbf{Measured CPI}                  & \textbf{1.54} & \textbf{1.63} & \textbf{1.83} & \textbf{2.02} & \textbf{2.18} \\
+\bottomrule
+\end{tabular}
+\end{table*}
 
 \begin{figure}[t]
 \centering
@@ -558,7 +580,23 @@ These invariants are encoded as a SystemVerilog assertion suite (checkpoint-equa
 
 SGF produces no $F_{\max}$ degradation under the same 10-directive methodology (Section~\ref{sec:synth_method}): the 7-stage SGF achieves $117.5 \pm 2.4$\,MHz vs.\ the baseline's $115.0 \pm 2.0$, and the 8-stage SGF $118.6 \pm 1.7$ vs.\ $117.5 \pm 1.8$.
 The nominal 2.5\,MHz uptick on the 7-stage is within the run-to-run standard deviation ($\sim$2\,MHz), and the baseline and SGF 95\% confidence intervals overlap. We therefore read it as placement-and-routing noise rather than a real speedup; the defensible claim is that SGF adds no measurable critical-path delay.
-The area cost is negligible: $+$49 LUTs / $+$57 FFs (0.6/0.7\%) on the 7-stage and $+$36 LUTs / $+$21 FFs (0.5/0.2\%) on the 8-stage, with unchanged DSP usage. The speculative-update and checkpoint logic is absorbed by the existing predictor datapath without creating new critical paths.
+The area cost is negligible: $+$49 LUTs / $+$57 FFs (0.6/0.7\%) on the 7-stage and $+$36 LUTs / $+$21 FFs (0.5/0.2\%) on the 8-stage, with unchanged DSP usage. The speculative-update and checkpoint logic is absorbed by the existing predictor datapath without creating new critical paths. Table~\ref{tab:sgf_synth} reports the full synthesis comparison.
+
+\begin{table*}[t]
+\centering
+\caption{SGF synthesis results on Artix-7 (mean $\pm$ std, 10 directive combinations). SGF adds $+$49 LUTs / $+$57 FFs on the 7-stage and $+$36 / $+$21 on the 8-stage (both sub-1\%), with no $F_{\max}$ degradation and unchanged DSP usage.}
+\label{tab:sgf_synth}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Metric} & \textbf{7-stg} & \textbf{7-stg SGF} & \textbf{8-stg} & \textbf{8-stg SGF} \\
+\midrule
+$F_{\max}$ (MHz)  & 115.0$\pm$2.0 & 117.5$\pm$2.4 & 117.5$\pm$1.8 & 118.6$\pm$1.7 \\
+Slice LUTs        & 7{,}766       & 7{,}815       & 7{,}841       & 7{,}877 \\
+Slice Regs (FFs)  & 8{,}550       & 8{,}607       & 8{,}678       & 8{,}699 \\
+DSP48E1           & 12            & 12            & 12            & 12 \\
+\bottomrule
+\end{tabular}
+\end{table*}
 
 \subsection{Benchmark Results}
 \label{sec:sgf_bench}
