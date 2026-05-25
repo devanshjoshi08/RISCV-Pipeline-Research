@@ -323,6 +323,24 @@ CoreMark, by contrast, exhibits a depth-dependent rise in misprediction count, t
 The 6-stage produces 154{,}077 mispredictions (21.4\%) versus 145{,}735 (20.2\%) at 4/5-stage, a 5.7\% increase from the longer update latency. The 7- and 8-stage are \emph{identical} at 147{,}760 (20.5\%): the two deepest pipelines share the same 4-stage predictor update latency, so the 8-stage's extra MEM split adds flush-penalty cycles (Mechanism~A) but no new staleness (Mechanism~B).
 All five variants execute identical instruction (2{,}893{,}145) and branch (719{,}810) counts, and the official CoreMark/MHz score ranges from 2.23 (4-stage) to 1.58 (8-stage).
 This inflation is the specific target of SGF.
+Table~\ref{tab:coremark} gives the full CoreMark figures across depths.
+
+\begin{table*}[t]
+\centering
+\caption{Official EEMBC CoreMark results across the five pipeline depths (10 iterations, PERFORMANCE\_RUN). All variants execute identical instruction counts (2{,}893{,}145) and branch counts (719{,}810). Cycles and mispredictions are from RTL simulation; CoreMark/MHz uses the post-place-and-route $F_{\max}$.}
+\label{tab:coremark}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Metric} & \textbf{4-stg} & \textbf{5-stg} & \textbf{6-stg} & \textbf{7-stg} & \textbf{8-stg} \\
+\midrule
+Cycles          & 4{,}481{,}534 & 4{,}724{,}937 & 5{,}310{,}372 & 5{,}856{,}929 & 6{,}323{,}069 \\
+Mispredictions  & 145{,}735 & 145{,}735 & 154{,}077 & 147{,}760 & 147{,}760 \\
+Mispredict rate & 20.2\%    & 20.2\%    & 21.4\%    & 20.5\%    & 20.5\% \\
+CPI             & 1.54      & 1.63      & 1.83      & 2.02      & 2.18 \\
+CoreMark/MHz    & 2.23      & 2.12      & 1.88      & 1.71      & 1.58 \\
+\bottomrule
+\end{tabular}
+\end{table*}
 
 Among the four Embench-IoT kernels, multiply-heavy aha-mont64 has the lowest CPI (few branches, MDU-bound). crc32 has almost zero mispredictions (344 across all depths, 0.19\%) on its highly predictable inner loop. statemate shows the strongest depth-dependent effect (66{,}603 mispredictions at 4/5-stage vs.\ 73{,}263 at 7/8-stage, $+$10.0\%) from data-dependent state transitions. edn has moderate CPI with a low 3.1\% misprediction rate.
 
