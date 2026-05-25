@@ -261,8 +261,7 @@ The synthesis results reveal the FPGA-specific frequency structure; the CPI meas
 \subsection{Synthesis Results}
 \label{sec:synth}
 
-Table~\ref{tab:results} presents the post-place-and-route results for all five variants.
-Fig.~\ref{fig:fmax} shows the frequency comparison with error bars.
+Table~\ref{tab:results} presents the post-place-and-route results for all five variants, with $F_{\max}$ means, standard deviations, and 95\% confidence intervals.
 
 \begin{table*}[t]
 \centering
@@ -281,13 +280,6 @@ DSP48E1           & 12    & 12     & 12     & 12     & 12 \\
 \bottomrule
 \end{tabular}
 \end{table*}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fmax_comparison.png}
-\caption{Maximum clock frequency ($F_{\max}$, post-place-and-route static timing) for each pipeline variant. Error bars show standard deviation from 10 synthesis directive combinations. The 44\,MHz tier gap has $p < 0.001$ (Cohen's $d = 18.5$).}
-\label{fig:fmax}
-\end{figure}
 
 The results reveal a two-tier frequency structure: the shallow tier (4/5-stage) at 70--74\,MHz and the deep tier (6/7/8-stage) at 115--118\,MHz.
 The 44\,MHz gap ($p < 0.001$, Cohen's $d = 18.5$) confirms this is not a placement artifact.
@@ -698,8 +690,7 @@ SGF is thus most valuable in embedded systems with tightly coupled memories, the
 
 Three reading caveats, separating what generalizes from what does not.
 \emph{(i)~Architectural fact vs.\ workload-specific result vs.\ heuristic.} The \emph{architectural fact} is the mechanism: Mechanism~B arises for any global-history predictor with nonzero update latency, shown causally by the bimodal and PHT controls, so the decomposition and the ROB-free construction transfer. The \emph{magnitudes} are workload- and predictor-specific: the percentages reported here hold for this benchmark set and predictor, not universally. The IBD threshold is a \emph{heuristic}, not a validated rule, grounded in only two positive workloads (Section~\ref{sec:mispred}).
-\emph{(ii)~Significance:} as stated in Section~\ref{sec:intro}, the 31\% misprediction cut is a 3\% CPI gain, so SGF is a cost-benefit improvement, not a throughput gain.
-\emph{(iii)~Scope:} the \texttt{-O1} setting, benchmark set, and single-cycle memory are stated boundaries (Sections~\ref{sec:cache_miss},~\ref{sec:limitations}), and the optimal-depth conclusion is the measured outcome under these conditions, not invariant to them.
+\emph{(ii)~Significance and scope:} SGF is a cost-benefit improvement, not a throughput gain (Section~\ref{sec:intro}), and the optimal-depth conclusion holds under the stated \texttt{-O1}, benchmark, and single-cycle-memory boundaries (Sections~\ref{sec:cache_miss},~\ref{sec:limitations}), not beyond them.
 
 \subsection{Design Guidance for Practitioners}
 \label{sec:guidance}
@@ -708,7 +699,7 @@ For RV32IM-class soft cores on Artix-7, the data support four guidelines.
 The 6-stage is the highest-throughput depth here (64.1\,MIPS CoreMark): it captures the full execute-split frequency benefit at moderate CPI.
 The 5-stage is dominated, sharing the 4-stage frequency ceiling while adding load-use stalls, so it helps only when area is binding (a conclusion conditional on the \texttt{-O1} mix).
 The 7/8-stage match the 6-stage on frequency but pay higher CPI, justified only when the IF split resolves a genuine timing bottleneck such as synchronous BRAM instruction memory.
-Consistent with the cost-benefit framing of Section~\ref{sec:intro}, SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF reaches $115.0/1.96 = 58.7$\,MIPS vs.\ 64.1). It is worth adding at any forced depth carrying $\geq$3 stages of update latency, including the 6-stage itself ($-$23.9\% CoreMark), for a 0.5--0.7\% area cost against a 17--31\% misprediction reduction.
+SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF: $58.7$\,MIPS vs.\ 64.1). It is worth adding at any forced depth with $\geq$3 stages of update latency, including the 6-stage ($-$23.9\% CoreMark), for 0.5--0.7\% area against a 17--31\% misprediction cut.
 
 \section{Causal Isolation and Supporting Analyses}
 \label{sec:supplementary}
@@ -798,10 +789,10 @@ This also answers the memory-mapping concern: the main study uses distributed LU
 Power is estimated with Vivado's \texttt{report\_power} on each out-of-context--synthesized variant. The estimate is annotated with workload-specific switching activity, captured as a Switching Activity Interchange Format (SAIF) file from a behavioral CoreMark simulation of that variant.
 These are Vivado vector-based estimates at ``Medium'' confidence, not physical measurements, and can differ from silicon by roughly $\pm$20--30\%. We therefore rely on the \emph{relative ordering across depths}, not the absolute watts, and report no hardware-power validation.
 Under workload-specific activity, total on-chip power \emph{falls} with depth, from 0.235\,W (4-stage) to 0.217\,W (8-stage); static power is constant at 0.069\,W and dynamic power drops from 0.167\,W to 0.149\,W.
-This trend is opposite to a uniform-toggle approximation. Although deeper pipelines add registers, their lower IPC (more bubbles and stalls per cycle) reduces average switching activity, so on the same workload they draw \emph{less} dynamic power. Only a workload-derived SAIF captures this effect.
+This trend is opposite to a uniform-toggle approximation, which only a workload-derived SAIF captures. Although deeper pipelines add registers, their lower IPC (more bubbles and stalls per cycle) reduces average switching activity, so on the same workload they draw \emph{less} dynamic power.
 
 From energy $E = P_{\text{dyn}}\cdot\text{Cycles}/F_{\max}$ and $\text{EDP} = E\cdot\text{Cycles}/F_{\max}$, the 6-stage achieves the lowest energy per CoreMark run (7.0\,mJ) and the lowest EDP (318\,mJ$\cdot$ms), versus 10.6\,mJ/675 for the 4-stage and 8.0\,mJ/432 for the 8-stage. It also has the highest efficiency: 286\,MIPS/W, versus 253/248 for the 7/8-stage and 195/197 for the 4/5-stage.
-On these estimates the 6-stage is the most energy-efficient depth as well as the highest-throughput. We present EDP as an estimated relative comparison, not a measured optimization criterion. SGF's $+$49 LUT/$+$57 FF add $<$1\% to dynamic power.
+The 6-stage is thus the most energy-efficient depth as well as the highest-throughput, though we present EDP as a relative comparison, not a measured criterion. SGF's $+$49 LUT/$+$57 FF add $<$1\% to dynamic power.
 
 \subsection{Published Cores Context}
 \label{sec:published}
