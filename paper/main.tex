@@ -96,9 +96,32 @@ DSP48E1 blocks provide registered multiply-accumulate; Block RAM offers single-c
 
 \subsection{Related RISC-V Soft Cores}
 
-Prior RISC-V FPGA implementations vary widely in scope. SERV \cite{serv2019} (bit-serial, $\sim$300\,MHz) and PicoRV32 \cite{picorv32} (multi-cycle, $\sim$250\,MHz) avoid pipelining; VexRiscv \cite{vexriscv} is configurable but cannot vary depth independently of other features; Ibex \cite{schiavone2017slow} is a 2-stage low-power core; CVA6 \cite{zaruba2019ariane} is RV64GC with out-of-order commit; SweRV EH1 \cite{swerv2019} is a 2-wide superscalar. None provides a controlled comparison across pipeline depths with invariant predictor, MDU, and memory hardware, or a stale-GHR fix.
+Prior RISC-V FPGA implementations vary widely in scope (Table~\ref{tab:cores}). They span bit-serial and multi-cycle designs with no pipeline, fixed shallow pipelines, and out-of-order or superscalar cores. None lets pipeline depth vary as a single controlled parameter with the predictor, MDU, and memory hardware held invariant, and none addresses stale-GHR recovery. That combination is what this study requires and supplies.
 
-\subsection{Speculative History in ASIC Processors}
+\begin{table}[t]
+\centering
+\caption{Representative RISC-V FPGA soft cores. None varies pipeline depth as a controlled parameter with invariant functional-unit hardware, and none addresses stale-GHR recovery.}
+\label{tab:cores}
+\small
+\begin{tabular}{@{}llcc@{}}
+\toprule
+\textbf{Core} & \textbf{Pipeline} & \textbf{Predictor} & \textbf{Depth-config.?} \\
+\midrule
+SERV \cite{serv2019}          & bit-serial        & none          & no \\
+PicoRV32 \cite{picorv32}      & multi-cycle       & none          & no \\
+Ibex \cite{schiavone2017slow} & 2-stage           & bimodal-style  & no \\
+VexRiscv \cite{vexriscv}      & configurable      & optional       & not indep.\ \\
+SweRV EH1 \cite{swerv2019}    & 2-wide superscalar & BHT           & no \\
+CVA6 \cite{zaruba2019ariane}  & out-of-order      & gshare-class   & no \\
+\midrule
+This work                     & 4--8 (shared RTL) & gshare+SGF     & yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Branch Predictors and Speculative History}
+
+Correlation predictors key a pattern-history table on global branch history. gshare \cite{mcfarling1993combining} XORs that history with the PC; tournament predictors add a chooser between global and local components; TAGE \cite{seznec2011tage} uses several tagged tables at geometric history lengths; and perceptron predictors \cite{jimenez2001dynamic} are a neural alternative. All of them index on a global history register, so all are exposed to the stale-GHR effect this paper isolates, and we measure three of the four.
 
 Speculative GHR updating with checkpoint rollback is long established and is \emph{not} what we claim as new.
 Yeh and Patt \cite{yeh1991two} describe speculative history in their two-level predictor. Out-of-order ASICs recover it through the reorder buffer or a branch stack (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}), and in-order ASIC pipelines have long used a shift-register history with checkpoint/mask restore on misprediction.
@@ -783,7 +806,7 @@ On these estimates the 6-stage is the most energy-efficient depth as well as the
 \subsection{Published Cores Context}
 \label{sec:published}
 
-As a sanity check, our 70--118\,MHz range sits in a realistic mid-range among Artix-7 RISC-V soft cores. We make no cross-project performance claim: cores like SERV \cite{serv2019} ($\sim$300\,MHz) and PicoRV32 \cite{picorv32} ($\sim$250\,MHz) differ in ISA subset, execution model, predictor, and memory, so their frequency gaps reflect those confounders, not pipeline depth.
+As a sanity check, our 70--118\,MHz range sits in a realistic mid-range among the Artix-7 RISC-V soft cores of Table~\ref{tab:cores}. We make no cross-project performance claim: those cores differ in ISA subset, execution model, predictor, and memory, so their frequency gaps reflect those confounders, not pipeline depth.
 
 \section{Limitations}
 \label{sec:limitations}
