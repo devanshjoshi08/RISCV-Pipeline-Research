@@ -51,13 +51,14 @@ RISC-V, pipeline depth, FPGA, Artix-7, RV32IM, branch prediction, gshare, specul
 How deep should an FPGA pipeline be?
 On ASIC processes the answer is well studied: partition the datapath until gate delay per stage reaches 6--8 FO4 inverter delays, then stop because branch-misprediction penalties and power begin to dominate \cite{hrishikesh2002optimal, sprangle2002increasing, hartstein2002optimum}.
 On FPGAs, where LUT delay is largely function-independent and routing delay dominates timing \cite{xilinx_7series, kuon2007measuring}, that answer does not transfer directly.
+This paper answers the question with a controlled experiment on Artix-7 and reports three findings: pipeline depth raises clock frequency only through the execute-stage split; beyond it, deeper pipelines add a stale-global-history misprediction penalty on branch-dense workloads; and a lightweight fix, Speculative GHR Forwarding (SGF), removes that penalty at under 1\% area and no frequency loss.
 Prior RISC-V soft cores differ in ISA support, predictor design, memory architecture, and forwarding strategy, making performance differences across projects unattributable to any single factor.
-No published study varies pipeline depth as the single controlled design parameter on a common FPGA target while holding the RTL of all other microarchitectural modules constant. Each stage split does carry structural side effects (an added load-use stall, a fetch bubble, an extra forwarding source), which we make explicit and decompose rather than assume away.
+We are not aware of a published study that varies pipeline depth as the single controlled design parameter on a common FPGA target while holding the RTL of all other microarchitectural modules constant. Each stage split does carry structural side effects (an added load-use stall, a fetch bubble, an extra forwarding source), which we make explicit and decompose rather than assume away.
 
 A subtler cost compounds the explicit penalty of deeper pipelines: the predictor's global history register (GHR) becomes stale because the latency between branch resolution and the next prediction spans more cycles.
 Speculative history updating is itself an established technique: Yeh and Patt's two-level adaptive predictor \cite{yeh1991two} already updates history speculatively, and ASIC out-of-order processors (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}) recover it on misprediction through the reorder buffer (ROB) or a dedicated branch stack; Gonzalez and Horowitz quantified the staleness cost in ASIC simulations \cite{gonzalez1999power}.
 These recovery mechanisms are tied to the out-of-order substrate, however: the R10000's branch stack checkpoints the register-map alias table and the Alpha's recovery rides the ROB. These are centralized structures that an in-order FPGA soft core lacks and could not add cheaply (the structures alone would dwarf the predictor they protect).
-The effect itself has not been measured under controlled conditions on FPGA fabric, and no lightweight in-order realization of speculative history has been demonstrated there.
+To our knowledge, the effect itself has not been measured under controlled conditions on FPGA fabric, and no lightweight in-order realization of speculative history has been demonstrated there.
 
 This paper makes two principal contributions (listed at the end of this section).
 First, we construct a controlled experiment that cleanly separates the CPI cost of deeper pipelining into two mechanisms. Five RV32IM pipeline variants (4--8 stages) share identical RTL for all functional units, synthesized on Xilinx Artix-7 XC7A35T across 50 post-place-and-route runs with seven benchmark workloads:
@@ -90,7 +91,7 @@ Deeper pipelines reduce per-stage logic delay but increase misprediction penalty
 Hrishikesh et al.\ established 6--8 FO4 delays per stage as optimal for ASICs \cite{hrishikesh2002optimal}; Sprangle and Carmean showed diminishing returns beyond certain depths \cite{sprangle2002increasing}.
 Both assume ASIC timing where gate delay scales linearly with logic depth.
 A less studied effect is that deeper pipelines also degrade branch prediction accuracy: the increased latency from resolution to the next prediction leaves the GHR stale when branches are closely spaced.
-Gonzalez and Horowitz identified this in ASIC simulations \cite{gonzalez1999power}; no published study has measured it on FPGA fabric under controlled conditions.
+Gonzalez and Horowitz identified this in ASIC simulations \cite{gonzalez1999power}; we are not aware of a study measuring it on FPGA fabric under controlled conditions.
 
 \subsection{FPGA Architecture Considerations}
 
@@ -117,10 +118,12 @@ Such generators and other in-order soft cores do carry lightweight branch-recove
 Neither line of work isolates pipeline depth as a controlled FPGA variable, nor addresses the stale-GHR effect.
 The FPGA-specific study of Kuon and Rose \cite{kuon2007measuring} characterizes the LUT-routing delay gap that makes FPGA pipelining fundamentally different from ASIC pipelining, but does not examine branch-prediction interactions.
 
-The gap is twofold: no controlled experiment varies pipeline depth as the single controlled design parameter on a single FPGA device (holding functional-unit RTL constant and decomposing each split's side effects rather than claiming them away), and no lightweight mechanism corrects the stale-GHR degradation such an experiment reveals.
+To our knowledge the gap is twofold: no published controlled experiment varies pipeline depth as the single controlled design parameter on a single FPGA device (holding functional-unit RTL constant and decomposing each split's side effects rather than claiming them away), and no lightweight mechanism corrects the stale-GHR degradation such an experiment reveals.
 
 \section{Experimental Setup}
 \label{sec:methodology}
+
+We keep three result types distinct throughout. $F_{\max}$, area, and power are \emph{post-place-and-route} (static timing analysis and Vivado vector-based power estimates). Cycle and misprediction counts are from \emph{RTL simulation}. The CPI decomposition (Section~\ref{sec:model}) is \emph{analytical}, and where it takes a measured misprediction rate as input we say so. Tables and text label which category each number belongs to.
 
 \subsection{Common Microarchitecture}
 \label{sec:common}
@@ -161,7 +164,7 @@ Each split targets a specific combinational path:
 
 \textbf{7-stage} (IF1, IF2, ID, EX1, EX2, MEM, WB): Splits instruction fetch, placing branch prediction in IF2 with a registered PC. Introduces a 1-cycle IF2 bubble on every correctly predicted taken branch (IF1's speculative fetch is discarded). Branch penalty: 4 cycles. This split targets BRAM read latency. An industrial pipeline might deploy a zero-delay Next-Line Predictor (NLP) or BTB directly in IF1 to eliminate this bubble. We do not, because embedding specialized routing paths in IF1 would alter the physical timing paths unevenly across the 4-to-8-stage variants. The bubble is a deliberate control-variable constraint that preserves strict structural invariants across all depths. It is also orthogonal to SGF: an IF1 next-line predictor changes only \emph{where} the next fetch address is produced, not \emph{when} the GHR is updated at resolution. It would remove the fetch bubble (the $\beta\,B(D)\,f_b$ term) but leave the stale-GHR window, and hence SGF's misprediction reduction, unchanged. Its effect would be to lower the baseline CPI that SGF is measured against, which shrinks SGF's \emph{relative} CPI gain slightly without changing its misprediction counts.
 
-\textbf{8-stage} (IF1, IF2, ID, EX1, EX2, MEM1, MEM2, WB): Splits memory access, creating a dual load-use stall (loads not available until MEM2). Branch penalty: 4 cycles.
+\textbf{8-stage} (IF1, IF2, ID, EX1, EX2, MEM1, MEM2, WB): Splits memory access, creating a dual load-use stall (loads not available until MEM2). Branch penalty: 4 cycles. The MEM split lengthens the load-use path but leaves the fetch-to-resolution path unchanged, so the predictor's update latency (4 stages), and therefore Mechanism~B, is identical to the 7-stage; the 8-stage's only added cost over the 7-stage is the dual load-use stall, not more stale history. This is why the 7- and 8-stage baselines share misprediction counts on every workload.
 
 Table~\ref{tab:hazard} summarizes the per-event costs.
 The 7/8-stage variants share the same branch penalty because both resolve branches in EX2 with equal numbers of preceding stages.
@@ -676,7 +679,7 @@ SGF is thus most valuable in embedded systems with tightly coupled memories, the
 
 Three reading caveats, separating what generalizes from what does not.
 \emph{(i)~Architectural fact vs.\ workload-specific result vs.\ heuristic.} The \emph{architectural fact} is the mechanism: Mechanism~B arises for any global-history predictor with nonzero update latency, shown causally by the bimodal and PHT controls, so the decomposition and the ROB-free construction transfer. The \emph{magnitudes} are workload- and predictor-specific: the percentages reported here hold for this benchmark set and predictor, not universally. The IBD threshold is a \emph{heuristic}, not a validated rule, grounded in only two positive workloads (Section~\ref{sec:mispred}).
-\emph{(ii)~Significance:} the 31\% misprediction cut is a 3\% CPI gain, so SGF's case is cost-benefit (sub-1\% area, no frequency penalty), not speedup.
+\emph{(ii)~Significance:} as stated in Section~\ref{sec:intro}, the 31\% misprediction cut is a 3\% CPI gain, so SGF is a cost-benefit improvement, not a throughput gain.
 \emph{(iii)~Scope:} the \texttt{-O1} setting, benchmark set, and single-cycle memory are stated boundaries (Sections~\ref{sec:cache_miss},~\ref{sec:limitations}), and the optimal-depth conclusion is the measured outcome under these conditions, not invariant to them.
 
 \subsection{Design Guidance for Practitioners}
