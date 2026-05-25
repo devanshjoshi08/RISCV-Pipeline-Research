@@ -10,7 +10,7 @@ Time resolution is 1 ps
   Mispredictions: 147760
   Iterations:     10
   CPI:            2.02
-$finish called at time : 58621435 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_CoreMark_rerun_tb.sv" Line 49
+$finish called at time : 58621435 ns : File "vivado_7s8s_rerun/7s_CoreMark_rerun_tb.sv" Line 49
 
 --- 8s_CoreMark_rerun: CoreMark ---
 Time resolution is 1 ps
@@ -21,7 +21,7 @@ Time resolution is 1 ps
   Mispredictions: 147760
   Iterations:     10
   CPI:            2.18
-$finish called at time : 63282875 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_CoreMark_rerun_tb.sv" Line 49
+$finish called at time : 63282875 ns : File "vivado_7s8s_rerun/8s_CoreMark_rerun_tb.sv" Line 49
 
 --- 7s_aha-mont64_rerun: aha-mont64 ---
 Time resolution is 1 ps
@@ -32,7 +32,7 @@ Time resolution is 1 ps
   Mispredictions: 139739
   Correct:        1
   CPI:            1.32
-$finish called at time : 59192295 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_aha-mont64_rerun_tb.sv" Line 49
+$finish called at time : 59192295 ns : File "vivado_7s8s_rerun/7s_aha-mont64_rerun_tb.sv" Line 49
 
 --- 8s_aha-mont64_rerun: aha-mont64 ---
 Time resolution is 1 ps
@@ -43,7 +43,7 @@ Time resolution is 1 ps
   Mispredictions: 139739
   Correct:        1
   CPI:            1.32
-$finish called at time : 59315415 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_aha-mont64_rerun_tb.sv" Line 49
+$finish called at time : 59315415 ns : File "vivado_7s8s_rerun/8s_aha-mont64_rerun_tb.sv" Line 49
 
 --- 7s_crc32_rerun: crc32 ---
 Time resolution is 1 ps
@@ -54,7 +54,7 @@ Time resolution is 1 ps
   Mispredictions: 344
   Correct:        1
   CPI:            1.52
-$finish called at time : 61394055 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_crc32_rerun_tb.sv" Line 49
+$finish called at time : 61394055 ns : File "vivado_7s8s_rerun/7s_crc32_rerun_tb.sv" Line 49
 
 --- 8s_crc32_rerun: crc32 ---
 Time resolution is 1 ps
@@ -65,7 +65,7 @@ Time resolution is 1 ps
   Mispredictions: 344
   Correct:        1
   CPI:            1.56
-$finish called at time : 63145155 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_crc32_rerun_tb.sv" Line 49
+$finish called at time : 63145155 ns : File "vivado_7s8s_rerun/8s_crc32_rerun_tb.sv" Line 49
 
 --- 7s_statemate_rerun: statemate ---
 Time resolution is 1 ps
@@ -76,7 +76,7 @@ Time resolution is 1 ps
   Mispredictions: 73263
   Correct:        0
   CPI:            1.50
-$finish called at time : 47452245 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_statemate_rerun_tb.sv" Line 49
+$finish called at time : 47452245 ns : File "vivado_7s8s_rerun/7s_statemate_rerun_tb.sv" Line 49
 
 --- 8s_statemate_rerun: statemate ---
 Time resolution is 1 ps
@@ -87,7 +87,7 @@ Time resolution is 1 ps
   Mispredictions: 73263
   Correct:        0
   CPI:            1.69
-$finish called at time : 53747905 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_statemate_rerun_tb.sv" Line 49
+$finish called at time : 53747905 ns : File "vivado_7s8s_rerun/8s_statemate_rerun_tb.sv" Line 49
 
 --- 7s_edn_rerun: edn ---
 Time resolution is 1 ps
@@ -98,7 +98,7 @@ Time resolution is 1 ps
   Mispredictions: 10452
   Correct:        1
   CPI:            1.78
-$finish called at time : 53776215 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/7s_edn_rerun_tb.sv" Line 49
+$finish called at time : 53776215 ns : File "vivado_7s8s_rerun/7s_edn_rerun_tb.sv" Line 49
 
 --- 8s_edn_rerun: edn ---
 Time resolution is 1 ps
@@ -109,5 +109,5 @@ Time resolution is 1 ps
   Mispredictions: 10452
   Correct:        1
   CPI:            1.95
-$finish called at time : 59080385 ns : File "D:/RISCV-Vivado/vivado_7s8s_rerun/8s_edn_rerun_tb.sv" Line 49
+$finish called at time : 59080385 ns : File "vivado_7s8s_rerun/8s_edn_rerun_tb.sv" Line 49
 

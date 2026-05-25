@@ -14,8 +14,8 @@
 
 set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
-set github_dir  "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
-# Use the CANONICAL 7-stage RTL from the GitHub repo (the D:/rtl_7stage copy is a
+set github_dir  [file normalize [file dirname [file dirname [info script]]]]
+# Use the CANONICAL 7-stage RTL from the GitHub repo (a stale local rtl_7stage copy is a
 # stale pre-bugfix version that does not reproduce the paper's baseline).
 set rtl7_dir    "$github_dir/rtl_7stage"
 set nlp_dir     "$project_dir/rtl_nlp"
@@ -25,10 +25,10 @@ set part        "xc7a35tcpg236-1"
 set log_file    "$project_dir/nlp_results.log"
 
 # Keep XSim temp on D:
-set ::env(TEMP)   "D:/RISCV-Vivado/tmp"
-set ::env(TMP)    "D:/RISCV-Vivado/tmp"
-set ::env(TMPDIR) "D:/RISCV-Vivado/tmp"
-file mkdir "D:/RISCV-Vivado/tmp"
+set ::env(TEMP)   ".vivado_work/tmp"
+set ::env(TMP)    ".vivado_work/tmp"
+set ::env(TMPDIR) ".vivado_work/tmp"
+file mkdir ".vivado_work/tmp"
 file mkdir $work_root
 
 set shared_rtl [list \

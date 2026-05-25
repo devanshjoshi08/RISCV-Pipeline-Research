@@ -10,7 +10,7 @@ Time resolution is 1 ps
   Mispredictions: 69
   Checksum:       9884351 (expect 24587)
 
-$finish called at time : 500145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_diag/diag_5s_tb.sv" Line 30
+$finish called at time : 500145 ns : File "vivado_diag/diag_5s_tb.sv" Line 30
 
 Time resolution is 1 ps
 === Diagnostic: rv32i_pipeline_top ===
@@ -20,7 +20,7 @@ Time resolution is 1 ps
   Mispredictions: 69
   Checksum:       9884351 (expect 24587)
 
-$finish called at time : 500145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_diag/diag_6s_tb.sv" Line 30
+$finish called at time : 500145 ns : File "vivado_diag/diag_6s_tb.sv" Line 30
 
 Time resolution is 1 ps
 === Diagnostic: rv32i_pipeline_7stage_top ===
@@ -30,5 +30,5 @@ Time resolution is 1 ps
   Mispredictions: 69
   Checksum:       9884351 (expect 24587)
 
-$finish called at time : 500145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_diag/diag_7s_tb.sv" Line 30
+$finish called at time : 500145 ns : File "vivado_diag/diag_7s_tb.sv" Line 30
 

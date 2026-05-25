@@ -2,14 +2,14 @@
 # Based on the proven working pattern: generate TB on-the-fly, create_project,
 # copy hex as program.hex, launch_simulation, run -all.
 #
-# Usage: cd D:/RISCV-Vivado
+# Usage: cd <your Vivado scratch dir>
 #        source run_benchmarks.tcl
 #
 # Output: benchmark_results_all.log (appended for each run)
 
 set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
-set github_dir  "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
+set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set asm_dir     "$project_dir/programs/asm"
 set log_file    "$project_dir/benchmark_results_all.log"
 

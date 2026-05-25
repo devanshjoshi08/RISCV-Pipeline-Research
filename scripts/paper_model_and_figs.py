@@ -23,7 +23,7 @@ L = np.array([0, 1, 1, 1, 1.5])                 # load-use stall, cycles
 B = np.array([0, 0, 0, 1, 1], dtype=float)      # IF2 bubble indicator
 
 # workload: instructions, branch frequency, misprediction count per depth, exact cycles per depth.
-# Cycles are exact XSim counts (D:/RISCV-Vivado logs; 7s/8s from the bugfixed-RTL rerun);
+# Cycles are exact XSim counts (XSim logs; 7s/8s from the bugfixed-RTL rerun);
 # CPI is computed at full precision as cycles/instructions, not the 2-decimal table value.
 WL = {
     "Dhrystone":  dict(N=2926,    fb=0.137, mis=[203, 203, 203, 203, 203],

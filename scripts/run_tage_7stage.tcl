@@ -5,7 +5,7 @@
 # exhibit Mechanism B and whether SGF removes it, as the paper projects.
 #
 # Source from the GitHub repo copy (canonical rtl_7stage):
-#   source C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor/scripts/run_tage_7stage.tcl
+#   source <repo>/scripts/run_tage_7stage.tcl
 # Output: tage_results.log  (benchmark counts) and tage_synth_results.log
 #
 # DETERMINISM GATE: for each workload, the Instructions and Branches counts MUST be
@@ -18,7 +18,7 @@ set rtl_dir  "$project_dir/rtl"
 set rtl7_dir "$project_dir/rtl_7stage"
 set asm_dir  "$project_dir/programs/asm"
 set part     "xc7a35tcpg236-1"
-set work_root "D:/RISCV-Vivado/tage"
+set work_root ".vivado_work/tage"
 set log_file "$project_dir/tage_results.log"
 set synth_log "$project_dir/tage_synth_results.log"
 set tb_dir   "$work_root/tb"

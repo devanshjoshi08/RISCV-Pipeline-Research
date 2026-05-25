@@ -11,7 +11,7 @@ Time resolution is 1 ps
   Iterations:     10
   CPI:            1.79
   Mispredict%:    16.28%
-$finish called at time : 52044585 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_CoreMark_tb.sv" Line 51
+$finish called at time : 52044585 ns : File "vivado_sgf_6s/6s_sgf_CoreMark_tb.sv" Line 51
 
 --- 6s_sgf_statemate ---
 Time resolution is 1 ps
@@ -23,7 +23,7 @@ Time resolution is 1 ps
   Correct:        0
   CPI:            1.35
   Mispredict%:    14.43%
-$finish called at time : 42919385 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_statemate_tb.sv" Line 51
+$finish called at time : 42919385 ns : File "vivado_sgf_6s/6s_sgf_statemate_tb.sv" Line 51
 
 --- 6s_sgf_aha-mont64 ---
 Time resolution is 1 ps
@@ -35,7 +35,7 @@ Time resolution is 1 ps
   Correct:        1
   CPI:            1.26
   Mispredict%:    27.94%
-$finish called at time : 56303035 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_aha-mont64_tb.sv" Line 51
+$finish called at time : 56303035 ns : File "vivado_sgf_6s/6s_sgf_aha-mont64_tb.sv" Line 51
 
 --- 6s_sgf_crc32 ---
 Time resolution is 1 ps
@@ -47,7 +47,7 @@ Time resolution is 1 ps
   Correct:        1
   CPI:            1.39
   Mispredict%:    0.29%
-$finish called at time : 56135355 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_crc32_tb.sv" Line 51
+$finish called at time : 56135355 ns : File "vivado_sgf_6s/6s_sgf_crc32_tb.sv" Line 51
 
 --- 6s_sgf_edn ---
 Time resolution is 1 ps
@@ -59,5 +59,5 @@ Time resolution is 1 ps
   Correct:        1
   CPI:            1.66
   Mispredict%:    3.31%
-$finish called at time : 50354195 ns : File "D:/RISCV-Vivado/vivado_sgf_6s/6s_sgf_edn_tb.sv" Line 51
+$finish called at time : 50354195 ns : File "vivado_sgf_6s/6s_sgf_edn_tb.sv" Line 51
 

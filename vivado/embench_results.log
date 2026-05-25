@@ -10,7 +10,7 @@ Time resolution is 1 ps
   Checksum:       0x8918bca7
   CPI:            2.04
   Mispredict%:    31.18%
-$finish called at time : 10000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_embench/CRC32_5s_tb.sv" Line 37
+$finish called at time : 10000145 ns : File "vivado_embench/CRC32_5s_tb.sv" Line 37
 
 Time resolution is 1 ps
 === CRC32: rv32i_pipeline_top ===
@@ -21,7 +21,7 @@ Time resolution is 1 ps
   Checksum:       0x8918bca7
   CPI:            2.31
   Mispredict%:    31.03%
-$finish called at time : 10000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_embench/CRC32_6s_tb.sv" Line 37
+$finish called at time : 10000145 ns : File "vivado_embench/CRC32_6s_tb.sv" Line 37
 
 Time resolution is 1 ps
 === CRC32: rv32i_pipeline_7stage_top ===
@@ -32,7 +32,7 @@ Time resolution is 1 ps
   Checksum:       0x00000070
   CPI:            1.45
   Mispredict%:    11.94%
-$finish called at time : 10000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_embench/CRC32_7s_tb.sv" Line 37
+$finish called at time : 10000145 ns : File "vivado_embench/CRC32_7s_tb.sv" Line 37
 
 Time resolution is 1 ps
 === Sort: rv32i_pipeline_5stage_top ===
@@ -43,7 +43,7 @@ Time resolution is 1 ps
   Checksum:       0x00005059
   CPI:            1.54
   Mispredict%:    4.77%
-$finish called at time : 10000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_embench/Sort_5s_tb.sv" Line 37
+$finish called at time : 10000145 ns : File "vivado_embench/Sort_5s_tb.sv" Line 37
 
 Time resolution is 1 ps
 === Sort: rv32i_pipeline_top ===
@@ -54,7 +54,7 @@ Time resolution is 1 ps
   Checksum:       0x00005059
   CPI:            1.57
   Mispredict%:    5.10%
-$finish called at time : 10000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_embench/Sort_6s_tb.sv" Line 37
+$finish called at time : 10000145 ns : File "vivado_embench/Sort_6s_tb.sv" Line 37
 
 Time resolution is 1 ps
 === Sort: rv32i_pipeline_7stage_top ===
@@ -65,5 +65,5 @@ Time resolution is 1 ps
   Checksum:       0x00004ef7
   CPI:            1.70
   Mispredict%:    3.86%
-$finish called at time : 10000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_embench/Sort_7s_tb.sv" Line 37
+$finish called at time : 10000145 ns : File "vivado_embench/Sort_7s_tb.sv" Line 37
 

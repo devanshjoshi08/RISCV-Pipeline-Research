@@ -22,9 +22,9 @@ Register dump:
   x5 = 55 (0x00000037)
 
 === Results: 5 PASS, 0 FAIL ===
-$finish called at time : 765 ns : File "C:/Users/Joshi/RISCV-Vivado/tb_5stage/rv32i_5stage_tb.sv" Line 89
+$finish called at time : 765 ns : File "tb_5stage/rv32i_5stage_tb.sv" Line 89
 TIMEOUT
-$finish called at time : 200 us : File "C:/Users/Joshi/RISCV-Vivado/tb_5stage/rv32i_5stage_tb.sv" Line 95
+$finish called at time : 200 us : File "tb_5stage/rv32i_5stage_tb.sv" Line 95
 
 ================================================================
   test_5s_comp (top: rv32i_5stage_comprehensive_tb)
@@ -82,7 +82,7 @@ Time resolution is 1 ps
     branches = 0
     mispred  = 0
 
-$finish called at time : 200145 ns : File "C:/Users/Joshi/RISCV-Vivado/tb_5stage/rv32i_5stage_comprehensive_tb.sv" Line 125
+$finish called at time : 200145 ns : File "tb_5stage/rv32i_5stage_comprehensive_tb.sv" Line 125
 
 ================================================================
   test_5s_mext (top: rv32i_5stage_mext_csr_tb)
@@ -100,7 +100,7 @@ Time resolution is 1 ps
 
   mcycle=5009  minstret=3297  branches=0  mispred=0
 done
-$finish called at time : 50145 ns : File "C:/Users/Joshi/RISCV-Vivado/tb_5stage/rv32i_5stage_mext_csr_tb.sv" Line 62
+$finish called at time : 50145 ns : File "tb_5stage/rv32i_5stage_mext_csr_tb.sv" Line 62
 
 ================================================================
   test_6s_basic (top: rv32i_pipeline_tb)
@@ -121,9 +121,9 @@ Running...
   x3 = 11 (0x0000000b)
   x5 = 55 (0x00000037)
 done
-$finish called at time : 855 ns : File "C:/Users/Joshi/RISCV-Vivado/tb/rv32i_pipeline_tb.sv" Line 78
+$finish called at time : 855 ns : File "tb/rv32i_pipeline_tb.sv" Line 78
 TIMEOUT
-$finish called at time : 200 us : File "C:/Users/Joshi/RISCV-Vivado/tb/rv32i_pipeline_tb.sv" Line 84
+$finish called at time : 200 us : File "tb/rv32i_pipeline_tb.sv" Line 84
 
 ================================================================
   test_6s_comp (top: rv32i_comprehensive_tb)
@@ -182,7 +182,7 @@ Time resolution is 1 ps
     branches (total)  = 0
     mispredictions    = 0
 
-$finish called at time : 3475 ns : File "C:/Users/Joshi/RISCV-Vivado/tb/rv32i_comprehensive_tb.sv" Line 157
+$finish called at time : 3475 ns : File "tb/rv32i_comprehensive_tb.sv" Line 157
 
 ================================================================
   test_6s_mext (top: rv32i_mext_csr_tb)
@@ -205,7 +205,7 @@ CSR unit state:
   mispred  = 0
 
 done
-$finish called at time : 1505 ns : File "C:/Users/Joshi/RISCV-Vivado/tb/rv32i_mext_csr_tb.sv" Line 90
+$finish called at time : 1505 ns : File "tb/rv32i_mext_csr_tb.sv" Line 90
 
 ================================================================
   test_7s_basic (top: rv32i_7stage_tb)
@@ -228,7 +228,7 @@ Register dump:
   x5 = 55 (0x00000037)
 
 === Results: 5 PASS, 0 FAIL ===
-$finish called at time : 20145 ns : File "C:/Users/Joshi/RISCV-Vivado/tb_7stage/rv32i_7stage_tb.sv" Line 85
+$finish called at time : 20145 ns : File "tb_7stage/rv32i_7stage_tb.sv" Line 85
 
 ================================================================
   test_7s_comp (top: rv32i_7stage_comprehensive_tb)
@@ -286,7 +286,7 @@ Time resolution is 1 ps
     branches = 0
     mispred  = 0
 
-$finish called at time : 200145 ns : File "C:/Users/Joshi/RISCV-Vivado/tb_7stage/rv32i_7stage_comprehensive_tb.sv" Line 124
+$finish called at time : 200145 ns : File "tb_7stage/rv32i_7stage_comprehensive_tb.sv" Line 124
 
 ================================================================
   test_7s_mext (top: rv32i_7stage_mext_csr_tb)
@@ -304,5 +304,5 @@ Time resolution is 1 ps
 
   mcycle=5009  minstret=2969  branches=0  mispred=0
 done
-$finish called at time : 50145 ns : File "C:/Users/Joshi/RISCV-Vivado/tb_7stage/rv32i_7stage_mext_csr_tb.sv" Line 62
+$finish called at time : 50145 ns : File "tb_7stage/rv32i_7stage_mext_csr_tb.sv" Line 62
 

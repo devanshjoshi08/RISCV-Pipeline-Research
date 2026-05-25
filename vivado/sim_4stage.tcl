@@ -9,7 +9,7 @@ set tb4_dir     "$project_dir/tb_4stage"
 set prog_dir    "$project_dir/programs/asm"
 
 # Create project in local (non-OneDrive) path to avoid permission issues
-set work_dir "C:/Users/Joshi/RISCV-sim/4stage"
+set work_dir ".vivado_work/4stage"
 file mkdir $work_dir
 create_project sim_4stage $work_dir -part xc7a35tcpg236-1 -force
 

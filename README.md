@@ -2,15 +2,21 @@
 
 This repository is the code-and-data supplement for the paper **"Speculative GHR
 Forwarding: Eliminating Stale Branch-Predictor State in Deep FPGA Pipelines"**
-(targeting IEEE Transactions on Computers). The full write-up is in
-[`paper/main.tex`](paper/main.tex).
+(targeting **ACM Transactions on Reconfigurable Technology and Systems, TRETS**).
+The write-up is in the ACM `acmart` format and split into the main paper
+[`paper/main.tex`](paper/main.tex) and a companion
+[`paper/supplement.tex`](paper/supplement.tex) holding the corroborating figures
+and tables (area, power/efficiency, BRAM, published-cores, CoreMark detail, CPI
+ablation, the inter-branch-distance and hazard tables, etc.). Both build against
+the same [`paper/figures/`](paper/figures/) and [`paper/references.bib`](paper/references.bib).
 
 The research asks a question prior work leaves open: **how does pipeline depth
 alone affect performance on an FPGA, and what does it cost the branch
 predictor?** We build five pipeline variants (4–8 stages) from *identical* RTL
 for every functional unit, vary only the staging, synthesize all of them on a
-Xilinx Artix-7 (Vivado 2025.2, 10 placement seeds), and then propose and measure
-a fix for the one correctable predictor effect the study isolates:
+Xilinx Artix-7 (Vivado 2025.2, 10 synthesis directive combinations = 50
+post-place-and-route runs), and then propose and measure a fix for the one
+correctable predictor effect the study isolates:
 
 > **Speculative GHR Forwarding (SGF)** — a ROB-free realization of speculative
 > branch history for an in-order FPGA soft core. SGF cuts 7-stage CoreMark
@@ -29,8 +35,8 @@ Vivado flow. Every number in the paper traces to a committed result log; the
 
 The paper's claims are measured outcomes under **one FPGA family** (Artix-7
 XC7A35T), **one toolchain** (Vivado 2025.2), **one in-order microarchitecture**,
-**the gshare predictor family**, and **`-O1`** compilation — not
-fabric- or predictor-independent laws. Absolute frequency/area/power do not
+the **gshare** predictor (with measured generalization to tournament and TAGE),
+and **`-O1`** compilation — not fabric- or predictor-independent laws. Absolute frequency/area/power do not
 transfer without re-synthesis; what transfers is the Mechanism-A/B decomposition
 and the ROB-free dual-GHR construction. See `paper/main.tex` §Limitations.
 
@@ -46,6 +52,14 @@ CPU-only machines cannot re-run the Vivado flow, but **all result logs and the
 figure-regeneration scripts are committed**, so every numeric claim stays
 inspectable offline.
 
+> **Portability / scratch directory.** No absolute machine paths are baked into
+> the repo — every driver script resolves the repo root from its own location
+> (`[info script]`) and writes Vivado projects and temporaries to a git-ignored
+> `./.vivado_work/` by default. Set the **`RISCV_WORK`** environment variable to
+> redirect that scratch to a faster or larger disk. Committed result logs record
+> only the testbench filename (no drive letters), so they reproduce identically
+> on any machine.
+
 ## Reproducing the paper evidence
 
 Drive the experiments from the **Vivado Tcl console** (`source <script>`). Each
@@ -53,7 +67,7 @@ script writes a result log under [`vivado/`](vivado/); the comments below name
 the log that backs the corresponding paper section.
 
 ```tcl
-# --- Synthesis: F_max + area, 10 placement seeds, all five depths ---
+# --- Synthesis: F_max + area, 10 directive combinations, all five depths ---
 source vivado/synth_seeds.tcl          ;# -> vivado/seed_results.log   (two-tier F_max)
 source vivado/synth_all.tcl            ;# -> vivado/synth_results.log  (area, DSP)
 source vivado/synth_bram.tcl           ;# BRAM instr-memory variants -> vivado/bram_synth_results.log
@@ -73,7 +87,12 @@ source vivado/run_sgf_eval.tcl         ;# SGF 7/8-stage bench + synth
                                        ;#   -> vivado/sgf_benchmark_results.log, vivado/sgf_synth_results.log
 source scripts/run_sgf_6stage.tcl      ;# SGF on the 6-stage (recommended depth)
 
-# --- Power ---
+# --- Generalization to other predictor families (measured, 7-stage) ---
+source scripts/run_tournament_7stage.tcl ;# tournament -> results/tournament_results.log, tournament_synth_results.log
+source scripts/run_tage_7stage.tcl       ;# downscaled TAGE -> results/tage_results.log, tage_synth_results.log
+
+# --- Robustness and power ---
+source scripts/run_O2_7stage.tcl       ;# -O2 recompilation, 7-stage -> results/o2_7stage_results.log
 source scripts/run_saif_workload.tcl   ;# workload-specific (CoreMark) SAIF power, all depths
 ```
 
@@ -101,7 +120,7 @@ Every code-backed claim in the paper, mapped to the source / script / committed 
 | Depth splits into Mechanism A (all workloads) + Mechanism B (CoreMark +5.7%, statemate +10%) | 4/5/6-stage: `vivado/coremark_official_results.log`, `vivado/embench_official_results.log`, `vivado/dhrystone_results.log`, `vivado/diagnostic_results.log`; **7/8-stage baseline: `vivado/7s8s_rerun_results.log`** (canonical 2,893,145-instr CoreMark; the 7/8-stage rows in `*_official_results.log` are a superseded pre-fixed-hex run) |
 | Mechanism B **requires** a GHR (bimodal control: zero depth inflation, 85,493/63,272 at every depth) | `rtl/branch_predictor_bimodal.sv` → `results/bimodal_coremark_results.log` |
 | Mechanism B is **not** PHT aliasing (32→1024 sweep, inflation persists) | `results/pht_sweep_coremark_results.log` |
-| SGF: −31.4% CoreMark / −22.7% statemate, +0.7% area, no F_max loss | `rtl/branch_predictor_sgf.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_top.sv` → `results/sgf_benchmark_results.log`, `results/sgf_synth_10seeds_results.log` (10-seed F_max) |
+| SGF: −31.4% CoreMark / −22.7% statemate, +0.7% area, no F_max loss | `rtl/branch_predictor_sgf.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_top.sv` → `results/sgf_benchmark_results.log`, `results/sgf_synth_10seeds_results.log` (10-directive F_max) |
 | SGF on the 6-stage (−23.9% CoreMark) | `rtl/rv32i_pipeline_sgf_top.sv`, `scripts/run_sgf_6stage.tcl` → `results/sgf_6stage_results.log` |
 | Analytical CPI model R² = 0.977, R²_CV = 0.941 (LOWO) | `scripts/generate_plots_5depth.py` (fit + `cpi_vs_depth`); inputs are the benchmark logs above |
 | Workload-SAIF power *falls* with depth (0.235→0.217 W, opposite to uniform-toggle) | `scripts/run_saif_workload.tcl` → `results/saif_workload_results.log`; fig `scripts/regen_power_figs.py` |
@@ -140,7 +159,7 @@ also retains exploratory next-line-predictor tops, `*_nlp_top.sv`, which the pap
 does not use: on this fabric the next-line predictor's IF1 redirect lowers
 frequency below the deep tier, a net throughput loss.)
 
-## Synthesis results (Artix-7 XC7A35T, 10-seed mean)
+## Synthesis results (Artix-7 XC7A35T, 10-directive mean)
 
 | Metric | 4-stg | 5-stg | 6-stg | 7-stg | 8-stg |
 |---|---|---|---|---|---|
@@ -153,7 +172,8 @@ frequency below the deep tier, a net throughput loss.)
 SGF on the 7-stage: +49 LUT (+0.6%), +57 FF (+0.7%), F_max 117.5 vs 115.0 MHz
 (no degradation). SGF ships **without** a confidence filter — we measured one
 that fixes a zero-CPI crc32 edge case but costs ~11 points of the CoreMark
-benefit, so it is off by default and retained only as a build option (paper §V-G).
+benefit, so it is off by default and retained only as a build option (see the
+paper's crc32 / confidence-filter section).
 
 ## Benchmarks
 
@@ -168,10 +188,10 @@ readout.
 
 ```
 paper/
-  main.tex                 the paper (SGF + pipeline-depth study)
+  main.tex                 main paper (acmart / ACM TRETS format)
+  supplement.tex           supplementary material (corroborating figures + tables)
   references.bib           bibliography
   figures/                 all figures (.png + .pdf)
-  REQUIRED_EXPERIMENTS.md  experiment tracker
 rtl/                       shared functional units + 6-stage baseline + SGF/bimodal/BRAM tops
   branch_predictor.sv          gshare + BTB + RAS (baseline)
   branch_predictor_sgf.sv      dual-GHR speculative-forwarding predictor (SGF)

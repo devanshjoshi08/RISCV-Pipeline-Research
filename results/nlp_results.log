@@ -11,7 +11,7 @@ Time resolution is 1 ps
   Iterations:     10
   CPI:            2.02
   Mispredict%:    20.52%
-$finish called at time : 58621435 ns : File "D:/RISCV-Vivado/vivado_nlp/base7_coremark/base7_coremark_tb.sv" Line 45
+$finish called at time : 58621435 ns : File "vivado_nlp/base7_coremark/base7_coremark_tb.sv" Line 45
 
 --- nlp7_coremark ---
 Time resolution is 1 ps
@@ -23,7 +23,7 @@ Time resolution is 1 ps
   Iterations:     10
   CPI:            1.97
   Mispredict%:    21.11%
-$finish called at time : 57146255 ns : File "D:/RISCV-Vivado/vivado_nlp/nlp7_coremark/nlp7_coremark_tb.sv" Line 45
+$finish called at time : 57146255 ns : File "vivado_nlp/nlp7_coremark/nlp7_coremark_tb.sv" Line 45
 
 --- base7_statemate ---
 Time resolution is 1 ps
@@ -35,7 +35,7 @@ Time resolution is 1 ps
   Iterations:     0
   CPI:            1.50
   Mispredict%:    19.46%
-$finish called at time : 47452245 ns : File "D:/RISCV-Vivado/vivado_nlp/base7_statemate/base7_statemate_tb.sv" Line 45
+$finish called at time : 47452245 ns : File "vivado_nlp/base7_statemate/base7_statemate_tb.sv" Line 45
 
 --- nlp7_statemate ---
 Time resolution is 1 ps
@@ -47,5 +47,5 @@ Time resolution is 1 ps
   Iterations:     0
   CPI:            1.42
   Mispredict%:    18.58%
-$finish called at time : 45087495 ns : File "D:/RISCV-Vivado/vivado_nlp/nlp7_statemate/nlp7_statemate_tb.sv" Line 45
+$finish called at time : 45087495 ns : File "vivado_nlp/nlp7_statemate/nlp7_statemate_tb.sv" Line 45
 

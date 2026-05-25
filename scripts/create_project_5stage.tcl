@@ -1,6 +1,6 @@
 # create_project_5stage.tcl
 # Run this in the Vivado TCL console:
-#   cd C:/Users/Joshi/RISCV-Vivado
+#   cd <vivado scratch dir>
 #   source create_project_5stage.tcl
 
 set project_name "RISCV-5stage"

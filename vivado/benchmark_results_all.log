@@ -7,80 +7,80 @@
 ================================================================
 --- b_4stage_bench_diagnostic: bench_diagnostic.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_4stage_top ===
-WARNING: File bench_diagnostic.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_diagnostic.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_4stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_4stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_4stage_tb.sv" Line 45
 
 --- b_4stage_bench_branch_heavy: bench_branch_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_4stage_top ===
-WARNING: File bench_branch_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_branch_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_4stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_4stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_4stage_tb.sv" Line 45
 
 --- b_4stage_bench_compute_heavy: bench_compute_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_4stage_top ===
-WARNING: File bench_compute_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_compute_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_4stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_4stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_4stage_tb.sv" Line 45
 
 --- b_4stage_bench_crc32: bench_crc32.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_4stage_top ===
-WARNING: File bench_crc32.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_crc32.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_4stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_4stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_4stage_tb.sv" Line 45
 
 --- b_4stage_bench_sort: bench_sort.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_4stage_top ===
-WARNING: File bench_sort.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_sort.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_4stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_4stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_4stage_tb.sv" Line 45
 
 --- b_4stage_dhrystone: dhrystone.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_4stage_top ===
-WARNING: File dhrystone.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File dhrystone.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_4stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_4stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_4stage_tb.sv" Line 45
 
 --- b_4stage_coremark_minimal: coremark_minimal.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_4stage_top ===
-WARNING: File coremark_minimal.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File coremark_minimal.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_4stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_4stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_4stage_tb.sv" Line 45
 
 
 ================================================================
@@ -88,80 +88,80 @@ $finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_4
 ================================================================
 --- b_5stage_bench_diagnostic: bench_diagnostic.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_5stage_top ===
-WARNING: File bench_diagnostic.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_diagnostic.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_5stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_5stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_5stage_tb.sv" Line 45
 
 --- b_5stage_bench_branch_heavy: bench_branch_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_5stage_top ===
-WARNING: File bench_branch_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_branch_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_5stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_5stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_5stage_tb.sv" Line 45
 
 --- b_5stage_bench_compute_heavy: bench_compute_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_5stage_top ===
-WARNING: File bench_compute_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_compute_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_5stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_5stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_5stage_tb.sv" Line 45
 
 --- b_5stage_bench_crc32: bench_crc32.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_5stage_top ===
-WARNING: File bench_crc32.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_crc32.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_5stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_5stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_5stage_tb.sv" Line 45
 
 --- b_5stage_bench_sort: bench_sort.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_5stage_top ===
-WARNING: File bench_sort.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_sort.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_5stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_5stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_5stage_tb.sv" Line 45
 
 --- b_5stage_dhrystone: dhrystone.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_5stage_top ===
-WARNING: File dhrystone.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File dhrystone.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_5stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_5stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_5stage_tb.sv" Line 45
 
 --- b_5stage_coremark_minimal: coremark_minimal.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_5stage_top ===
-WARNING: File coremark_minimal.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File coremark_minimal.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_5stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_5stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_5stage_tb.sv" Line 45
 
 
 ================================================================
@@ -169,80 +169,80 @@ $finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_5
 ================================================================
 --- b_6stage_bench_diagnostic: bench_diagnostic.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_top ===
-WARNING: File bench_diagnostic.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_diagnostic.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_6stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_6stage_tb.sv" Line 45
 
 --- b_6stage_bench_branch_heavy: bench_branch_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_top ===
-WARNING: File bench_branch_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_branch_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_6stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_6stage_tb.sv" Line 45
 
 --- b_6stage_bench_compute_heavy: bench_compute_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_top ===
-WARNING: File bench_compute_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_compute_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_6stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_6stage_tb.sv" Line 45
 
 --- b_6stage_bench_crc32: bench_crc32.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_top ===
-WARNING: File bench_crc32.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_crc32.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_6stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_6stage_tb.sv" Line 45
 
 --- b_6stage_bench_sort: bench_sort.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_top ===
-WARNING: File bench_sort.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_sort.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_6stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_6stage_tb.sv" Line 45
 
 --- b_6stage_dhrystone: dhrystone.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_top ===
-WARNING: File dhrystone.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File dhrystone.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_6stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_6stage_tb.sv" Line 45
 
 --- b_6stage_coremark_minimal: coremark_minimal.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_top ===
-WARNING: File coremark_minimal.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File coremark_minimal.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_6stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_6stage_tb.sv" Line 45
 
 
 ================================================================
@@ -250,80 +250,80 @@ $finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_6
 ================================================================
 --- b_7stage_bench_diagnostic: bench_diagnostic.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_7stage_top ===
-WARNING: File bench_diagnostic.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_diagnostic.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_7stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_7stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_7stage_tb.sv" Line 45
 
 --- b_7stage_bench_branch_heavy: bench_branch_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_7stage_top ===
-WARNING: File bench_branch_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_branch_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_7stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_7stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_7stage_tb.sv" Line 45
 
 --- b_7stage_bench_compute_heavy: bench_compute_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_7stage_top ===
-WARNING: File bench_compute_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_compute_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_7stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_7stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_7stage_tb.sv" Line 45
 
 --- b_7stage_bench_crc32: bench_crc32.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_7stage_top ===
-WARNING: File bench_crc32.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_crc32.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_7stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_7stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_7stage_tb.sv" Line 45
 
 --- b_7stage_bench_sort: bench_sort.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_7stage_top ===
-WARNING: File bench_sort.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_sort.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_7stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_7stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_7stage_tb.sv" Line 45
 
 --- b_7stage_dhrystone: dhrystone.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_7stage_top ===
-WARNING: File dhrystone.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File dhrystone.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_7stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_7stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_7stage_tb.sv" Line 45
 
 --- b_7stage_coremark_minimal: coremark_minimal.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_7stage_top ===
-WARNING: File coremark_minimal.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File coremark_minimal.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_7stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_7stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_7stage_tb.sv" Line 45
 
 
 ================================================================
@@ -331,78 +331,78 @@ $finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_7
 ================================================================
 --- b_8stage_bench_diagnostic: bench_diagnostic.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_8stage_top ===
-WARNING: File bench_diagnostic.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_diagnostic.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_diagnostic.hex on rv32i_pipeline_8stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_8stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_8stage_tb.sv" Line 45
 
 --- b_8stage_bench_branch_heavy: bench_branch_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_8stage_top ===
-WARNING: File bench_branch_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_branch_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_branch_heavy.hex on rv32i_pipeline_8stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_8stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_8stage_tb.sv" Line 45
 
 --- b_8stage_bench_compute_heavy: bench_compute_heavy.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_8stage_top ===
-WARNING: File bench_compute_heavy.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_compute_heavy.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_compute_heavy.hex on rv32i_pipeline_8stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_8stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_8stage_tb.sv" Line 45
 
 --- b_8stage_bench_crc32: bench_crc32.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_8stage_top ===
-WARNING: File bench_crc32.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_crc32.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_crc32.hex on rv32i_pipeline_8stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_8stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_8stage_tb.sv" Line 45
 
 --- b_8stage_bench_sort: bench_sort.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_8stage_top ===
-WARNING: File bench_sort.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File bench_sort.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === bench_sort.hex on rv32i_pipeline_8stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_8stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_8stage_tb.sv" Line 45
 
 --- b_8stage_dhrystone: dhrystone.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_8stage_top ===
-WARNING: File dhrystone.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File dhrystone.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === dhrystone.hex on rv32i_pipeline_8stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_8stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_8stage_tb.sv" Line 45
 
 --- b_8stage_coremark_minimal: coremark_minimal.hex ---
 Time resolution is 1 ps
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_8stage_top ===
-WARNING: File coremark_minimal.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
-WARNING: File program.hex referenced on D:/RISCV-Vivado/rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File coremark_minimal.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
+WARNING: File program.hex referenced on rtl/csr_unit.sv at line 39 cannot be opened for reading. Please ensure that this file is available in the current working directory or parent directory of xsim.dir location specified via -xsimdir switch.
 === coremark_minimal.hex on rv32i_pipeline_8stage_top ===
   TIMEOUT - did not halt
 === Done ===
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench/bench_8stage_tb.sv" Line 45
+$finish called at time : 5000145 ns : File "vivado_bench/bench_8stage_tb.sv" Line 45
 

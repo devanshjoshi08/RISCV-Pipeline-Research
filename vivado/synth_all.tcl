@@ -3,7 +3,7 @@
 # Results saved to synth_results.log
 #
 # Usage: close Vivado, reopen, then:
-#   cd C:/Users/Joshi/RISCV-Vivado
+#   cd <vivado scratch dir>
 #   source synth_all.tcl
 
 set project_dir [file normalize [file dirname [info script]]]

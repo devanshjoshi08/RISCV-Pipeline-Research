@@ -10,7 +10,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.48
   Mispredict%:    50.50%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bimodal/bim_5s_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_bimodal/bim_5s_tb.sv" Line 37
 
 Time resolution is 1 ps
 === Bimodal Dhrystone: rv32i_pipeline_top ===
@@ -21,7 +21,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.68
   Mispredict%:    50.50%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bimodal/bim_6s_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_bimodal/bim_6s_tb.sv" Line 37
 
 Time resolution is 1 ps
 === Bimodal Dhrystone: rv32i_pipeline_7stage_top ===
@@ -32,5 +32,5 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.85
   Mispredict%:    50.50%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bimodal/bim_7s_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_bimodal/bim_7s_tb.sv" Line 37
 

@@ -9,7 +9,7 @@ set tb8_dir     "$project_dir/tb_8stage"
 set prog_dir    "$project_dir/programs/asm"
 
 # Create project
-set work_dir "D:/RISCV-sim/8stage"
+set work_dir ".vivado_work/8stage"
 file mkdir $work_dir
 create_project sim_8stage $work_dir -part xc7a35tcpg236-1 -force
 

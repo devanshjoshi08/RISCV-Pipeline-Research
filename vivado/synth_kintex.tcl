@@ -3,7 +3,7 @@
 
 set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
-set github_dir  "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
+set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set log_file    "$project_dir/ultrascale_results.log"
 set part        "xcku035-fbva676-1-c"
 set clk_xdc     "$project_dir/synth_clk_only.xdc"

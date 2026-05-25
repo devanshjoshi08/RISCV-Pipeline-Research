@@ -1,6 +1,6 @@
 # run_all_tests.tcl — Run all testbenches for 5-stage, 6-stage, and 7-stage.
 # Usage in Vivado TCL console:
-#   cd C:/Users/Joshi/RISCV-Vivado
+#   cd <vivado scratch dir>
 #   source run_all_tests.tcl
 #
 # Each test creates a project, runs simulation, closes.

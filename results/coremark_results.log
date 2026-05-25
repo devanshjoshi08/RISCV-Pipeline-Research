@@ -11,7 +11,7 @@ Time resolution is 1 ps
   Checksum:       0x0028bb10
   CPI:            1.51
   Mispredict%:    18.25%
-$finish called at time : 10000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_coremark/cm_5s_tb.sv" Line 38
+$finish called at time : 10000145 ns : File "vivado_coremark/cm_5s_tb.sv" Line 38
 
 Time resolution is 1 ps
 === CoreMark: rv32i_pipeline_top ===
@@ -23,7 +23,7 @@ Time resolution is 1 ps
   Checksum:       0x0028bb10
   CPI:            1.66
   Mispredict%:    20.35%
-$finish called at time : 10000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_coremark/cm_6s_tb.sv" Line 38
+$finish called at time : 10000145 ns : File "vivado_coremark/cm_6s_tb.sv" Line 38
 
 Time resolution is 1 ps
 === CoreMark: rv32i_pipeline_7stage_top ===
@@ -35,5 +35,5 @@ Time resolution is 1 ps
   Checksum:       0xxxxxxxxx
   CPI:            1.91
   Mispredict%:    21.38%
-$finish called at time : 10000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_coremark/cm_7s_tb.sv" Line 38
+$finish called at time : 10000145 ns : File "vivado_coremark/cm_7s_tb.sv" Line 38
 

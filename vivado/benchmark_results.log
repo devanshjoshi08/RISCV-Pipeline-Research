@@ -14,7 +14,7 @@ Time resolution is 1 ps
   CPI:            1.71
   Mispredict%:    28.41%
 === Done ===
-$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_5s_tb.sv" Line 41
+$finish called at time : 2000145 ns : File "vivado_bench/bench_5s_tb.sv" Line 41
 
 ================================================================
   bench_6s_bench_branch_heavy - bench_branch_heavy.hex
@@ -29,7 +29,7 @@ Time resolution is 1 ps
   CPI:            1.90
   Mispredict%:    34.07%
 === Done ===
-$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_6s_tb.sv" Line 41
+$finish called at time : 2000145 ns : File "vivado_bench/bench_6s_tb.sv" Line 41
 
 ================================================================
   bench_7s_bench_branch_heavy - bench_branch_heavy.hex
@@ -44,7 +44,7 @@ Time resolution is 1 ps
   CPI:            2.02
   Mispredict%:    23.48%
 === Done ===
-$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_7s_tb.sv" Line 41
+$finish called at time : 2000145 ns : File "vivado_bench/bench_7s_tb.sv" Line 41
 
 ================================================================
   bench_5s_bench_compute_heavy - bench_compute_heavy.hex
@@ -59,7 +59,7 @@ Time resolution is 1 ps
   CPI:            1.34
   Mispredict%:    10.88%
 === Done ===
-$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_5s_tb.sv" Line 41
+$finish called at time : 2000145 ns : File "vivado_bench/bench_5s_tb.sv" Line 41
 
 ================================================================
   bench_6s_bench_compute_heavy - bench_compute_heavy.hex
@@ -74,7 +74,7 @@ Time resolution is 1 ps
   CPI:            1.42
   Mispredict%:    10.88%
 === Done ===
-$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_6s_tb.sv" Line 41
+$finish called at time : 2000145 ns : File "vivado_bench/bench_6s_tb.sv" Line 41
 
 ================================================================
   bench_7s_bench_compute_heavy - bench_compute_heavy.hex
@@ -89,5 +89,5 @@ Time resolution is 1 ps
   CPI:            1.51
   Mispredict%:    17.19%
 === Done ===
-$finish called at time : 2000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_bench/bench_7s_tb.sv" Line 41
+$finish called at time : 2000145 ns : File "vivado_bench/bench_7s_tb.sv" Line 41
 

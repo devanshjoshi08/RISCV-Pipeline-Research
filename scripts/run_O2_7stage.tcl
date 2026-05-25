@@ -7,7 +7,7 @@
 #   1. bash scripts/build_O2_benchmarks.sh   (produces *_o2 hex in programs/asm)
 #   2. Source this from the GitHub repo copy (uses the canonical rtl_7stage, NOT
 #      the D: mirror which lacks the if2_redirect/ras_push gates):
-#        source C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor/scripts/run_O2_7stage.tcl
+#        source <repo>/scripts/run_O2_7stage.tcl
 #
 # Output: o2_7stage_results.log (the four runs, with the printed counters).
 
@@ -16,7 +16,7 @@ set rtl_dir  "$project_dir/rtl"
 set rtl7_dir "$project_dir/rtl_7stage"
 set asm_dir  "$project_dir/programs/asm"
 set part     "xc7a35tcpg236-1"
-set work_root "D:/RISCV-Vivado/o2_7stage"
+set work_root ".vivado_work/o2_7stage"
 set log_file "$project_dir/o2_7stage_results.log"
 set tb_dir   "$work_root/tb"
 file mkdir $tb_dir

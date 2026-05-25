@@ -5,14 +5,14 @@
 # (115.0 MHz) and SGF (117.5 MHz).
 #
 # Source from the GitHub repo copy (canonical rtl_7stage):
-#   source C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor/scripts/synth_nlp_7stage.tcl
+#   source <repo>/scripts/synth_nlp_7stage.tcl
 # Output: nlp_synth_results.log  (variant,run,Fmax_MHz,WNS_ns,LUTs,FFs)
 
 set project_dir [file normalize [file dirname [file dirname [info script]]]]
 set rtl_dir  "$project_dir/rtl"
 set rtl7_dir "$project_dir/rtl_7stage"
 set part     "xc7a35tcpg236-1"
-set work_root "D:/RISCV-Vivado/nlp_synth"
+set work_root ".vivado_work/nlp_synth"
 set log_file "$project_dir/nlp_synth_results.log"
 
 set clk_xdc "$work_root/clk_only.xdc"

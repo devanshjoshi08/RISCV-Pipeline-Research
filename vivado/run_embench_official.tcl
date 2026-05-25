@@ -4,7 +4,7 @@
 
 set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
-set github_dir  "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
+set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set asm_dir     "$github_dir/programs/asm"
 set log_file    "$project_dir/embench_official_results.log"
 set tb_dir      "$project_dir/vivado_embench_official"

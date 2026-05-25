@@ -12,7 +12,7 @@ Time resolution is 1 ps
   CPI:            1.48
   Mispredict%:    50.75%
 === Done ===
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_dhry/dhry_5s_tb.sv" Line 41
+$finish called at time : 5000145 ns : File "vivado_dhry/dhry_5s_tb.sv" Line 41
 
 Time resolution is 1 ps
 === Dhrystone 2.1: rv32i_pipeline_top ===
@@ -25,7 +25,7 @@ Time resolution is 1 ps
   CPI:            1.68
   Mispredict%:    50.75%
 === Done ===
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_dhry/dhry_6s_tb.sv" Line 41
+$finish called at time : 5000145 ns : File "vivado_dhry/dhry_6s_tb.sv" Line 41
 
 Time resolution is 1 ps
 === Dhrystone 2.1: rv32i_pipeline_7stage_top ===
@@ -38,5 +38,5 @@ Time resolution is 1 ps
   CPI:            1.85
   Mispredict%:    50.75%
 === Done ===
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_dhry/dhry_7s_tb.sv" Line 41
+$finish called at time : 5000145 ns : File "vivado_dhry/dhry_7s_tb.sv" Line 41
 

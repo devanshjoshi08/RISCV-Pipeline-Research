@@ -10,7 +10,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.48
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_predsweep/5s_pht32_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_predsweep/5s_pht32_tb.sv" Line 37
 
 Time resolution is 1 ps
 === rv32i_pipeline_top PHT=32 ===
@@ -21,7 +21,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.68
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_predsweep/6s_pht32_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_predsweep/6s_pht32_tb.sv" Line 37
 
 Time resolution is 1 ps
 === rv32i_pipeline_7stage_top PHT=32 ===
@@ -32,7 +32,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.85
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_predsweep/7s_pht32_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_predsweep/7s_pht32_tb.sv" Line 37
 
 Time resolution is 1 ps
 === rv32i_pipeline_5stage_top PHT=64 ===
@@ -43,7 +43,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.48
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_predsweep/5s_pht64_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_predsweep/5s_pht64_tb.sv" Line 37
 
 Time resolution is 1 ps
 === rv32i_pipeline_top PHT=64 ===
@@ -54,7 +54,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.68
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_predsweep/6s_pht64_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_predsweep/6s_pht64_tb.sv" Line 37
 
 Time resolution is 1 ps
 === rv32i_pipeline_7stage_top PHT=64 ===
@@ -65,7 +65,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.85
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_predsweep/7s_pht64_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_predsweep/7s_pht64_tb.sv" Line 37
 
 Time resolution is 1 ps
 === rv32i_pipeline_5stage_top PHT=128 ===
@@ -76,7 +76,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.48
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_predsweep/5s_pht128_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_predsweep/5s_pht128_tb.sv" Line 37
 
 Time resolution is 1 ps
 === rv32i_pipeline_top PHT=128 ===
@@ -87,7 +87,7 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.68
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_predsweep/6s_pht128_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_predsweep/6s_pht128_tb.sv" Line 37
 
 Time resolution is 1 ps
 === rv32i_pipeline_7stage_top PHT=128 ===
@@ -98,5 +98,5 @@ Time resolution is 1 ps
   Dhrystones:     100
   CPI:            1.85
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "C:/Users/Joshi/RISCV-Vivado/vivado_predsweep/7s_pht128_tb.sv" Line 37
+$finish called at time : 5000145 ns : File "vivado_predsweep/7s_pht128_tb.sv" Line 37
 

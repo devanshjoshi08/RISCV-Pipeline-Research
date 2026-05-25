@@ -1,3 +1,7 @@
+# Vivado scratch / work dir (driver scripts write Vivado projects + temp here by
+# default; override with the RISCV_WORK env var). Build artifact, never committed.
+.vivado_work/
+
 # Vivado project files
 *.jou
 *.str
@@ -27,6 +31,21 @@ programs/embench/*.elf
 programs/embench/*_raw.hex
 programs/embench/*.full
 programs/embench/*.dump
+
+# Stale backups / internal scaffolding — kept locally, NOT for the public repo
+paper/main_backup*.tex
+paper/REQUIRED_EXPERIMENTS.md
+paper/submission/
+paper/submission.zip
+
+# Root-level duplicate driver scripts (canonical copies live in vivado/ and scripts/)
+/create_project.tcl
+/run_all_tests.tcl
+/synth_seeds.tcl
+/sim_4stage.tcl
+/sim_5stage.tcl
+/sim_7stage.tcl
+/sim_8stage.tcl
 
 # OS files
 .DS_Store

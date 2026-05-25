@@ -11,7 +11,7 @@ Time resolution is 1 ps
   Checksum:       0x00000064
   CPI:            1.41
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench_4s8s/4s_dhrystone_tb.sv" Line 38
+$finish called at time : 5000145 ns : File "vivado_bench_4s8s/4s_dhrystone_tb.sv" Line 38
 
 --- 4s_bench_diagnostic: Diagnostic ---
 Time resolution is 1 ps
@@ -23,7 +23,7 @@ Time resolution is 1 ps
   Checksum:       0x0096d2bf
   CPI:            1.38
   Mispredict%:    19.16%
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench_4s8s/4s_bench_diagnostic_tb.sv" Line 38
+$finish called at time : 5000145 ns : File "vivado_bench_4s8s/4s_bench_diagnostic_tb.sv" Line 38
 
 --- 4s_coremark_minimal: CoreMark-insp ---
 Time resolution is 1 ps
@@ -35,7 +35,7 @@ Time resolution is 1 ps
   Checksum:       0x0000000a
   CPI:            1.47
   Mispredict%:    18.25%
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench_4s8s/4s_coremark_minimal_tb.sv" Line 38
+$finish called at time : 5000145 ns : File "vivado_bench_4s8s/4s_coremark_minimal_tb.sv" Line 38
 
 --- 8s_dhrystone: Dhrystone ---
 Time resolution is 1 ps
@@ -47,7 +47,7 @@ Time resolution is 1 ps
   Checksum:       0x00000064
   CPI:            1.99
   Mispredict%:    50.75%
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench_4s8s/8s_dhrystone_tb.sv" Line 38
+$finish called at time : 5000145 ns : File "vivado_bench_4s8s/8s_dhrystone_tb.sv" Line 38
 
 --- 8s_bench_diagnostic: Diagnostic ---
 Time resolution is 1 ps
@@ -59,7 +59,7 @@ Time resolution is 1 ps
   Checksum:       0x0096d2bf
   CPI:            2.11
   Mispredict%:    19.16%
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench_4s8s/8s_bench_diagnostic_tb.sv" Line 38
+$finish called at time : 5000145 ns : File "vivado_bench_4s8s/8s_bench_diagnostic_tb.sv" Line 38
 
 --- 8s_coremark_minimal: CoreMark-insp ---
 Time resolution is 1 ps
@@ -71,5 +71,5 @@ Time resolution is 1 ps
   Checksum:       0x0000000a
   CPI:            2.03
   Mispredict%:    21.38%
-$finish called at time : 5000145 ns : File "D:/RISCV-Vivado/vivado_bench_4s8s/8s_coremark_minimal_tb.sv" Line 38
+$finish called at time : 5000145 ns : File "vivado_bench_4s8s/8s_coremark_minimal_tb.sv" Line 38
 

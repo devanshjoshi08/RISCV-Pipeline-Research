@@ -8,7 +8,7 @@
 
 set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
-set github_dir  "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
+set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set rtl7_dir    "$github_dir/rtl_7stage"
 set nlp_dir     "$project_dir/rtl_nlp"
 set asm_dir     "$github_dir/programs/asm"
@@ -16,10 +16,10 @@ set work_root   "$project_dir/vivado_sgfnlp"
 set part        "xc7a35tcpg236-1"
 set log_file    "$project_dir/sgf_nlp_results.log"
 
-set ::env(TEMP)   "D:/RISCV-Vivado/tmp"
-set ::env(TMP)    "D:/RISCV-Vivado/tmp"
-set ::env(TMPDIR) "D:/RISCV-Vivado/tmp"
-file mkdir "D:/RISCV-Vivado/tmp"
+set ::env(TEMP)   ".vivado_work/tmp"
+set ::env(TMP)    ".vivado_work/tmp"
+set ::env(TMPDIR) ".vivado_work/tmp"
+file mkdir ".vivado_work/tmp"
 file mkdir $work_root
 
 # common modules (standard pipe registers; SGF forwards its checkpoint in-top)
@@ -113,7 +113,7 @@ proc run_one {proj rtl_files top_module} {
     close_sim -quiet
     close_project -quiet
     catch {file delete -force $wdir}
-    catch {foreach f [glob -nocomplain "D:/RISCV-Vivado/tmp/*.xilwvdat"] {file delete -force $f}}
+    catch {foreach f [glob -nocomplain ".vivado_work/tmp/*.xilwvdat"] {file delete -force $f}}
 }
 
 set fd [open $log_file w]

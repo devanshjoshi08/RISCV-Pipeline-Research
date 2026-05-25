@@ -8,15 +8,15 @@
 #         programs/asm/embench_statemate_o2.hex (+ _data.hex)
 #
 # Override paths with env vars if your install differs, e.g.:
-#   RISCV_BIN=/path/to/bin COREMARK_DIR=D:/coremark bash scripts/build_O2_benchmarks.sh
+#   RISCV_BIN=/path/to/bin COREMARK_DIR=programs/coremark bash scripts/build_O2_benchmarks.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ASM="$ROOT/programs/asm"
 
-RISCV_BIN="${RISCV_BIN:-C:/Users/Joshi/Downloads/xpack-riscv-none-elf-gcc-15.2.0-1-win32-x64/xpack-riscv-none-elf-gcc-15.2.0-1/bin}"
-COREMARK_DIR="${COREMARK_DIR:-D:/coremark}"
-EMBENCH_DIR="${EMBENCH_DIR:-D:/embench-iot}"
+RISCV_BIN="${RISCV_BIN:-/path/to/riscv-none-elf-gcc/bin}"
+COREMARK_DIR="${COREMARK_DIR:-programs/coremark}"
+EMBENCH_DIR="${EMBENCH_DIR:-programs/embench}"
 CC="$RISCV_BIN/riscv-none-elf-gcc"
 OBJCOPY="$RISCV_BIN/riscv-none-elf-objcopy"
 PY="${PY:-python}"

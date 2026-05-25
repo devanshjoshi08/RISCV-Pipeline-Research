@@ -4,11 +4,11 @@
 
 set idx [lindex $argv 0]
 
-set rtl_dir    "D:/RISCV-Vivado/rtl"
-set gh         "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
-set work       "D:/RISCV-Vivado/vivado_seeds"
-set log        "D:/RISCV-Vivado/seed_results.log"
-set xdc        "D:/RISCV-Vivado/synth_clk_ooc.xdc"
+set gh         [file normalize [file dirname [file dirname [info script]]]]
+set rtl_dir    "$gh/rtl"
+set work       ".vivado_work/vivado_seeds"
+set log        ".vivado_work/seed_results.log"
+set xdc        "$gh/vivado/synth_clk_ooc.xdc"
 set part       "xc7a35tcpg236-1"
 set clk_period 5.000
 

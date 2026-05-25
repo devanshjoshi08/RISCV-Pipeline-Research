@@ -17,7 +17,7 @@
 
 set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
-set github_dir  "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
+set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set asm_dir     "$github_dir/programs/asm"
 set tb_dir      "$project_dir/vivado_sgf_6s"
 set part        "xc7a35tcpg236-1"

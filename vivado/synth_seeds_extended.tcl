@@ -4,7 +4,7 @@
 
 set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
-set github_dir  "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
+set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set log_file    "$project_dir/seed_results_extended.log"
 set part        "xc7a35tcpg236-1"
 set clk_xdc     "$project_dir/synth_clk_only.xdc"

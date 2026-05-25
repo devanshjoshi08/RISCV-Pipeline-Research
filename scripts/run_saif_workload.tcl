@@ -25,7 +25,7 @@
 
 set project_dir [file normalize [file dirname [info script]]]
 set rtl_dir     "$project_dir/rtl"
-set github_dir  "C:/Users/Joshi/OneDrive/Documents/GitHub/RISCV-RV32IM-Processor"
+set github_dir  [file normalize [file dirname [file dirname [info script]]]]
 set asm_dir     "$github_dir/programs/asm"
 set work_root   "$project_dir/vivado_saif_wl"
 set part        "xc7a35tcpg236-1"
@@ -35,10 +35,10 @@ set clk_xdc     "$project_dir/synth_clk_only.xdc"
 set cm_hex  "$asm_dir/coremark_official.hex"
 set cm_data "$github_dir/programs/coremark/data.hex"
 
-set ::env(TEMP)   "D:/RISCV-Vivado/tmp"
-set ::env(TMP)    "D:/RISCV-Vivado/tmp"
-set ::env(TMPDIR) "D:/RISCV-Vivado/tmp"
-file mkdir "D:/RISCV-Vivado/tmp"
+set ::env(TEMP)   ".vivado_work/tmp"
+set ::env(TMP)    ".vivado_work/tmp"
+set ::env(TMPDIR) ".vivado_work/tmp"
+file mkdir ".vivado_work/tmp"
 file mkdir $work_root
 
 # Build a 4096-word imem copy (CoreMark needs 16 KB; default imem is 1 KB)
