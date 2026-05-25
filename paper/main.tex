@@ -177,7 +177,7 @@ Pipeline registers        & 3 & 4 & 5 & 6 & 7 \\
 Forwarding sources        & 1 & 2 & 3 & 3 & 3 \\
 Load-use stall            & 0 & 1\,cy & 1\,cy & 1\,cy & 1--2\,cy \\
 Branch penalty            & 2\,cy & 2\,cy & 3\,cy & 4\,cy & 4\,cy \\
-IF2 prediction bubble     & -- & -- & -- & 1\,cy & 1\,cy \\
+IF2 prediction bubble     & 0 & 0 & 0 & 1\,cy & 1\,cy \\
 Predictor update latency  & 2 & 2 & 3 & 4 & 4 \\
 \bottomrule
 \end{tabular}
@@ -627,7 +627,7 @@ The hardware cost, in contrast, does not generalize uniformly, and the measureme
 
 \begin{table}[t]
 \centering
-\caption{SGF misprediction change ($\Delta$) across three predictor families on the 7-stage pipeline (Artix-7). Instruction and branch counts are identical between each baseline and its SGF variant, so the deltas are exact. The benefit generalizes on the history-dense workloads; the biased-branch edge case (Section~\ref{sec:crc32}) relocates across families (crc32 for gshare, aha-mont64 for TAGE, both CPI-neutral); the confidence filter that removes it on gshare does not transfer to TAGE (Section~\ref{sec:generalization}). SGF area cost is sub-1\% on gshare and the tournament but $+21\%$ LUTs on multi-table TAGE.}
+\caption{SGF misprediction change ($\Delta$) across three predictor families on the 7-stage pipeline (Artix-7). Instruction and branch counts are identical between each baseline and its SGF variant, so the deltas are exact. Section~\ref{sec:generalization} interprets the trends.}
 \label{tab:families}
 \small
 \begin{tabular}{@{}l rrr@{}}
