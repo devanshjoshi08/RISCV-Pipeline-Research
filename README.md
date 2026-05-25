@@ -212,3 +212,18 @@ constraints/               Basys 3 XDC
 tools/                     hex disassembler, riscv-tests runner
 ```
 
+## License
+
+The original work in this repository — the RV32IM RTL, testbenches, driver and
+figure scripts, result logs, constraints, and paper sources — is released under
+the **MIT License** (see [`LICENSE`](LICENSE)).
+
+The benchmark programs under [`programs/`](programs/) are **not** covered by MIT;
+each retains its upstream license (CoreMark — EEMBC, Apache-2.0; Embench-IoT;
+Dhrystone 2.1 — public domain). Only our bare-metal porting layer, linker
+scripts, and derived `.hex` images are MIT-licensed. See [`NOTICE`](NOTICE) for
+details.
+
+If you use this work, please cite the paper (Joshi and Ula, "Speculative GHR
+Forwarding: Eliminating Stale Branch-Predictor State in Deep FPGA Pipelines").
+
