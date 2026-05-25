@@ -281,7 +281,14 @@ DSP48E1           & 12    & 12     & 12     & 12     & 12 \\
 \end{tabular}
 \end{table*}
 
-The results reveal a two-tier frequency structure: the shallow tier (4/5-stage) at 70--74\,MHz and the deep tier (6/7/8-stage) at 115--118\,MHz.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fmax_comparison.png}
+\caption{Maximum clock frequency ($F_{\max}$, post-place-and-route static timing) for each pipeline depth. Error bars show standard deviation across 10 synthesis directive combinations. The 44\,MHz gap between the shallow tier (4/5-stage) and the deep tier (6/7/8-stage) has $p < 0.001$ (Cohen's $d = 18.5$).}
+\label{fig:fmax}
+\end{figure}
+
+The results reveal a two-tier frequency structure: the shallow tier (4/5-stage) at 70--74\,MHz and the deep tier (6/7/8-stage) at 115--118\,MHz (Fig.~\ref{fig:fmax}).
 The 44\,MHz gap ($p < 0.001$, Cohen's $d = 18.5$) confirms this is not a placement artifact.
 The effect size is extreme by convention ($d > 0.8$ is ``large''), but expected here: the two tiers' 95\% confidence intervals do not overlap, so a large standardized separation is the arithmetic consequence of the small within-tier placement variance.
 
@@ -296,6 +303,14 @@ Within the deep tier, differences are $<$2\,MHz ($<$2\%) with limited practical 
 The 4-stage uses the fewest resources (7{,}219 LUTs, 8{,}040 FFs; Table~\ref{tab:results}).
 Each additional pipeline stage adds 52--210 LUTs and 76--150 FFs, for a total increase from 4 to 8 stages of 622 LUTs (8.6\%) and 638 FFs (7.9\%).
 All five variants use 12 DSP48E1 blocks for the pipelined multiplier, and no BRAM tiles since both instruction and data memories are implemented in distributed LUT RAM.
+Fig.~\ref{fig:area} shows the LUT and flip-flop growth with depth. The increase is gradual and sub-linear in the added pipeline registers, because the dominant cost is the shared functional-unit logic (ALU, MDU, register file), which is identical across depths; only the inter-stage registers and the slightly larger forwarding/hazard logic grow.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{area_comparison.png}
+\caption{Slice LUT and flip-flop utilization across pipeline depths on Artix-7 XC7A35T. The 4-to-8-stage increase is 622 LUTs (8.6\%) and 638 FFs (7.9\%); DSP usage is constant at 12 blocks.}
+\label{fig:area}
+\end{figure}
 
 \subsection{CPI Measurements}
 \label{sec:cpi}
@@ -425,6 +440,21 @@ Residuals have mean 0 and standard deviation 0.038\,CPI with no depth pattern; t
 
 Decomposing CoreMark CPI into the four additive terms of Eq.~\ref{eq:cpi_model} isolates each architectural cost on top of the ideal 1.00: a depth-invariant base ($\gamma_w = 0.45$); a branch-flush term that grows with depth (0.10 at 4/5-stage to 0.16 at 6-stage and 0.20 at 7/8-stage, Mechanism~A, including the Mechanism~B count rise at depth~6); a load-use term (0 at 4-stage, 0.15 at 5/6/7-stage, 0.22 at 8-stage); and an IF2-bubble term (0.28, only at 7/8-stage).
 Summed, these predict measured CPI within the model residual ($\leq$0.09) at every depth across all 35 points.
+Fig.~\ref{fig:cpimodel} overlays the model on the measured CPI for all seven workloads, and Fig.~\ref{fig:cpiresid} shows the residuals carry no depth-dependent bias.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{cpi_vs_depth.png}
+\caption{Measured CPI (points) and the analytical model of Eq.~\ref{eq:cpi_model} (lines) across the five pipeline depths for all seven workloads. The model captures the depth trend with $R^2 = 0.977$ ($R^2_{\text{CV}} = 0.941$ leave-one-workload-out).}
+\label{fig:cpimodel}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{cpi_residuals.png}
+\caption{CPI model residuals (measured minus predicted) across depths. Mean 0, standard deviation 0.038\,CPI, with no depth-dependent pattern; the largest residual ($+$0.086) is on 6-stage CoreMark.}
+\label{fig:cpiresid}
+\end{figure}
 
 \subsection{Throughput}
 \label{sec:throughput}
@@ -433,6 +463,14 @@ Effective throughput (MIPS) is $F_{\max} / \text{CPI}$.
 This combines two separately obtained quantities: post-place-and-route $F_{\max}$ from static timing analysis and CPI from behavioral simulation. It is therefore a valid figure of merit for architectural comparison across our variants, but not a single end-to-end measurement on running silicon. The two were not co-measured on one physical system, and the product assumes the simulated cycle stream executes at the timing-closed clock.
 Computed from 10-directive mean $F_{\max}$ and CoreMark CPI, the 6-stage achieves the highest throughput on this fabric (64.1\,MIPS on CoreMark, 70.7\,MIPS on Diagnostic): its 67\% frequency advantage over the 4-stage more than compensates for its higher CPI.
 The 7-stage reaches 56.9\,MIPS (11\% below the 6-stage) and the 8-stage 53.9\,MIPS, confirming that stages beyond 6 degrade net throughput on this Artix-7 fabric.
+Fig.~\ref{fig:throughput} plots throughput across depths, showing the 6-stage peak.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{throughput_comparison.png}
+\caption{Effective throughput (MIPS $= F_{\max}/\text{CPI}$) across pipeline depths on CoreMark. The 6-stage is the peak: it captures the full execute-split frequency gain at moderate CPI, while deeper pipelines pay higher CPI without further frequency.}
+\label{fig:throughput}
+\end{figure}
 
 \section{Speculative GHR Forwarding}
 \label{sec:sgf}
