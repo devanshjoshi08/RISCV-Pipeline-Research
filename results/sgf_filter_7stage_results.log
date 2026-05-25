@@ -1,0 +1,48 @@
+=== SGF Confidence-Filter Evaluation (7-stage, gshare) ===
+=== Mon May 25 13:38:46 -0500 2026 ===
+=== CONF_FILTER=0 is the shipped SGF (self-check vs 101,418 CoreMark); CONF_FILTER=1 is the filtered variant ===
+
+--- CoreMark  CONF_FILTER=0 ---
+Time resolution is 1 ps
+=== CoreMark (CONF_FILTER=0): rv32i_pipeline_7stage_sgf_top ===
+  Cycles:         5696997
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 101418
+  CPI:            1.96
+  Mispredict%:    14.08%
+$finish called at time : 57022115 ns : File "D:/RISCV-Vivado/sgf_filter/7s_sgf_CoreMark_cf0_tb.sv" Line 51
+
+--- CoreMark  CONF_FILTER=1 ---
+Time resolution is 1 ps
+=== CoreMark (CONF_FILTER=1): rv32i_pipeline_7stage_sgf_top ===
+  Cycles:         5751002
+  Instructions:   2893145
+  Branches:       719810
+  Mispredictions: 117207
+  CPI:            1.98
+  Mispredict%:    16.28%
+$finish called at time : 57562165 ns : File "D:/RISCV-Vivado/sgf_filter/7s_sgf_CoreMark_cf1_tb.sv" Line 51
+
+--- statemate  CONF_FILTER=0 ---
+Time resolution is 1 ps
+=== statemate (CONF_FILTER=0): rv32i_pipeline_7stage_sgf_top ===
+  Cycles:         4692103
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 56627
+  CPI:            1.48
+  Mispredict%:    15.04%
+$finish called at time : 46953165 ns : File "D:/RISCV-Vivado/sgf_filter/7s_sgf_statemate_cf0_tb.sv" Line 51
+
+--- statemate  CONF_FILTER=1 ---
+Time resolution is 1 ps
+=== statemate (CONF_FILTER=1): rv32i_pipeline_7stage_sgf_top ===
+  Cycles:         4685209
+  Instructions:   3160225
+  Branches:       376291
+  Mispredictions: 54329
+  CPI:            1.48
+  Mispredict%:    14.43%
+$finish called at time : 46884225 ns : File "D:/RISCV-Vivado/sgf_filter/7s_sgf_statemate_cf1_tb.sv" Line 51
+

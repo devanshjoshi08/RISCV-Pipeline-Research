@@ -9,7 +9,12 @@ import pkg_riscv::*;
 module branch_predictor_sgf #(
   parameter PHT_DEPTH  = 64,
   parameter BTB_DEPTH  = 32,
-  parameter RAS_DEPTH  = 4
+  parameter RAS_DEPTH  = 4,
+  // Confidence filter: build-time option, OFF by default (= shipped SGF behavior).
+  // When 1, the speculative GHR shift is suppressed while the indexing PHT counter
+  // is saturated, so a rare misprediction on a strongly-biased branch cannot
+  // pollute the speculative history. Default 0 leaves the datapath unchanged.
+  parameter CONF_FILTER = 0
 )(
   input  logic        clk, rst_n,
 
@@ -82,6 +87,12 @@ module branch_predictor_sgf #(
   logic pht_taken;
   assign pht_taken = pht[pht_predict_idx][1];
 
+  // Confidence-filter signal: the indexing PHT counter is saturated (strongly
+  // biased taken or not-taken). Only consulted when CONF_FILTER = 1.
+  logic pht_saturated;
+  assign pht_saturated = (pht[pht_predict_idx] == 2'b11) ||
+                         (pht[pht_predict_idx] == 2'b00);
+
   // Export current spec_ghr as checkpoint for pipeline forwarding
   assign ghr_checkpoint_out = spec_ghr;
 
@@ -133,7 +144,7 @@ module branch_predictor_sgf #(
       // On every conditional branch prediction, shift the predicted direction
       // into spec_ghr. This keeps the history fresh for the next prediction,
       // even if the current branch hasn't resolved yet.
-      if (is_conditional_branch && !flush) begin
+      if (is_conditional_branch && !flush && !(CONF_FILTER && pht_saturated)) begin
         spec_ghr <= {spec_ghr[PHT_IDX-2:0], predict_taken};
       end
 
