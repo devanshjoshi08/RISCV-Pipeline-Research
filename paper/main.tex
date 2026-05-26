@@ -102,7 +102,7 @@ First, we construct a controlled experiment that cleanly separates the CPI cost 
 
 Two controls establish that Mechanism~B is causal rather than correlational: a bimodal predictor (no GHR) shows \emph{zero} depth-dependent inflation on the same workloads, and a 32$\times$ PHT capacity sweep shows the inflation is not a table-size aliasing artifact (Section~\ref{sec:causal}). A first-order CPI model ($R^2 = 0.977$, $R^2_{\text{CV}} = 0.941$) captures the depth decomposition (Section~\ref{sec:model}).
 
-Second, we propose Speculative GHR Forwarding (SGF), an implementation and measurement contribution rather than a new predictor. Speculative history with checkpoint restore is established \cite{yeh1991two, kessler1999alpha}; SGF does not reinvent it. The novelty is twofold. The first part is the \emph{in-order, ROB-free realization}. An in-order single-issue pipeline admits no nested or out-of-order rollback (Section~\ref{sec:sgf_integration}), so a single GHR checkpoint forwarded through the \emph{existing} pipeline registers is provably sufficient. It replaces the reorder buffer or branch stack that ASIC schemes require. The second is the \emph{controlled demonstration} that stale GHR state measurably degrades deep pipelines on Artix-7, isolated from the inherent flush penalty so that SGF removes only the correctable Mechanism~B. On the 7-stage pipeline SGF cuts mispredictions 31.4\% on CoreMark and 22.7\% on statemate, pushing deep-pipeline counts \emph{below} the shallow-pipeline baseline, at 49~LUTs and 57~FFs (0.7\% area, no frequency loss). The benefit reproduces on a tournament and a downscaled TAGE predictor (Section~\ref{sec:generalization}); the sub-1\% cost holds for single-history predictors and grows on multi-table TAGE.
+Second, we propose Speculative GHR Forwarding (SGF), an implementation and measurement contribution rather than a new predictor. Speculative history with checkpoint restore is established \cite{yeh1991two, kessler1999alpha}; SGF does not reinvent it. The novelty is twofold. The first part is the \emph{in-order, ROB-free realization}. An in-order single-issue pipeline admits no nested or out-of-order rollback (Section~\ref{sec:sgf_integration}), so a single GHR checkpoint forwarded through the \emph{existing} pipeline registers is provably sufficient. It needs no reorder buffer or branch stack; what is new is reusing the in-order pipeline's \emph{existing} registers for recovery, not the rollback idea. The second is the \emph{controlled measurement} that stale GHR state degrades deep pipelines on Artix-7, isolated from the inherent flush penalty so that SGF removes only the correctable Mechanism~B. On the 7-stage pipeline SGF cuts mispredictions 31.4\% on CoreMark and 22.7\% on statemate at 49~LUTs and 57~FFs (0.7\% area, no frequency loss). The benefit reproduces on a tournament and a downscaled TAGE predictor (Section~\ref{sec:generalization}); the sub-1\% cost holds for single-history predictors and grows on multi-table TAGE.
 
 The value is a favorable cost-benefit tradeoff, not a large speedup: Mechanism~B is one of several depth costs, so the 31\% misprediction cut is a roughly 3\% CPI gain, and SGF does not let a deeper pipeline out-throughput the 6-stage. Its use case is a depth \emph{already forced} by timing, such as a registered-BRAM fetch that mandates the IF1/IF2 split, where the stale-GHR penalty is otherwise unavoidable. At under 1\% area and no frequency loss it is a low-risk addition to any gshare-class in-order pipeline with three or more stages of update latency; the gain is largest with tightly coupled memory and dilutes under cache-miss stalls (Sections~\ref{sec:cache_miss}, \ref{sec:generalization}).
 
@@ -426,7 +426,7 @@ Fig.~\ref{fig:throughput} plots throughput across depths, showing the 6-stage pe
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.52\columnwidth]{throughput_comparison.png}
-\caption{Effective throughput (MIPS $= F_{\max}/\text{CPI}$) across pipeline depths on CoreMark. The 6-stage is the peak: it captures the full execute-split frequency gain at moderate CPI, while deeper pipelines pay higher CPI without further frequency.}
+\caption{Effective throughput (MIPS $= F_{\max}/\text{CPI}$, derived from post-PnR $F_{\max}$ and RTL-simulation CPI) across pipeline depths on CoreMark. The 6-stage is the peak: it captures the full execute-split frequency gain at moderate CPI, while deeper pipelines pay higher CPI without further frequency.}
 \label{fig:throughput}
 \end{figure}
 
@@ -598,7 +598,7 @@ The hardware cost, in contrast, does not generalize uniformly, and the measureme
 
 \begin{table}[t]
 \centering
-\caption{SGF misprediction change ($\Delta$) across three predictor families on the 7-stage pipeline (Artix-7). Instruction and branch counts are identical between each baseline and its SGF variant, so the deltas are exact. Section~\ref{sec:generalization} interprets the trends.}
+\caption{SGF misprediction change ($\Delta$, RTL simulation) across three predictor families on the 7-stage pipeline (Artix-7). Instruction and branch counts are identical between each baseline and its SGF variant, so the deltas are exact. Section~\ref{sec:generalization} interprets the trends.}
 \label{tab:families}
 \small
 \begin{tabular}{@{}l rrr@{}}
@@ -704,7 +704,7 @@ The only architectural difference is the presence of a GHR in the prediction ind
 
 \begin{table}[t]
 \centering
-\caption{Bimodal predictor (no GHR) misprediction counts on CoreMark and statemate. The counts are identical across all five depths: zero Mechanism~B inflation.}
+\caption{Bimodal predictor (no GHR) misprediction counts (RTL simulation) on CoreMark and statemate. The counts are identical across all five depths: zero Mechanism~B inflation.}
 \label{tab:bimodal}
 \small
 \begin{tabular}{@{}lcc@{}}
