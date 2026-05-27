@@ -11,7 +11,7 @@ Time resolution is 1 ps
   Mispredictions: 101418
   CPI:            1.96
   Mispredict%:    14.08%
-$finish called at time : 57022115 ns : File "D:/RISCV-Vivado/sgf_filter/7s_sgf_CoreMark_cf0_tb.sv" Line 51
+$finish called at time : 57022115 ns : File "7s_sgf_CoreMark_cf0_tb.sv" Line 51
 
 --- CoreMark  CONF_FILTER=1 ---
 Time resolution is 1 ps
@@ -22,7 +22,7 @@ Time resolution is 1 ps
   Mispredictions: 117207
   CPI:            1.98
   Mispredict%:    16.28%
-$finish called at time : 57562165 ns : File "D:/RISCV-Vivado/sgf_filter/7s_sgf_CoreMark_cf1_tb.sv" Line 51
+$finish called at time : 57562165 ns : File "7s_sgf_CoreMark_cf1_tb.sv" Line 51
 
 --- statemate  CONF_FILTER=0 ---
 Time resolution is 1 ps
@@ -33,7 +33,7 @@ Time resolution is 1 ps
   Mispredictions: 56627
   CPI:            1.48
   Mispredict%:    15.04%
-$finish called at time : 46953165 ns : File "D:/RISCV-Vivado/sgf_filter/7s_sgf_statemate_cf0_tb.sv" Line 51
+$finish called at time : 46953165 ns : File "7s_sgf_statemate_cf0_tb.sv" Line 51
 
 --- statemate  CONF_FILTER=1 ---
 Time resolution is 1 ps
@@ -44,5 +44,5 @@ Time resolution is 1 ps
   Mispredictions: 54329
   CPI:            1.48
   Mispredict%:    14.43%
-$finish called at time : 46884225 ns : File "D:/RISCV-Vivado/sgf_filter/7s_sgf_statemate_cf1_tb.sv" Line 51
+$finish called at time : 46884225 ns : File "7s_sgf_statemate_cf1_tb.sv" Line 51
 
