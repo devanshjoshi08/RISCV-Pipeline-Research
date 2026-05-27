@@ -1,18 +1,13 @@
 \documentclass[acmsmall,nonacm,screen]{acmart}
 
-% acmart provides graphicx, booktabs, hyperref, xcolor, url, amsmath.
 \usepackage{amssymb}
 \usepackage{multirow}
 
 \graphicspath{{figures/}}
 
-% "nonacm" strips the ACM publication apparatus (copyright/address footnotes,
-% reference format, journal volume/issue/DOI strip) for a clean draft.
 \settopmatter{printacmref=false}
 \acmJournal{TRETS}
 
-% Number supplementary floats S1, S2, ... so they are unambiguous from the
-% main paper, which refers to them by these labels.
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\thetable}{S\arabic{table}}
 
@@ -41,11 +36,12 @@
 \maketitle
 
 \noindent
-This supplement collects corroborating figures and one modeled table referenced
-from the main paper. All data are reproduced from the same measured runs; nothing
-here is required to follow the main argument, which is why these floats are placed
-out of line. Section numbers (S\ldots) and float labels (Fig.~S\ldots, Table~S\ldots)
-match the citations in the main text.
+This supplement collects corroborating figures and tables referenced from the main
+paper, plus a Mechanism-B susceptibility screen on two additional workloads. Most are
+reproduced from the same measured runs; the cache-miss table is modeled, as noted
+there. Nothing here is required to follow the main argument, which is why these floats
+are placed out of line. Section numbers (S\ldots) and float labels (Fig.~S\ldots,
+Table~S\ldots) match the citations in the main text.
 
 \section{Area Scaling with Depth}
 \label{sup:area}
@@ -209,27 +205,31 @@ Workload base ($\gamma_w$)             & \multicolumn{5}{c}{0.45 (depth-invarian
 
 \section{Mechanism-B Susceptibility by Inter-Branch Distance}
 \label{sup:ibd}
-Table~\ref{tab:ibd} classifies the seven workloads by inter-branch distance (IBD) and
-observed Mechanism~B behavior. The two workloads that exhibit Mechanism~B (CoreMark,
-statemate) have IBD~$\leq$~8.4 and data-dependent outcomes; workloads with larger IBD
-or highly biased outcomes show no depth-dependent variation.
+Table~\ref{tab:ibd} classifies the workloads by inter-branch distance (IBD) and
+observed Mechanism~B behavior. Four workloads exhibit Mechanism~B. CoreMark and
+statemate are from the main suite; huffbench and sglib-combined are from the
+susceptibility screen (Section~\ref{sup:screen}). All four have IBD below 10 and
+data-dependent outcomes. Workloads with larger IBD or highly biased outcomes show no
+depth-dependent variation.
 
 \begin{table}[h]
 \centering
-\caption{Mechanism~B susceptibility classified by inter-branch distance (IBD) and branch outcome predictability.}
+\caption{Mechanism~B susceptibility classified by inter-branch distance (IBD) and branch outcome predictability. huffbench and sglib-combined are from the susceptibility screen (Section~\ref{sup:screen}); their inflation is measured against the 4-stage reference.}
 \label{tab:ibd}
 \small
 \begin{tabular}{@{}lccc@{}}
 \toprule
 \textbf{Workload} & \textbf{IBD} & \textbf{Outcome type} & \textbf{Mech.~B?} \\
 \midrule
-CoreMark   & 4.0  & Data-dependent  & Yes (+5.7\%) \\
-statemate  & 8.4  & Data-dependent  & Yes (+10\%) \\
-edn        & 8.8  & Mixed           & No \\
-aha-mont64 & 8.7  & Biased loops    & No \\
-Diagnostic & 3.8  & Structured      & No \\
-Dhrystone  & 7.3  & Structured      & No \\
-crc32      & 23.0 & Highly biased   & No \\
+CoreMark       & 4.0  & Data-dependent  & Yes (+5.7\%) \\
+statemate      & 8.4  & Data-dependent  & Yes (+10\%) \\
+huffbench      & 3.3  & Data-dependent  & Yes (+2.0\%) \\
+sglib-combined & 4.0  & Data-dependent  & Yes (+2.4\%) \\
+edn            & 8.8  & Mixed           & No \\
+aha-mont64     & 8.7  & Biased loops    & No \\
+Diagnostic     & 3.8  & Structured      & No \\
+Dhrystone      & 7.3  & Structured      & No \\
+crc32          & 23.0 & Highly biased   & No \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -257,6 +257,55 @@ IF2 prediction bubble     & 0 & 0 & 0 & 1\,cy & 1\,cy \\
 Predictor update latency  & 2 & 2 & 3 & 4 & 4 \\
 \bottomrule
 \end{tabular}
+\end{table}
+
+\section{Mechanism-B Susceptibility Screen}
+\label{sup:screen}
+The main suite has two Mechanism-B workloads. To broaden the evidence, we screened two
+further low-IBD, data-dependent Embench-IoT kernels, huffbench (IBD 3.28) and
+sglib-combined (IBD 4.00). Table~\ref{tab:screen} reports their misprediction counts
+across depth and under SGF. Both rise over the 4-stage reference into the deep tier,
+the Mechanism-B signature, and SGF reduces the count at the 6-, 7-, and 8-stage.
+
+These kernels need a 16\,KB data memory to fit, whereas the main suite uses 8\,KB.
+Data-memory size changes synthesis area, frequency, and power, but not the
+control-path misprediction counts measured here. We also use the 4-stage as the
+shallow reference, not the 4/5-stage pair used for the main suite. These kernels have
+branches that depend on nearby loads. The 5-stage load-use stall shifts those branches
+by one cycle and lowers its count slightly, while the 4-stage has no such stall. The
+4-stage is therefore the cleaner baseline. This effect is confined to the shallow tier
+and does not change the deep-tier rise or the SGF reduction.
+
+Under SGF, sglib-combined's 8-stage reduction (17.5\%) is smaller than its 7-stage
+(21.8\%), a wider 7-to-8 gap than the main suite shows. The same load-dependent branch
+timing acts through the 8-stage's dual load-use stall.
+
+The bimodal and PHT-capacity controls that isolate Mechanism~B causally were run on the
+main suite, not on these kernels. The predictor-family (tournament, TAGE) and \texttt{-O2}
+robustness studies likewise use the main suite. The screen evaluates the default gshare
+predictor at \texttt{-O1}, and tests only whether more workloads show the effect. Here the
+depth-dependent rise and the SGF response are consistent with that mechanism, on the same
+gshare predictor. As in the main suite, the SGF reduction exceeds the baseline inflation
+because SGF removes the full update latency, not only its depth-dependent slice.
+
+\begin{table}[h]
+\centering
+\caption{Mechanism-B susceptibility screen: misprediction counts (RTL simulation) for two additional Embench-IoT kernels across depth and under SGF. Instruction and branch counts are identical across depths (huffbench 2{,}098{,}752/638{,}859; sglib-combined 2{,}431{,}970/607{,}229). The 7- and 8-stage baselines are equal, as in the main suite.}
+\label{tab:screen}
+\small
+\begin{tabular}{@{}l c rrr rrr@{}}
+\toprule
+& & \multicolumn{3}{c}{\textbf{Baseline mispred}} & \multicolumn{3}{c}{\textbf{SGF mispred}} \\
+\cmidrule(lr){3-5} \cmidrule(lr){6-8}
+\textbf{Workload} & \textbf{IBD} & \textbf{4-stg} & \textbf{6-stg} & \textbf{7/8-stg} & \textbf{6-stg} & \textbf{7-stg} & \textbf{8-stg} \\
+\midrule
+huffbench      & 3.28 & 187{,}420 & 191{,}088 & 191{,}090 & 109{,}903 & 109{,}903 & 110{,}192 \\
+sglib-combined & 4.00 & 171{,}291 & 175{,}477 & 175{,}043 & 140{,}026 & 136{,}959 & 144{,}334 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2mm}
+{\footnotesize SGF reduction vs.\ the same-depth baseline. huffbench: $-$42.5\%, $-$42.5\%, $-$42.3\% at 6/7/8-stage. sglib-combined: $-$20.2\%, $-$21.8\%, $-$17.5\% at 6/7/8-stage. CPI falls at every depth (huffbench 1.86$\to$1.74 at 6-stage, 2.12$\to$1.96 at 7-stage).}
 \end{table}
 
 \end{document}

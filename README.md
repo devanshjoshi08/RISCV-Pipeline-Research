@@ -93,6 +93,11 @@ source scripts/run_sgf_eval.tcl         ;# SGF 7/8-stage bench + synth
                                        ;#   -> results/sgf_benchmark_results.log, results/sgf_synth_results.log
 source scripts/run_sgf_6stage.tcl      ;# SGF on the 6-stage (recommended depth)
 
+# --- Mechanism-B susceptibility screen (additional Embench-IoT kernels) ---
+# Build the kernel hex first:  bash scripts/build_extra_embench.sh
+source scripts/run_extra_embench.tcl   ;# huffbench, sglib-combined: baseline + 6/7/8-stage SGF
+                                       ;#   -> results/extra_embench_results.log
+
 # --- Generalization to other predictor families (measured, 7-stage) ---
 source scripts/run_tournament_7stage.tcl ;# tournament -> results/tournament_results.log, tournament_synth_results.log
 source scripts/run_tage_7stage.tcl       ;# downscaled TAGE -> results/tage_results.log, tage_synth_results.log
@@ -128,6 +133,7 @@ Every code-backed claim in the paper, mapped to the source / script / committed 
 | Mechanism B is **not** PHT aliasing (32→1024 sweep, inflation persists) | `results/pht_sweep_coremark_results.log` |
 | SGF: −31.4% CoreMark / −22.7% statemate, +0.7% area, no F_max loss | `rtl/branch_predictor_sgf.sv`, `rtl_7stage/rv32i_pipeline_7stage_sgf_top.sv` → `results/sgf_benchmark_results.log`, `results/sgf_synth_10seeds_results.log` (10-directive F_max) |
 | SGF on the 6-stage (−23.9% CoreMark) | `rtl/rv32i_pipeline_sgf_top.sv`, `scripts/run_sgf_6stage.tcl` → `results/sgf_6stage_results.log` |
+| Mechanism B reproduces on two further screened kernels (huffbench, sglib-combined; SGF −42% / −22% at 7-stage) | `scripts/build_extra_embench.sh`, `scripts/run_extra_embench.tcl` → `results/extra_embench_results.log` |
 | Analytical CPI model R² = 0.977, R²_CV = 0.941 (LOWO) | `scripts/generate_plots_5depth.py` (fit + `cpi_vs_depth`); inputs are the benchmark logs above |
 | Workload-SAIF power *falls* with depth (0.235→0.217 W, opposite to uniform-toggle) | `scripts/run_saif_workload.tcl` → `results/saif_workload_results.log`; fig `scripts/regen_power_figs.py` |
 | SGF benefit survives `-O2` (CoreMark −43.6%, statemate −12.0%; IBD stays < 10) | `scripts/build_O2_benchmarks.sh`, `scripts/run_O2_7stage.tcl` → `results/o2_7stage_results.log` |
@@ -189,6 +195,13 @@ crc32, statemate, edn). Sources and prebuilt hex are under
 [`programs/`](programs/) (`asm/`, `c/`, `coremark/`, `embench/`). Each reads the
 hardware counters before/after and stores results to data memory for testbench
 readout.
+
+A supplementary **Mechanism-B susceptibility screen** adds two further low-IBD,
+data-dependent Embench-IoT kernels (huffbench, sglib-combined). Both are
+Mechanism-B positive and SGF removes the inflation at the 6/7/8-stage, bringing
+the count of workloads exhibiting Mechanism B to four. Build with
+[`scripts/build_extra_embench.sh`](scripts/build_extra_embench.sh) and run with
+[`scripts/run_extra_embench.tcl`](scripts/run_extra_embench.tcl) → `results/extra_embench_results.log`.
 
 ## Repository layout
 

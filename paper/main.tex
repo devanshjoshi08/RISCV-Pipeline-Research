@@ -1,25 +1,18 @@
 \documentclass[acmsmall,nonacm,screen]{acmart}
 
-% acmart provides graphicx, booktabs, hyperref, xcolor, url, amsmath.
 \usepackage{amssymb}
 \usepackage{multirow}
 \usepackage{enumitem}
 
 \graphicspath{{figures/}}
 
-% Draft: tighten vertical whitespace around floats and lists to compress the
-% layout (revert for the camera-ready ACM submission).
 \setlist{topsep=2pt, itemsep=2pt, parsep=0pt}
-\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
-\setlength{\floatsep}{8pt plus 2pt minus 2pt}
-\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\belowcaptionskip}{0pt}
 
-% --- Draft: "nonacm" strips the entire ACM publication apparatus (the
-% copyright/permission footnote, the authors'-address footnote, the ACM
-% reference format, and the journal volume/issue/DOI strip), all of which are
-% only assigned by ACM at acceptance and otherwise print placeholder text.
-% For the actual TRETS submission, remove "nonacm" and add the "review" option
-% (which adds the line numbers reviewers use).
 \settopmatter{printacmref=false}
 \acmJournal{TRETS}
 
@@ -28,6 +21,7 @@
 \title{Speculative GHR Forwarding: Eliminating Stale Branch-Predictor State in Deep FPGA Pipelines}
 
 \author{Devansh Joshi}
+\orcid{0009-0000-0357-2002}
 \affiliation{%
   \institution{The University of Texas at Austin}
   \department{Department of Electrical and Computer Engineering}
@@ -37,6 +31,7 @@
 \email{devansh.jos@utexas.edu}
 
 \author{Shafin Ula}
+\orcid{0009-0001-2566-3228}
 \affiliation{%
   \institution{The University of Texas at Austin}
   \department{Department of Electrical and Computer Engineering}
@@ -97,7 +92,7 @@ First, we construct a controlled experiment that cleanly separates the CPI cost 
 
 \begin{itemize}
 \item \textbf{Mechanism~A (inherent):} Higher per-misprediction flush penalty from additional stages to drain. Present on all workloads, predictable from pipeline structure alone.
-\item \textbf{Mechanism~B (correctable):} Inflated misprediction count from stale GHR state. Present only on branch-dense, data-dependent workloads, two of our seven (+5.7\% on CoreMark at 6-stage, +10\% on statemate at 7/8-stage), and unpredictable without cycle-accurate simulation.
+\item \textbf{Mechanism~B (correctable):} Inflated misprediction count from stale GHR state, present only on branch-dense, data-dependent workloads and unpredictable without cycle-accurate simulation. Four workloads exhibit it: CoreMark (+5.7\% at 6-stage) and statemate (+10\% at 7/8-stage) in the main suite, plus huffbench and sglib-combined in a supplementary screen.
 \end{itemize}
 
 Two controls establish that Mechanism~B is causal rather than correlational: a bimodal predictor (no GHR) shows \emph{zero} depth-dependent inflation on the same workloads, and a 32$\times$ PHT capacity sweep shows the inflation is not a table-size aliasing artifact (Section~\ref{sec:causal}). A first-order CPI model ($R^2 = 0.977$, $R^2_{\text{CV}} = 0.941$) captures the depth decomposition (Section~\ref{sec:model}).
@@ -153,12 +148,12 @@ This work                     & 4--8 (shared RTL) & gshare+SGF     & yes \\
 Correlation predictors key a pattern-history table on global branch history. gshare \cite{mcfarling1993combining} XORs that history with the PC; tournament predictors add a chooser between global and local components; TAGE \cite{seznec2011tage} uses several tagged tables at geometric history lengths; and perceptron predictors \cite{jimenez2001dynamic} are a neural alternative. All of them index on a global history register, so all are exposed to the stale-GHR effect this paper isolates, and we measure three of the four.
 
 Speculative GHR updating with checkpoint rollback is long established and is \emph{not} what we claim as new.
-Yeh and Patt \cite{yeh1991two} describe speculative history; out-of-order ASICs recover it through the reorder buffer or a branch stack (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}), structures that tie to out-of-order state (the R10000's branch stack checkpoints the register-rename map) and that an in-order soft core lacks. In-order ASIC pipelines have likewise used shift-register history with checkpoint/mask restore, but as dedicated recovery logic. SGF's contribution is the in-order FPGA realization that instead reuses the \emph{existing} pipeline registers (Section~\ref{sec:sgf}), not the rollback concept.
-In tagged predictors stale GHR corrupts both index and tag (a different error profile than gshare), needing per-table checkpoints \cite{seznec2011tage, seznec2006revisiting}; Michaud et al.\ \cite{michaud1999trading} note that update latency compounds with PHT aliasing.
+Yeh and Patt \cite{yeh1991two} describe speculative history, and Jourdan et al.\ \cite{jourdan1997recovery} established the recovery requirements for branch-history structures under mispredicted-path execution; out-of-order ASICs recover it through the reorder buffer or a branch stack (Alpha~21264 \cite{kessler1999alpha}, MIPS~R10000 \cite{yeager1996mips}), structures that tie to out-of-order state (the R10000's branch stack checkpoints the register-rename map) and that an in-order soft core lacks. In-order ASIC pipelines have likewise used shift-register history with checkpoint/mask restore, and return-address-stack repair handles the analogous return corruption \cite{skadron1998improving}. Both rely on dedicated recovery logic. SGF's contribution is the in-order FPGA realization that instead reuses the \emph{existing} pipeline registers (Section~\ref{sec:sgf}), not the rollback concept.
+In tagged predictors stale GHR corrupts both index and tag (a different error profile than gshare), needing per-table checkpoints \cite{seznec2011tage, seznec2006revisiting} whose storage cost warrants dedicated hardware in out-of-order TAGE \cite{schlais2016badgr}; Michaud et al.\ \cite{michaud1999trading} note that update latency compounds with PHT aliasing.
 
 \subsection{FPGA Pipeline Studies}
 
-Prior surveys catalog pipelining techniques across RISC families \cite{biglari2019pipelining}, and configurable generators such as Rocket Chip \cite{asanovic2016rocket} offer parameterizable pipelines with branch-prediction front-ends.
+Configurable generators such as Rocket Chip \cite{asanovic2016rocket} offer parameterizable pipelines with branch-prediction front-ends.
 Such generators and other in-order soft cores carry lightweight branch-recovery state (PC redirect, BTB/RAS checkpoints), but none, to our knowledge, speculatively checkpoints and forwards the \emph{global history register} of a correlation predictor in an in-order FPGA pipeline, nor isolates pipeline depth as a controlled FPGA variable.
 The FPGA-specific study of Kuon and Rose \cite{kuon2007measuring} characterizes the LUT-routing delay gap that makes FPGA pipelining differ from ASIC pipelining, but does not examine branch-prediction interactions.
 
@@ -247,6 +242,8 @@ Each benchmark reads the hardware performance counters (\texttt{mcycle}, \texttt
 Functional correctness is verified by confirming that all five pipeline variants produce identical instruction counts, branch counts, and memory checksums for each workload.
 
 The seven workloads, listed as (instructions, branches, branch frequency), are: \textbf{Dhrystone~2.1} \cite{hennessy2017computer} (2{,}926, 400, 13.7\%); a mixed \textbf{Diagnostic} program exercising arithmetic, load/store, calls, and conditional branches (1{,}367, 360, 26.3\%); official EEMBC \textbf{CoreMark} \cite{coremark} (10 iterations, PERFORMANCE\_RUN; 2{,}893{,}145, 719{,}810, 24.9\%); and four Embench-IoT \cite{embench2019} kernels, \textbf{aha-mont64} (Montgomery multiply, multiply-heavy; 4{,}453{,}858, 512{,}593, 11.5\%), \textbf{crc32} (4{,}008{,}648, 174{,}591, 4.4\%; near-perfectly predictable, 0.19\% misprediction rate), \textbf{statemate} (FSM with data-dependent transitions; 3{,}160{,}225, 376{,}291, 11.9\%), and \textbf{edn} (signal processing; 2{,}972{,}527, 338{,}986, 11.4\%).
+
+The four Embench-IoT kernels span branch frequency and inter-branch distance, not the full suite. Other Embench kernels do not build for this RV32IM core: floating-point kernels (cubic, nbody, minver) need an FPU, nsichneu overflows the 16\,KB instruction memory, and others require a C library the bare-metal port omits. Two further low-IBD kernels, huffbench and sglib-combined, form a Mechanism-B susceptibility screen (Table~S6, supplementary material) that raises the Mechanism-B workload count from two to four.
 
 \section{Baseline Results}
 \label{sec:results}
@@ -367,8 +364,8 @@ On statemate, the 7/8-stage pipelines produce 73{,}263 versus 66{,}603 for the 4
 Mechanism~B requires two conditions: (1)~branches spaced closely enough that a new prediction occurs before the prior branch's resolution updates the PHT, and (2)~outcomes sensitive to global history.
 A useful proxy metric is the \emph{average inter-branch distance} (IBD), defined as $\text{IBD} = N / B$ where $N$ is total instructions and $B$ is total branches.
 Table~S4 (supplementary material) classifies our workloads by IBD and observed Mechanism~B behavior.
-The two workloads exhibiting Mechanism~B (CoreMark, statemate) have IBD~$\leq$~8.4 and data-dependent branch outcomes, while workloads with larger IBD or highly biased outcomes (crc32: 99.8\% taken) show no depth-dependent misprediction variation.
-This suggests a \emph{preliminary} indicator, not a validated design rule: SGF is likely beneficial when IBD~$<$~10 \emph{and} branches are data-dependent rather than loop-structured. Because this rests on only the two Mechanism-B workloads in our suite, we present it as an observation to test rather than a guideline to apply.
+The two main-suite workloads exhibiting Mechanism~B (CoreMark, statemate) have IBD~$\leq$~8.4 and data-dependent branch outcomes, while workloads with larger IBD or highly biased outcomes (crc32: 99.8\% taken) show no depth-dependent misprediction variation.
+This suggests a \emph{preliminary} indicator, not a validated design rule: SGF is likely beneficial when IBD~$<$~10 \emph{and} branches are data-dependent rather than loop-structured. This now rests on four Mechanism-B workloads (CoreMark and statemate, plus huffbench and sglib-combined in a supplementary screen), but we still present it as an observation to test rather than a guideline to apply.
 
 SGF eliminates precisely this unpredictable amplification on susceptible workloads. Two controls in Section~\ref{sec:causal} confirm the cause is GHR staleness, not an artifact: a no-GHR bimodal predictor shows \emph{zero} depth-dependent inflation on the same workloads, and a 32$\times$ PHT capacity sweep shows the inflation persists at every table size, excluding aliasing.
 
@@ -390,21 +387,21 @@ The 8-stage's $L(D) = 1.5$ is a structural average, not a single per-instruction
 
 The shared $\alpha$ (load-use) and $\beta$ (IF2 bubble) are fitted across all 35 points and $\gamma_w$ per workload (9 parameters for 35 observations), giving $\alpha = 0.145$, $\beta = 1.12$.
 Here $\alpha$ is the per-instruction \emph{frequency} of load-use hazards, not a per-stall cost. The value $\alpha < 1$ reflects that only $\sim$15\% of instructions are loads immediately consumed by the next operation, and $\alpha\,L(D)$ multiplies this frequency by the stall cycles each hazard incurs. Three-source forwarding resolves the remaining loads at zero penalty.
-We note the model's status precisely. Because the branch-flush term takes the \emph{measured} $M_w(D)$ as input, the model \emph{decomposes} observed CPI rather than predicting it ab initio on the two Mechanism-B workloads where $M_w$ varies with $D$. On the five workloads with depth-invariant $M_w$ it is genuinely predictive from architectural parameters. The LOWO test below isolates the depth-term accuracy from the $\gamma_w$ offset.
+Because the branch-flush term takes the \emph{measured} $M_w(D)$ as input, the model \emph{decomposes} observed CPI rather than predicting it ab initio on the two Mechanism-B workloads in this suite where $M_w$ varies with $D$. On the five workloads with depth-invariant $M_w$ it is genuinely predictive from architectural parameters. The LOWO test below isolates the depth-term accuracy from the $\gamma_w$ offset.
 
 This model achieves $R^2 = 0.977$ across all 35 data points (adjusted $R^2_{\text{adj}} = 0.969$, accounting for the 9 fitted parameters; mean absolute error 0.033\,CPI, maximum residual 0.086\,CPI), capturing 97.7\% of the variance compared to 67\% for a simple linear regression.
 
 The model's value is its decomposability: the branch-flush term carries measured (Mechanism A+B) misprediction counts, $\alpha = 0.145$ is the CPI cost per load-use stall cycle, and $\beta = 1.12$ scales the IF2-bubble cost by branch frequency.
-The per-workload base $\gamma_w$ ranges from $-0.01$ (multiply-dominated aha-mont64) to $0.48$ (load-heavy edn), capturing instruction-mix effects orthogonal to depth. Because it is orthogonal to depth, $\gamma_w$ is in principle estimable before implementation from the static instruction profile of the compiled binary (its load, multiply-divide, and branch frequencies) rather than from cycle-accurate simulation. Validating such a static estimator is future work; until then $\gamma_w$ is fitted.
+The per-workload base $\gamma_w$ ranges from $-0.01$ (multiply-dominated aha-mont64) to $0.48$ (load-heavy edn), capturing instruction-mix effects orthogonal to depth. Because it is orthogonal to depth, $\gamma_w$ could in principle be estimated from a binary's static instruction profile rather than by simulation, which we leave to future work.
 The 4-stage merges MEM/WB, eliminating load-use stalls (it enters the model with $L(D)=0$) at the cost of a longer critical path. That lengthening is a \emph{frequency} effect (in $F_{\max}$), not a CPI term, and the 4-stage residual stays $\leq$0.04\,CPI.
 
 \textbf{Cross-validation and status.}
 Leave-one-workload-out (LOWO) cross-validation refits on 30 points per fold and predicts the held-out workload from the depth-dependent terms, with $\gamma_w$ set to the training mean. It gives $R^2_{\text{CV}} = 0.941$ (MAE 0.052\,CPI), with $\alpha$ and $\beta$ stable across folds ($0.14 \pm 0.01$, $1.10 \pm 0.05$). The largest errors fall on edn and Diagnostic, at the extremes of the instruction-mix distribution.
 The model is thus \emph{predictive} for its depth-dependent terms (validated out-of-sample) and \emph{descriptive} for the fitted per-workload $\gamma_w$; the depth decomposition, not absolute cross-workload CPI prediction, is what we claim.
-Because $\alpha$ and $\beta$ barely move across folds, the gap between $R^2_{\text{CV}}$ and in-sample $R^2$ is almost entirely $\gamma_w$-substitution error, not depth-term error; an extreme instruction mix such as floating-point-heavy code would enlarge only that term.
+Because $\alpha$ and $\beta$ barely move across folds, the gap between $R^2_{\text{CV}}$ and in-sample $R^2$ is almost entirely $\gamma_w$-substitution error, not depth-term error.
 Residuals have mean 0 and standard deviation 0.038\,CPI with no depth pattern; the largest ($+$0.086 on 6-stage CoreMark) reflects the smooth $M_w(D)$ slightly under-capturing the depth-6 misprediction jump.
 
-Table~S3 (supplementary material) decomposes CoreMark CPI into the four additive terms of Eq.~\ref{eq:cpi_model} on top of the ideal 1.00: a depth-invariant base ($\gamma_w = 0.45$), a branch-flush term growing with depth (Mechanism~A, including the Mechanism~B rise at depth~6), a load-use term, and an IF2-bubble term present only at 7/8-stage. Summed, they match measured CPI within the residual ($\leq$0.09) at every depth.
+Table~S3 (supplementary material) decomposes CoreMark CPI into the four additive terms of Eq.~\ref{eq:cpi_model}. Summed, they match measured CPI within the residual ($\leq$0.09) at every depth.
 Fig.~\ref{fig:cpimodel} overlays the model on the measured CPI for all seven workloads, and Figure~S2 (supplementary material) shows the residuals carry no depth-dependent bias.
 
 \begin{figure}[t]
@@ -507,6 +504,7 @@ DSP48E1           & 12            & 12            & 12            & 12 \\
 \label{sec:sgf_bench}
 
 Table~\ref{tab:sgf_mispred} presents the measured misprediction counts and CPI with SGF enabled on the 7- and 8-stage pipelines.
+We apply SGF at the 6/7/8-stage depths, where update latency is elevated. The 4/5-stage carry no depth-dependent penalty to remove and serve as the zero-inflation reference.
 All counts are from deterministic behavioral RTL simulation (Vivado XSim), not analytical estimates.
 
 \begin{table*}[t]
@@ -552,7 +550,7 @@ Section~\ref{sec:crc32} dissects this interaction and the confidence-filter coun
 \subsection{Key Finding: Deep-Pipeline Accuracy Below Shallow-Pipeline Baseline}
 \label{sec:sgf_key}
 
-SGF does not merely restore deep-pipeline accuracy to the shallow level; it pushes counts \emph{below} the 4/5-stage baseline: CoreMark 101{,}418 vs.\ 145{,}735 (30.4\% fewer), statemate 56{,}627 vs.\ 66{,}603 (15.0\%), aha-mont64 115{,}644 vs.\ 139{,}739 (17.2\%). The reason is the update-latency asymmetry: \texttt{spec\_ghr} has zero update latency while even the shallowest baseline has two stages, so when predictions are mostly correct (79.8\% on CoreMark) it approximates true history better than any latency-bound committed GHR. SGF is therefore beneficial at \emph{any} depth that uses global history, not only where Mechanism~B is measurable.
+SGF does not merely restore deep-pipeline accuracy to the shallow level; it pushes counts \emph{below} the 4/5-stage baseline: CoreMark 101{,}418 vs.\ 145{,}735 (30.4\% fewer), statemate 56{,}627 vs.\ 66{,}603 (15.0\%), aha-mont64 115{,}644 vs.\ 139{,}739 (17.2\%). The reason is the update-latency asymmetry: \texttt{spec\_ghr} has zero update latency while even the shallowest baseline has two stages, so when predictions are mostly correct (79.8\% on CoreMark) it approximates true history better than any latency-bound committed GHR. SGF is therefore beneficial even where Mechanism~B is not measurable, because the zero-latency speculative history is more accurate than the latency-bound committed history.
 
 This also explains why the 31.4\% reduction far exceeds the $+$5.7\% Mechanism~B inflation at the 6-stage: that figure is only the \emph{marginal} latency added by deepening, whereas SGF removes the \emph{entire} update latency, including the 2-stage component shared by every depth. Mechanism~B is the depth-dependent slice of a larger latency cost.
 
@@ -569,14 +567,14 @@ Under the baseline, a rare not-taken misprediction does not reach the GHR until 
 SGF instead shifts the wrong \texttt{0} into \texttt{spec\_ghr} immediately, so the next prediction uses a polluted PC\,XOR\,GHR index (a different, possibly untrained counter). This adds 1--3 mispredictions until correct predictions or the EX2 rollback restore the pattern.
 
 \textbf{A confidence filter would close it, at a cost.}
-Suppressing speculative updates when the PHT counter is saturated (one 2-bit comparator, no flip-flops) restores crc32 to its baseline 344 mispredictions. It also forfeits useful freshening on stably-biased hot branches, however: on CoreMark it raises mispredictions from 101{,}418 to 117{,}207, cutting SGF's reduction from 31.4\% to 20.7\%.
+Suppressing speculative updates when the PHT counter is saturated, a confidence-based gate \cite{jacobsen1996assigning} (one 2-bit comparator, no flip-flops), restores crc32 to its baseline 344 mispredictions. It also forfeits useful freshening on stably-biased hot branches, however: on CoreMark it raises mispredictions from 101{,}418 to 117{,}207, cutting SGF's reduction from 31.4\% to 20.7\%.
 The trade is lopsided: a 167-misprediction, zero-CPI blip on crc32 against $\sim$16{,}000 real CoreMark savings. We therefore ship SGF without the filter (crc32 CPI unchanged at 1.52, the extra flushes negligible against the loop runtime) and retain it only as a build-time option for crc-like, highly-biased workloads.
 
 \subsection{SGF at the 6-Stage Design Point}
 \label{sec:sgf_6stage}
 
 Because the 6-stage is the highest-throughput depth (Section~\ref{sec:throughput}), we also implemented SGF there, the same dual-GHR mechanism forwarded through the shorter IF/ID/EX1/EX2 path. On CoreMark it reduces mispredictions from 154{,}077 to 117{,}207 ($-$23.9\%, CPI 1.83$\to$1.79) and on statemate from 69{,}933 to 54{,}329 ($-$22.3\%, CPI 1.37$\to$1.35), with identical instruction and branch counts.
-The reduction is smaller than at 7/8-stage ($-$31.4\%) because the 6-stage's 3-stage update latency leaves less staleness to correct, consistent with Mechanism~B scaling with depth. The biased-branch edge case (Section~\ref{sec:crc32}) recurs as small CPI-neutral increases. SGF is thus beneficial at every depth with nonzero update latency.
+The reduction is smaller than at 7/8-stage ($-$31.4\%) because the 6-stage's 3-stage update latency leaves less staleness to correct, consistent with Mechanism~B scaling with depth. The biased-branch edge case (Section~\ref{sec:crc32}) recurs as small CPI-neutral increases. SGF thus helps at every depth we measured with elevated update latency (6/7/8-stage).
 
 \subsection{Compiler-Optimization Sensitivity (\texttt{-O2})}
 \label{sec:o2}
@@ -594,7 +592,7 @@ The magnitude tracks how history-dependent each predictor is. The tournament red
 
 The biased-branch edge case of Section~\ref{sec:crc32} also generalizes but relocates with predictor structure: on gshare it raises crc32, while on TAGE it instead raises aha-mont64 ($+5.0\%$, CPI-neutral) as biased loops pollute the history-indexed tables, and crc32 itself improves. The saturated-provider confidence filter that fixes the gshare crc32 case does \emph{not} transfer to TAGE: we measured that it worsens aha-mont64 (to $+12.2\%$) and erodes the CoreMark reduction (to $-20.1\%$), because holding the speculative shift across TAGE's three history-indexed tables starves them of fresh history. We therefore report the unfiltered TAGE counts and accept the small, CPI-neutral aha-mont64 increase.
 
-The hardware cost, in contrast, does not generalize uniformly, and the measurements confirm the multi-table caveat of Section~\ref{sec:sgf_design}. On the tournament predictor SGF stays cheap: $+50$ LUTs ($0.6\%$), $+44$ flip-flops ($0.5\%$), and no frequency penalty ($112.6$ vs.\ $111.7$\,MHz across three seeds), since one forwarded global checkpoint corrects both the global PHT and the chooser. On TAGE the checkpoint flip-flops stay modest ($+74$), but LUTs grow $+2{,}434$ ($+21\%$). Each of the three geometric-history tables hashes its index and tag from the speculative history for the read and from the forwarded checkpoint for the write. That per-table dual hashing does not share. This is the super-linear growth anticipated in Section~\ref{sec:sgf_design}, now measured. TAGE is also expensive before SGF (about $1.5\times$ the gshare core's LUTs and a frequency tier slower, $\sim$94\,MHz), so it is not the predictor a resource-constrained soft core would choose on this fabric. SGF delivers a misprediction reduction at negligible cost on the single-global-history predictors (gshare, tournament) that suit such cores; on a multi-table predictor the benefit persists but the low cost does not.
+The hardware cost, in contrast, does not generalize uniformly, and the measurements confirm the multi-table caveat of Section~\ref{sec:sgf_design}. On the tournament predictor SGF stays cheap: $+50$ LUTs ($0.6\%$), $+44$ flip-flops ($0.5\%$), and no frequency penalty ($112.6$ vs.\ $111.7$\,MHz across three seeds), since one forwarded global checkpoint corrects both the global PHT and the chooser. On TAGE the checkpoint flip-flops stay modest ($+74$), but LUTs grow $+2{,}434$ ($+21\%$). Each of the three geometric-history tables hashes its index and tag from the speculative history for the read and from the forwarded checkpoint for the write. That per-table dual hashing does not share. This is the super-linear growth anticipated in Section~\ref{sec:sgf_design}, now measured. A banked GHR such as BADGR \cite{schlais2016badgr} could amortize this multi-table checkpoint cost. TAGE is also expensive before SGF (about $1.5\times$ the gshare core's LUTs and a frequency tier slower, $\sim$94\,MHz), so it is not the predictor a resource-constrained soft core would choose on this fabric. SGF delivers a misprediction reduction at negligible cost on the single-global-history predictors (gshare, tournament) that suit such cores; on a multi-table predictor the benefit persists but the low cost does not.
 
 \begin{table}[t]
 \centering
@@ -638,9 +636,9 @@ Table~S1 (supplementary material) works the 7-stage CoreMark case through four m
 \subsection{Scope and Design Guidance}
 \label{sec:guidance}
 
-We separate what generalizes from what does not. The mechanism is an \emph{architectural fact}: Mechanism~B arises for any global-history predictor with nonzero update latency, shown causally by the bimodal and PHT controls, so the decomposition and the ROB-free construction transfer. The \emph{magnitudes} are workload- and predictor-specific, and the IBD threshold is a \emph{heuristic} grounded in only two positive workloads (Section~\ref{sec:mispred}). SGF is a cost-benefit improvement, not a throughput gain, and the optimal-depth conclusion holds only under the stated \texttt{-O1}, benchmark, and single-cycle-memory boundaries (Sections~\ref{sec:cache_miss},~\ref{sec:limitations}).
+We separate what generalizes from what does not. The mechanism is an \emph{architectural fact}: Mechanism~B arises for any global-history predictor with nonzero update latency, shown causally by the bimodal and PHT controls, so the decomposition and the ROB-free construction transfer. The \emph{magnitudes} are workload- and predictor-specific, and the IBD threshold is a \emph{heuristic} grounded in four positive workloads (Section~\ref{sec:mispred}). SGF is a cost-benefit improvement, not a throughput gain, and the optimal-depth conclusion holds only under the stated \texttt{-O1}, benchmark, and single-cycle-memory boundaries (Sections~\ref{sec:cache_miss},~\ref{sec:limitations}).
 
-For RV32IM-class soft cores on Artix-7: the 6-stage is the highest-throughput depth (64.1\,MIPS CoreMark), capturing the full execute-split frequency benefit at moderate CPI; the 5-stage is dominated (4-stage frequency ceiling plus load-use stalls), useful only when area is binding; and the 7/8-stage match the 6-stage frequency but pay higher CPI, justified only when the IF split resolves a real timing bottleneck such as synchronous BRAM. SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF: $58.7$ vs.\ 64.1\,MIPS), but is worth adding at any forced depth with $\geq$3 stages of update latency, including the 6-stage ($-$23.9\% CoreMark), for 0.5--0.7\% area against a 17--31\% misprediction cut.
+For RV32IM-class soft cores on Artix-7: the 6-stage is the highest-throughput depth (64.1\,MIPS CoreMark), capturing the full execute-split frequency benefit at moderate CPI; the 5-stage is dominated (4-stage frequency ceiling plus load-use stalls), useful only when area is binding; and the 7/8-stage match the 6-stage frequency but pay higher CPI, justified only when the IF split resolves a real timing bottleneck such as synchronous BRAM. SGF does \emph{not} let a deeper pipeline out-throughput the 6-stage (7-stage+SGF: $58.7$ vs.\ 64.1\,MIPS), but is worth adding at any forced depth with $\geq$3 stages of update latency, including the 6-stage ($-$23.9\% CoreMark), for 0.5--0.7\% area against a 17--31\% misprediction cut on the main suite (up to 42\% on the screened kernels).
 
 \section{Causal Isolation and Supporting Analyses}
 \label{sec:supplementary}
@@ -767,7 +765,7 @@ The model (Eq.~\ref{eq:cpi_model}) predicts the depth-dependent terms from archi
 SGF is measured on three families (gshare, tournament, downscaled TAGE; Section~\ref{sec:generalization}); the stale-GHR effect is not gshare-specific. On TAGE \cite{seznec2011tage} the benefit persists but the area cost grows to $+21\%$ LUTs. A measured evaluation on perceptron \cite{jimenez2001dynamic} and local-history \cite{yeh1991two} predictors is future work, and the crc32 confidence filter ships off by default.
 
 \textbf{Benchmark and compiler scope.}
-The seven workloads (branch frequency 4.4--26.3\%, 1.4K--4.5M instructions) exclude floating-point, OS-level, and multi-threaded code, and the IBD indicator (Table~S4, supplementary material) rests on only two positive workloads. Headline results use \texttt{-O1}; an \texttt{-O2} re-measurement (Section~\ref{sec:o2}) shows Mechanism~B and SGF's benefit persist (CoreMark's reduction grows), so the effect is not an \texttt{-O1} artifact. \texttt{-O3}, floating-point, OS-level, and multi-threaded workloads remain untested.
+The seven workloads (branch frequency 4.4--26.3\%, 1.4K--4.5M instructions) exclude floating-point, OS-level, and multi-threaded code, and the IBD indicator (Table~S4, supplementary material) rests on four positive workloads. Headline results use \texttt{-O1}; an \texttt{-O2} re-measurement (Section~\ref{sec:o2}) shows Mechanism~B and SGF's benefit persist (CoreMark's reduction grows), so the effect is not an \texttt{-O1} artifact. \texttt{-O3}, floating-point, OS-level, and multi-threaded workloads remain untested.
 
 \section{Conclusion}
 \label{sec:conclusion}

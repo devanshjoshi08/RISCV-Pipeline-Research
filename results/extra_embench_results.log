@@ -1,0 +1,200 @@
+=== Additional Embench-IoT Kernels: Mechanism-B screen ===
+=== Wed May 27 00:22:44 -0500 2026 ===
+=== Baseline 4/5/6/7/8-stage and 6/7/8-stage SGF, for huffbench and sglib-combined. ===
+=== The 4-stage is the shallow reference used in the paper; 5-stage is included for completeness. ===
+
+--- huffbench_4s ---
+Time resolution is 1 ps
+=== huffbench: rv32i_pipeline_4stage_top ===
+  Cycles:         3237788
+  Instructions:   2098752
+  Branches:       638859
+  Mispredictions: 187420
+  CPI:            1.54
+  IBD:            3.28
+  Mispredict%:    29.33%
+$finish called at time : 32388825 ns : File "huffbench_4s_tb.sv" Line 53
+
+--- huffbench_5s ---
+Time resolution is 1 ps
+=== huffbench: rv32i_pipeline_5stage_top ===
+  Cycles:         3554261
+  Instructions:   2098752
+  Branches:       638859
+  Mispredictions: 184492
+  CPI:            1.69
+  IBD:            3.28
+  Mispredict%:    28.87%
+$finish called at time : 35553595 ns : File "huffbench_5s_tb.sv" Line 53
+
+--- huffbench_6s ---
+Time resolution is 1 ps
+=== huffbench: rv32i_pipeline_top ===
+  Cycles:         3912237
+  Instructions:   2098752
+  Branches:       638859
+  Mispredictions: 191088
+  CPI:            1.86
+  IBD:            3.28
+  Mispredict%:    29.91%
+$finish called at time : 39133455 ns : File "huffbench_6s_tb.sv" Line 53
+
+--- huffbench_7s ---
+Time resolution is 1 ps
+=== huffbench: rv32i_pipeline_7stage_top ===
+  Cycles:         4451076
+  Instructions:   2098752
+  Branches:       638859
+  Mispredictions: 191090
+  CPI:            2.12
+  IBD:            3.28
+  Mispredict%:    29.91%
+$finish called at time : 44521935 ns : File "huffbench_7s_tb.sv" Line 53
+
+--- huffbench_8s ---
+Time resolution is 1 ps
+=== huffbench: rv32i_pipeline_8stage_top ===
+  Cycles:         4867504
+  Instructions:   2098752
+  Branches:       638859
+  Mispredictions: 191090
+  CPI:            2.31
+  IBD:            3.28
+  Mispredict%:    29.91%
+$finish called at time : 48686275 ns : File "huffbench_8s_tb.sv" Line 53
+
+--- huffbench_7s_sgf ---
+Time resolution is 1 ps
+=== huffbench: rv32i_pipeline_7stage_sgf_top ===
+  Cycles:         4124149
+  Instructions:   2098752
+  Branches:       638859
+  Mispredictions: 109903
+  CPI:            1.96
+  IBD:            3.28
+  Mispredict%:    17.20%
+$finish called at time : 41252665 ns : File "huffbench_7s_sgf_tb.sv" Line 53
+
+--- sglib-combined_4s ---
+Time resolution is 1 ps
+=== sglib-combined: rv32i_pipeline_4stage_top ===
+  Cycles:         3762780
+  Instructions:   2431970
+  Branches:       607229
+  Mispredictions: 171291
+  CPI:            1.54
+  IBD:            4.00
+  Mispredict%:    28.20%
+$finish called at time : 38991785 ns : File "sglib-combined_4s_tb.sv" Line 53
+
+--- sglib-combined_5s ---
+Time resolution is 1 ps
+=== sglib-combined: rv32i_pipeline_5stage_top ===
+  Cycles:         4090185
+  Instructions:   2431970
+  Branches:       607229
+  Mispredictions: 166858
+  CPI:            1.68
+  IBD:            4.00
+  Mispredict%:    27.47%
+$finish called at time : 42372635 ns : File "sglib-combined_5s_tb.sv" Line 53
+
+--- sglib-combined_6s ---
+Time resolution is 1 ps
+=== sglib-combined: rv32i_pipeline_top ===
+  Cycles:         4520538
+  Instructions:   2431970
+  Branches:       607229
+  Mispredictions: 175477
+  CPI:            1.85
+  IBD:            4.00
+  Mispredict%:    28.89%
+$finish called at time : 46838665 ns : File "sglib-combined_6s_tb.sv" Line 53
+
+--- sglib-combined_7s ---
+Time resolution is 1 ps
+=== sglib-combined: rv32i_pipeline_7stage_top ===
+  Cycles:         5009925
+  Instructions:   2431970
+  Branches:       607229
+  Mispredictions: 175043
+  CPI:            2.06
+  IBD:            4.00
+  Mispredict%:    28.82%
+$finish called at time : 51913445 ns : File "sglib-combined_7s_tb.sv" Line 53
+
+--- sglib-combined_8s ---
+Time resolution is 1 ps
+=== sglib-combined: rv32i_pipeline_8stage_top ===
+  Cycles:         5463984
+  Instructions:   2431970
+  Branches:       607229
+  Mispredictions: 175043
+  CPI:            2.24
+  IBD:            4.00
+  Mispredict%:    28.82%
+$finish called at time : 56602695 ns : File "sglib-combined_8s_tb.sv" Line 53
+
+--- sglib-combined_7s_sgf ---
+Time resolution is 1 ps
+=== sglib-combined: rv32i_pipeline_7stage_sgf_top ===
+  Cycles:         4873739
+  Instructions:   2431970
+  Branches:       607229
+  Mispredictions: 136959
+  CPI:            2.00
+  IBD:            4.00
+  Mispredict%:    22.55%
+$finish called at time : 50505365 ns : File "sglib-combined_7s_sgf_tb.sv" Line 53
+
+=== 8-stage SGF rows (added Wed May 27 01:36:23 -0500 2026) ===
+
+--- huffbench_8s_sgf ---
+Time resolution is 1 ps
+=== huffbench: rv32i_pipeline_8stage_sgf_top ===
+  Cycles:         4542206
+  Instructions:   2098752
+  Branches:       638859
+  Mispredictions: 110192
+  CPI:            2.16
+  IBD:            3.28
+  Mispredict%:    17.24%
+$finish called at time : 45433295 ns : File "huffbench_8s_sgf_tb.sv" Line 53
+
+--- sglib-combined_8s_sgf ---
+Time resolution is 1 ps
+=== sglib-combined: rv32i_pipeline_8stage_sgf_top ===
+  Cycles:         5353364
+  Instructions:   2431970
+  Branches:       607229
+  Mispredictions: 144334
+  CPI:            2.20
+  IBD:            4.00
+  Mispredict%:    23.76%
+$finish called at time : 55457995 ns : File "sglib-combined_8s_sgf_tb.sv" Line 53
+=== 6-stage SGF rows (added Wed May 27 13:49:44 -0500 2026) ===
+
+--- huffbench_6s_sgf ---
+Time resolution is 1 ps
+=== huffbench: rv32i_pipeline_sgf_top ===
+  Cycles:         3668682
+  Instructions:   2098752
+  Branches:       638859
+  Mispredictions: 109903
+  CPI:            1.74
+  IBD:            3.28
+  Mispredict%:    17.20%
+$finish called at time : 36697905 ns : File "huffbench_6s_sgf_tb.sv" Line 53
+
+--- sglib-combined_6s_sgf ---
+Time resolution is 1 ps
+=== sglib-combined: rv32i_pipeline_sgf_top ===
+  Cycles:         4414185
+  Instructions:   2431970
+  Branches:       607229
+  Mispredictions: 140026
+  CPI:            1.81
+  IBD:            4.00
+  Mispredict%:    23.05%
+$finish called at time : 45738625 ns : File "sglib-combined_6s_sgf_tb.sv" Line 53
+
