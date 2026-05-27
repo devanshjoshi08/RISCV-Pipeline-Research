@@ -87,8 +87,8 @@ source scripts/run_diagnostic.tcl       ;# -> results/diagnostic_results.log
 source scripts/run_embench_official.tcl ;# -> results/embench_official_results.log
 
 # --- Causal isolation of Mechanism B (the two controls) ---
-source scripts/run_bimodal.tcl          ;# no-GHR control -> results/bimodal_results.log
-source scripts/run_predictor_sweep.tcl  ;# 32..1024 PHT sweep -> results/predictor_sweep_results.log
+source scripts/run_bimodal_coremark.tcl    ;# no-GHR control -> results/bimodal_coremark_results.log
+source scripts/run_pht_sweep_coremark.tcl  ;# 32..1024 PHT sweep -> results/pht_sweep_coremark_results.log
 
 # --- SGF and orthogonal techniques ---
 source scripts/run_sgf_eval.tcl         ;# SGF 7/8-stage bench + synth
