@@ -41,9 +41,11 @@ Vivado flow. Every number in the paper traces to a committed result log; the
 The paper's claims are measured outcomes under **one FPGA family** (Artix-7
 XC7A35T), **one toolchain** (Vivado 2025.2), **one in-order microarchitecture**,
 the **gshare** predictor (with measured generalization to tournament and TAGE),
-and **`-O1`** compilation - not fabric- or predictor-independent laws. Absolute frequency/area/power do not
-transfer without re-synthesis; what transfers is the Mechanism-A/B decomposition
-and the ROB-free dual-GHR construction. See `paper/main.tex` §Limitations.
+and **`-O1`** compilation, with an **`-O2`** re-measurement that confirms Mechanism B
+and SGF's benefit persist - not fabric- or predictor-independent laws. Absolute
+frequency/area/power do not transfer without re-synthesis; what transfers is the
+Mechanism-A/B decomposition and the ROB-free dual-GHR construction. See
+`paper/main.tex` §Limitations.
 
 ## Requirements
 
@@ -194,7 +196,8 @@ a mixed **Diagnostic** program, and four **Embench-IoT** kernels (aha-mont64,
 crc32, statemate, edn). Sources and prebuilt hex are under
 [`programs/`](programs/) (`asm/`, `c/`, `coremark/`, `embench/`). Each reads the
 hardware counters before/after and stores results to data memory for testbench
-readout.
+readout. CoreMark and statemate are additionally rebuilt at `-O2`, confirming
+Mechanism B and SGF's benefit are not an `-O1` artifact (`results/o2_7stage_results.log`).
 
 A supplementary **Mechanism-B susceptibility screen** adds two further low-IBD,
 data-dependent Embench-IoT kernels (huffbench, sglib-combined). Both are
