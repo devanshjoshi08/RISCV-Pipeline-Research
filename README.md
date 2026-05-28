@@ -1,6 +1,6 @@
 # Speculative GHR Forwarding: Eliminating Stale Branch-Predictor State in Deep FPGA Pipelines
 
-**Preprint:** [https://doi.org/10.31224/7181](https://doi.org/10.31224/7181)
+**Preprint:** [doi.org/10.31224/7181](https://doi.org/10.31224/7181) ([EngrXiv landing page](https://engrxiv.org/preprint/view/7181))
 
 This repository is the code-and-data supplement for the paper **"Speculative GHR
 Forwarding: Eliminating Stale Branch-Predictor State in Deep FPGA Pipelines"**
