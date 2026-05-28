@@ -9,8 +9,9 @@ The write-up is in the ACM `acmart` format and split into the main paper
 [`paper/main.tex`](paper/main.tex) and a companion
 [`paper/supplement.tex`](paper/supplement.tex) holding the corroborating figures
 and tables (area, power/efficiency, BRAM, published-cores, CoreMark detail, CPI
-ablation, the inter-branch-distance and hazard tables, etc.). Both build against
-the same [`paper/figures/`](paper/figures/) and [`paper/references.bib`](paper/references.bib).
+ablation, the inter-branch-distance and hazard tables, and the Mechanism-B
+susceptibility screen). Both build against the same
+[`paper/figures/`](paper/figures/) and [`paper/references.bib`](paper/references.bib).
 
 The paper's contribution is **Speculative GHR Forwarding (SGF)**. When an in-order
 FPGA soft core is pipelined deeper to raise its clock, the branch predictor's global
