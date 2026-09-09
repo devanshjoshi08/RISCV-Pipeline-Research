@@ -4,7 +4,6 @@
 
 This repository is the code-and-data supplement for the paper **"Speculative GHR
 Forwarding: Eliminating Stale Branch-Predictor State in Deep FPGA Pipelines"**
-(targeting **ACM Transactions on Reconfigurable Technology and Systems, TRETS**).
 The write-up is in the ACM `acmart` format and split into the main paper
 [`paper/main.tex`](paper/main.tex) and a companion
 [`paper/supplement.tex`](paper/supplement.tex) holding the corroborating figures
