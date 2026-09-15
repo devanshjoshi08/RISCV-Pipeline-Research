@@ -17,6 +17,11 @@
 *.wdb
 *.wcfg
 
+# Icarus SGF evaluation scratch and per-run logs.  Published CSV/plots remain
+# visible under results_new/.
+results_new/work/
+results_new/logs/
+
 # Build artifacts
 *.bit
 *.bin
@@ -50,6 +55,8 @@ paper/submission.zip
 # OS files
 .DS_Store
 Thumbs.db
+__pycache__/
+*.pyc
 
 # Harness runtime output written into scripts/ on re-run (committed evidence
 # lives in results/, not here). The bundled synthesis RTL snapshot

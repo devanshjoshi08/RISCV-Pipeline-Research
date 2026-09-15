@@ -124,6 +124,37 @@ python scripts/regen_power_figs.py            # power, efficiency (workload-SAIF
 python scripts/regen_bram_fig.py              # LUT- vs BRAM-memory F_max
 ```
 
+### End-to-end SGF evaluation with Icarus
+
+Run the 6/7/8-stage baseline and SGF matrix using the prebuilt benchmark hex
+files:
+
+```bash
+python3 scripts/run_sgf_evaluation.py
+```
+
+The runner includes `bench_branch_heavy`, the canonical CoreMark image, and all
+available Embench images under `programs/asm/` and `programs/embench/` (preferring
+the canonical assembly image when both locations contain a kernel). It compiles
+each RTL variant once, parses the five benchmark result words, and refuses to
+publish new results if a baseline/SGF pair differs in instruction count, branch
+count, or checksum. Successful output is written only under `results_new/`:
+
+- `results.csv`
+- `cpi_comparison.svg`
+- `mpki_comparison.svg`
+
+Long runs may be resumed and parallelized, for example:
+
+```bash
+python3 scripts/run_sgf_evaluation.py --resume --jobs 6
+```
+
+Use `--benchmarks bench_branch_heavy coremark` for a selected smoke run. Compile
+and simulation diagnostics are retained in the ignored `results_new/logs/`
+directory; Icarus scratch is retained in the ignored `results_new/work/`
+directory.
+
 ## Claim-to-Code Map
 
 Every code-backed claim in the paper, mapped to the source / script / committed log that supports it.
@@ -249,4 +280,3 @@ details.
 
 If you use this work, please cite the paper (Joshi and Ula, "Speculative GHR
 Forwarding: Eliminating Stale Branch-Predictor State in Deep FPGA Pipelines").
-

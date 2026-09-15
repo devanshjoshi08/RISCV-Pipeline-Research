@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="620" viewBox="0 0 1500 620">
+<rect width="100%" height="100%" fill="white"/>
+<style>text{font-family:Arial,sans-serif;fill:#222}.axis{stroke:#333;stroke-width:1}.grid{stroke:#ddd;stroke-width:1}</style>
+<text x="750.0" y="28" text-anchor="middle" font-size="20">MPKI: baseline vs SGF</text>
+<line class="grid" x1="78" y1="470.0" x2="1476" y2="470.0"/>
+<text x="70" y="474.0" text-anchor="end" font-size="11">0.00</text>
+<line class="grid" x1="78" y1="389.0" x2="1476" y2="389.0"/>
+<text x="70" y="393.0" text-anchor="end" font-size="11">21.62</text>
+<line class="grid" x1="78" y1="308.0" x2="1476" y2="308.0"/>
+<text x="70" y="312.0" text-anchor="end" font-size="11">43.25</text>
+<line class="grid" x1="78" y1="227.0" x2="1476" y2="227.0"/>
+<text x="70" y="231.0" text-anchor="end" font-size="11">64.87</text>
+<line class="grid" x1="78" y1="146.0" x2="1476" y2="146.0"/>
+<text x="70" y="150.0" text-anchor="end" font-size="11">86.50</text>
+<line class="grid" x1="78" y1="65.0" x2="1476" y2="65.0"/>
+<text x="70" y="69.0" text-anchor="end" font-size="11">108.12</text>
+<line class="axis" x1="78" y1="65" x2="78" y2="470"/>
+<line class="axis" x1="78" y1="470" x2="1476" y2="470"/>
+<rect x="90.5" y="352.5" width="17.5" height="117.5" fill="#4472c4" fill-opacity="1"/>
+<rect x="109.9" y="372.7" width="17.5" height="97.3" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="129.4" y="352.5" width="17.5" height="117.5" fill="#ed7d31" fill-opacity="1"/>
+<rect x="148.9" y="372.7" width="17.5" height="97.3" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="168.4" y="352.5" width="17.5" height="117.5" fill="#70ad47" fill-opacity="1"/>
+<rect x="187.8" y="372.7" width="17.5" height="97.3" fill="#70ad47" fill-opacity="0.55"/>
+<text x="147.9" y="488" text-anchor="end" font-size="11" transform="rotate(-35 147.9 488)">aha-mont64</text>
+<rect x="230.3" y="108.4" width="17.5" height="361.6" fill="#4472c4" fill-opacity="1"/>
+<rect x="249.8" y="184.3" width="17.5" height="285.7" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="269.2" y="165.8" width="17.5" height="304.2" fill="#ed7d31" fill-opacity="1"/>
+<rect x="288.7" y="200.1" width="17.5" height="269.9" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="308.2" y="165.8" width="17.5" height="304.2" fill="#70ad47" fill-opacity="1"/>
+<rect x="327.7" y="205.4" width="17.5" height="264.6" fill="#70ad47" fill-opacity="0.55"/>
+<text x="287.7" y="488" text-anchor="end" font-size="11" transform="rotate(-35 287.7 488)">bench_branch_heavy</text>
+<rect x="370.1" y="270.5" width="17.5" height="199.5" fill="#4472c4" fill-opacity="1"/>
+<rect x="389.6" y="338.7" width="17.5" height="131.3" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="409.0" y="278.7" width="17.5" height="191.3" fill="#ed7d31" fill-opacity="1"/>
+<rect x="428.5" y="338.7" width="17.5" height="131.3" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="448.0" y="278.7" width="17.5" height="191.3" fill="#70ad47" fill-opacity="1"/>
+<rect x="467.4" y="337.9" width="17.5" height="132.1" fill="#70ad47" fill-opacity="0.55"/>
+<text x="427.5" y="488" text-anchor="end" font-size="11" transform="rotate(-35 427.5 488)">coremark</text>
+<rect x="509.9" y="469.7" width="17.5" height="0.3" fill="#4472c4" fill-opacity="1"/>
+<rect x="529.4" y="469.5" width="17.5" height="0.5" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="548.8" y="469.7" width="17.5" height="0.3" fill="#ed7d31" fill-opacity="1"/>
+<rect x="568.3" y="469.5" width="17.5" height="0.5" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="587.8" y="469.7" width="17.5" height="0.3" fill="#70ad47" fill-opacity="1"/>
+<rect x="607.2" y="469.5" width="17.5" height="0.5" fill="#70ad47" fill-opacity="0.55"/>
+<text x="567.3" y="488" text-anchor="end" font-size="11" transform="rotate(-35 567.3 488)">crc32</text>
+<rect x="649.7" y="456.8" width="17.5" height="13.2" fill="#4472c4" fill-opacity="1"/>
+<rect x="669.2" y="456.8" width="17.5" height="13.2" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="688.6" y="456.8" width="17.5" height="13.2" fill="#ed7d31" fill-opacity="1"/>
+<rect x="708.1" y="456.8" width="17.5" height="13.2" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="727.6" y="456.8" width="17.5" height="13.2" fill="#70ad47" fill-opacity="1"/>
+<rect x="747.1" y="456.8" width="17.5" height="13.2" fill="#70ad47" fill-opacity="0.55"/>
+<text x="707.1" y="488" text-anchor="end" font-size="11" transform="rotate(-35 707.1 488)">edn</text>
+<rect x="789.5" y="129.0" width="17.5" height="341.0" fill="#4472c4" fill-opacity="1"/>
+<rect x="809.0" y="273.9" width="17.5" height="196.1" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="828.4" y="129.0" width="17.5" height="341.0" fill="#ed7d31" fill-opacity="1"/>
+<rect x="847.9" y="273.9" width="17.5" height="196.1" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="867.4" y="129.0" width="17.5" height="341.0" fill="#70ad47" fill-opacity="1"/>
+<rect x="886.9" y="273.3" width="17.5" height="196.7" fill="#70ad47" fill-opacity="0.55"/>
+<text x="846.9" y="488" text-anchor="end" font-size="11" transform="rotate(-35 846.9 488)">huffbench</text>
+<rect x="929.3" y="449.8" width="17.5" height="20.2" fill="#4472c4" fill-opacity="1"/>
+<rect x="948.8" y="449.9" width="17.5" height="20.1" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="968.2" y="449.8" width="17.5" height="20.2" fill="#ed7d31" fill-opacity="1"/>
+<rect x="987.7" y="449.9" width="17.5" height="20.1" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="1007.2" y="449.8" width="17.5" height="20.2" fill="#70ad47" fill-opacity="1"/>
+<rect x="1026.7" y="449.9" width="17.5" height="20.1" fill="#70ad47" fill-opacity="0.55"/>
+<text x="986.7" y="488" text-anchor="end" font-size="11" transform="rotate(-35 986.7 488)">matmult-int</text>
+<rect x="1069.1" y="462.0" width="17.5" height="8.0" fill="#4472c4" fill-opacity="1"/>
+<rect x="1088.5" y="463.8" width="17.5" height="6.2" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="1108.0" y="462.0" width="17.5" height="8.0" fill="#ed7d31" fill-opacity="1"/>
+<rect x="1127.5" y="463.6" width="17.5" height="6.4" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="1147.0" y="462.0" width="17.5" height="8.0" fill="#70ad47" fill-opacity="1"/>
+<rect x="1166.5" y="463.6" width="17.5" height="6.4" fill="#70ad47" fill-opacity="0.55"/>
+<text x="1126.5" y="488" text-anchor="end" font-size="11" transform="rotate(-35 1126.5 488)">nettle-aes</text>
+<rect x="1208.9" y="199.7" width="17.5" height="270.3" fill="#4472c4" fill-opacity="1"/>
+<rect x="1228.4" y="254.3" width="17.5" height="215.7" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="1247.8" y="200.4" width="17.5" height="269.6" fill="#ed7d31" fill-opacity="1"/>
+<rect x="1267.3" y="259.1" width="17.5" height="210.9" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="1286.8" y="200.4" width="17.5" height="269.6" fill="#70ad47" fill-opacity="1"/>
+<rect x="1306.3" y="247.7" width="17.5" height="222.3" fill="#70ad47" fill-opacity="0.55"/>
+<text x="1266.3" y="488" text-anchor="end" font-size="11" transform="rotate(-35 1266.3 488)">sglib-combined</text>
+<rect x="1348.7" y="387.1" width="17.5" height="82.9" fill="#4472c4" fill-opacity="1"/>
+<rect x="1368.2" y="402.9" width="17.5" height="67.1" fill="#4472c4" fill-opacity="0.55"/>
+<rect x="1387.6" y="383.2" width="17.5" height="86.8" fill="#ed7d31" fill-opacity="1"/>
+<rect x="1407.1" y="402.9" width="17.5" height="67.1" fill="#ed7d31" fill-opacity="0.55"/>
+<rect x="1426.6" y="383.2" width="17.5" height="86.8" fill="#70ad47" fill-opacity="1"/>
+<rect x="1446.1" y="402.9" width="17.5" height="67.1" fill="#70ad47" fill-opacity="0.55"/>
+<text x="1406.1" y="488" text-anchor="end" font-size="11" transform="rotate(-35 1406.1 488)">statemate</text>
+<rect x="78" y="580" width="16" height="12" fill="#4472c4" fill-opacity="1"/>
+<text x="100" y="591" font-size="12">6-stage baseline</text>
+<rect x="223" y="580" width="16" height="12" fill="#4472c4" fill-opacity="0.55"/>
+<text x="245" y="591" font-size="12">6-stage sgf</text>
+<rect x="368" y="580" width="16" height="12" fill="#ed7d31" fill-opacity="1"/>
+<text x="390" y="591" font-size="12">7-stage baseline</text>
+<rect x="513" y="580" width="16" height="12" fill="#ed7d31" fill-opacity="0.55"/>
+<text x="535" y="591" font-size="12">7-stage sgf</text>
+<rect x="658" y="580" width="16" height="12" fill="#70ad47" fill-opacity="1"/>
+<text x="680" y="591" font-size="12">8-stage baseline</text>
+<rect x="803" y="580" width="16" height="12" fill="#70ad47" fill-opacity="0.55"/>
+<text x="825" y="591" font-size="12">8-stage sgf</text>
+</svg>
