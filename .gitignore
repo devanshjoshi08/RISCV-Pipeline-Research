@@ -70,3 +70,11 @@ scripts/tb/
 # Stray Vivado build artifacts at repo root
 dfx_runtime.txt
 vivado_*stage/
+
+# Root-level Icarus scratch produced by ad-hoc benchmark runs. Canonical hex
+# inputs live under programs/ and published evaluation output under results_new/.
+/sim_*
+/program.hex
+/bench_branch_heavy.hex
+/baseline*.txt
+/sgf*.txt

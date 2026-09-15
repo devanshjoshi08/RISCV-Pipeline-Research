@@ -12,14 +12,14 @@
 // Instantiate with the desired top module by editing the DUT line.
 // The hex file is loaded via $readmemh in the initial block.
 
-module rv32i_benchmark_tb;
+module rv32i_sgf_benchmark_tb;
 
   logic clk, rst_n;
   logic [31:0] debug_pc, debug_instr, debug_alu_result;
 
   // Change this line for different variants:
   // rv32i_pipeline_5stage_top dut (.*);
-  rv32i_pipeline_top dut (.*);
+  rv32i_pipeline_sgf_top dut (.*);
   // rv32i_pipeline_7stage_top dut (.*);
 
   initial clk = 0;

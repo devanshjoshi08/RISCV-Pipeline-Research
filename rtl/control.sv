@@ -58,12 +58,18 @@ module control (
           mdu_op = mdu_op_t'(funct3);
         end else begin
           case (funct3)
-            3'b000: alu_op = (funct7[5]) ? ALU_SUB : ALU_ADD;
+            3'b000: begin
+              if (funct7[5]) alu_op = ALU_SUB;
+              else alu_op = ALU_ADD;
+            end
             3'b001: alu_op = ALU_SLL;
             3'b010: alu_op = ALU_SLT;
             3'b011: alu_op = ALU_SLTU;
             3'b100: alu_op = ALU_XOR;
-            3'b101: alu_op = (funct7[5]) ? ALU_SRA : ALU_SRL;
+            3'b101: begin
+              if (funct7[5]) alu_op = ALU_SRA;
+              else alu_op = ALU_SRL;
+            end
             3'b110: alu_op = ALU_OR;
             3'b111: alu_op = ALU_AND;
             default: alu_op = ALU_ADD;
@@ -81,7 +87,10 @@ module control (
           3'b010: alu_op = ALU_SLT;
           3'b011: alu_op = ALU_SLTU;
           3'b100: alu_op = ALU_XOR;
-          3'b101: alu_op = (funct7[5]) ? ALU_SRA : ALU_SRL;
+          3'b101: begin
+              if (funct7[5]) alu_op = ALU_SRA;
+              else alu_op = ALU_SRL;
+            end
           3'b110: alu_op = ALU_OR;
           3'b111: alu_op = ALU_AND;
           default: alu_op = ALU_ADD;
