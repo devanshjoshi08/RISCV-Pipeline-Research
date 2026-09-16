@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-// Shared Icarus harness for the 6/7/8-stage baseline and SGF evaluations.
+// Shared Icarus/Verilator harness for the 6/7/8-stage baseline and SGF evaluations.
 // DUT_MODULE is supplied by scripts/run_sgf_evaluation.py.  Instruction memory
 // is loaded by rtl/imem.sv from program.hex in the simulation working directory.
 module sgf_evaluation_tb;
@@ -8,6 +8,12 @@ module sgf_evaluation_tb;
   logic [31:0] debug_pc, debug_instr, debug_alu_result;
 
   `DUT_MODULE dut (.*);
+
+`ifdef SGF_CONF_FILTER
+  // Diagnostic-only parameter override used to reproduce historical filtered
+  // SGF runs. Normal evaluation builds do not define SGF_CONF_FILTER.
+  defparam dut.u_bp.CONF_FILTER = `SGF_CONF_FILTER;
+`endif
 
   // The prebuilt benchmark images fit in 16 KiB instruction/data memories.
   defparam dut.u_imem.DEPTH = 4096;

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the 6/7/8-stage baseline-vs-SGF benchmark matrix with Icarus."""
+"""Run the 6/7/8-stage baseline-vs-SGF benchmark matrix."""
 
 from __future__ import annotations
 
@@ -14,7 +14,6 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
-from typing import Iterable
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -140,29 +139,51 @@ def run_checked(command: list[str], *, cwd: Path, timeout: int | None = None) ->
     return completed.stdout
 
 
-def compile_variant(item: Variant) -> Path:
-    build_dir = WORK / "build"
+def compile_variant(item: Variant, backend: str) -> Path:
+    build_dir = WORK / "build" / backend
     build_dir.mkdir(parents=True, exist_ok=True)
-    executable = build_dir / f"{item.key}.vvp"
-    command = [
-        "iverilog", "-g2012", "-Wall", "-s", "sgf_evaluation_tb",
-        f"-DDUT_MODULE={item.top}", "-o", str(executable),
-        *(str(path) for path in item.sources), str(TB),
-    ]
+    if backend == "icarus":
+        executable = build_dir / f"{item.key}.vvp"
+        command = [
+            "iverilog", "-g2012", "-Wall", "-s", "sgf_evaluation_tb",
+            f"-DDUT_MODULE={item.top}", "-o", str(executable),
+            *(str(path) for path in item.sources), str(TB),
+        ]
+    elif backend == "verilator":
+        object_dir = build_dir / item.key
+        executable = object_dir / f"sim_{item.key}"
+        command = [
+            "verilator", "--binary", "--timing", "-Wno-fatal", "-j", "0",
+            "--top-module", "sgf_evaluation_tb", f"-DDUT_MODULE={item.top}",
+            "--Mdir", str(object_dir), "-o", executable.name,
+            *(str(path) for path in item.sources), str(TB),
+        ]
+    else:
+        raise ValueError(backend)
     output = run_checked(command, cwd=ROOT)
-    (LOGS / f"compile_{item.key}.log").write_text(output, encoding="utf-8")
+    (LOGS / f"compile_{backend}_{item.key}.log").write_text(output, encoding="utf-8")
     return executable
 
 
-def simulate(bench: Benchmark, item: Variant, executable: Path, args: argparse.Namespace) -> dict[str, object]:
-    run_dir = WORK / "runs" / bench.name / item.key
+def simulate(
+    bench: Benchmark, item: Variant, executable: Path, backend: str,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    run_dir = WORK / "runs" / backend / bench.name / item.key
     run_dir.mkdir(parents=True, exist_ok=True)
-    log_path = LOGS / f"{bench.name}_{item.key}.log"
-    if args.resume and log_path.is_file() and RESULT_RE.search(log_path.read_text(encoding="utf-8")):
-        output = log_path.read_text(encoding="utf-8")
+    log_path = LOGS / f"{backend}_{bench.name}_{item.key}.log"
+    legacy_log = LOGS / f"{bench.name}_{item.key}.log"
+    reusable = log_path
+    if backend == "icarus" and not log_path.exists() and legacy_log.exists():
+        reusable = legacy_log
+    if args.resume and reusable.is_file() and RESULT_RE.search(reusable.read_text(encoding="utf-8")):
+        output = reusable.read_text(encoding="utf-8")
+        if reusable != log_path:
+            log_path.write_text(output, encoding="utf-8")
     else:
         shutil.copy2(bench.program, run_dir / "program.hex")
-        command = ["vvp", str(executable), f"+MAX_CYCLES={args.max_cycles}"]
+        command = (["vvp", str(executable)] if backend == "icarus" else [str(executable)])
+        command.append(f"+MAX_CYCLES={args.max_cycles}")
         if bench.data:
             command.append(f"+DATA_HEX={bench.data.resolve()}")
         output = run_checked(command, cwd=run_dir, timeout=args.timeout)
@@ -175,6 +196,7 @@ def simulate(bench: Benchmark, item: Variant, executable: Path, args: argparse.N
     if not instructions or not branches:
         raise EvaluationError(f"invalid zero counter for {bench.name} {item.key}; see {log_path}")
     return {
+        "simulator": backend,
         "benchmark": bench.name,
         "stage": item.stage,
         "design": item.design,
@@ -190,22 +212,52 @@ def simulate(bench: Benchmark, item: Variant, executable: Path, args: argparse.N
 
 
 def validate_pairs(rows: list[dict[str, object]]) -> None:
-    grouped = {(str(r["benchmark"]), int(r["stage"]), str(r["design"])): r for r in rows}
+    simulators = sorted({str(row["simulator"]) for row in rows})
+    errors: list[str] = []
+    for simulator in simulators:
+        subset = [row for row in rows if row["simulator"] == simulator]
+        grouped = {(str(r["benchmark"]), int(r["stage"]), str(r["design"])): r for r in subset}
+        for benchmark in sorted({str(row["benchmark"]) for row in subset}):
+            for stage in (6, 7, 8):
+                baseline = grouped.get((benchmark, stage, "baseline"))
+                sgf = grouped.get((benchmark, stage, "sgf"))
+                if baseline is None or sgf is None:
+                    errors.append(f"{simulator} {benchmark} stage {stage}: missing baseline or SGF row")
+                    continue
+                for field in ("instructions", "branches", "checksum"):
+                    if baseline[field] != sgf[field]:
+                        left = f"0x{baseline[field]:08x}" if field == "checksum" else str(baseline[field])
+                        right = f"0x{sgf[field]:08x}" if field == "checksum" else str(sgf[field])
+                        errors.append(
+                            f"{simulator} {benchmark} stage {stage}: {field} mismatch "
+                            f"({left} != {right})"
+                        )
+    if errors:
+        raise EvaluationError("baseline/SGF equivalence check failed:\n  " + "\n  ".join(errors))
+
+
+def validate_simulators(rows: list[dict[str, object]]) -> None:
+    grouped = {
+        (str(row["simulator"]), str(row["benchmark"]), int(row["stage"]), str(row["design"])): row
+        for row in rows
+    }
     errors: list[str] = []
     for benchmark in sorted({str(row["benchmark"]) for row in rows}):
         for stage in (6, 7, 8):
-            baseline = grouped.get((benchmark, stage, "baseline"))
-            sgf = grouped.get((benchmark, stage, "sgf"))
-            if baseline is None or sgf is None:
-                errors.append(f"{benchmark} stage {stage}: missing baseline or SGF row")
-                continue
-            for field in ("instructions", "branches", "checksum"):
-                if baseline[field] != sgf[field]:
-                    left = f"0x{baseline[field]:08x}" if field == "checksum" else str(baseline[field])
-                    right = f"0x{sgf[field]:08x}" if field == "checksum" else str(sgf[field])
-                    errors.append(f"{benchmark} stage {stage}: {field} mismatch ({left} != {right})")
+            for design in ("baseline", "sgf"):
+                icarus = grouped.get(("icarus", benchmark, stage, design))
+                verilator = grouped.get(("verilator", benchmark, stage, design))
+                if icarus is None or verilator is None:
+                    errors.append(f"{benchmark} stage {stage} {design}: missing simulator row")
+                    continue
+                for field in ("cycles", "instructions", "branches", "mispredictions", "checksum"):
+                    if icarus[field] != verilator[field]:
+                        errors.append(
+                            f"{benchmark} stage {stage} {design}: {field} differs "
+                            f"(Icarus={icarus[field]}, Verilator={verilator[field]})"
+                        )
     if errors:
-        raise EvaluationError("baseline/SGF equivalence check failed:\n  " + "\n  ".join(errors))
+        raise EvaluationError("Icarus/Verilator cross-check failed:\n  " + "\n  ".join(errors))
 
 
 FIELDS = (
@@ -214,8 +266,9 @@ FIELDS = (
 )
 
 
-def write_csv(rows: list[dict[str, object]]) -> None:
-    temporary = OUTPUT / ".results.csv.tmp"
+def write_csv(rows: list[dict[str, object]], filename: str = "results.csv") -> None:
+    destination = OUTPUT / filename
+    temporary = OUTPUT / f".{filename}.tmp"
     with temporary.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS)
         writer.writeheader()
@@ -224,8 +277,23 @@ def write_csv(rows: list[dict[str, object]]) -> None:
             for field in ("cpi", "mpki", "mispredict_rate"):
                 rendered[field] = f"{float(row[field]):.6f}"
             rendered["checksum"] = f"0x{int(row['checksum']):08x}"
+            writer.writerow({field: rendered[field] for field in FIELDS})
+    os.replace(temporary, destination)
+
+
+def write_crosscheck_csv(rows: list[dict[str, object]]) -> None:
+    fields = ("simulator",) + FIELDS
+    temporary = OUTPUT / ".simulator_crosscheck.csv.tmp"
+    with temporary.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        for row in rows:
+            rendered = dict(row)
+            for field in ("cpi", "mpki", "mispredict_rate"):
+                rendered[field] = f"{float(row[field]):.6f}"
+            rendered["checksum"] = f"0x{int(row['checksum']):08x}"
             writer.writerow(rendered)
-    os.replace(temporary, OUTPUT / "results.csv")
+    os.replace(temporary, OUTPUT / "simulator_crosscheck.csv")
 
 
 def write_plot(rows: list[dict[str, object]], metric: str, label: str, filename: str) -> None:
@@ -281,13 +349,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timeout", type=int, default=900, help="host timeout in seconds per run")
     parser.add_argument("--jobs", type=int, default=1, help="simulations to run concurrently")
     parser.add_argument("--resume", action="store_true", help="reuse existing successful per-run logs")
+    parser.add_argument(
+        "--backend", choices=("icarus", "verilator", "both"), default="icarus",
+        help="simulation backend; 'both' requires exact cross-simulator results",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    if not shutil.which("iverilog") or not shutil.which("vvp"):
+    backends = ("icarus", "verilator") if args.backend == "both" else (args.backend,)
+    if "icarus" in backends and (not shutil.which("iverilog") or not shutil.which("vvp")):
         raise EvaluationError("Icarus Verilog is required (missing iverilog or vvp in PATH)")
+    if "verilator" in backends and not shutil.which("verilator"):
+        raise EvaluationError("Verilator is required (missing verilator in PATH)")
     selected = benchmarks()
     if args.benchmarks:
         requested = set(args.benchmarks)
@@ -299,29 +374,49 @@ def main() -> int:
     OUTPUT.mkdir(exist_ok=True)
     LOGS.mkdir(exist_ok=True)
     variants = [variant(stage, design) for stage in (6, 7, 8) for design in ("baseline", "sgf")]
-    print(f"Compiling {len(variants)} Icarus variants...", flush=True)
-    executables = {item.key: compile_variant(item) for item in variants}
+    executables: dict[tuple[str, str], Path] = {}
+    for backend in backends:
+        print(f"Compiling {len(variants)} {backend} variants...", flush=True)
+        for item in variants:
+            executables[(backend, item.key)] = compile_variant(item, backend)
 
     rows: list[dict[str, object]] = []
-    total = len(selected) * len(variants)
-    tasks = [(bench, item) for bench in selected for item in variants]
+    total = len(selected) * len(variants) * len(backends)
+    tasks = [(backend, bench, item) for backend in backends for bench in selected for item in variants]
     with ThreadPoolExecutor(max_workers=max(1, args.jobs)) as executor:
         pending = {
-            executor.submit(simulate, bench, item, executables[item.key], args): (bench, item)
-            for bench, item in tasks
+            executor.submit(
+                simulate, bench, item, executables[(backend, item.key)], backend, args
+            ): (backend, bench, item)
+            for backend, bench, item in tasks
         }
         for index, future in enumerate(as_completed(pending), start=1):
-            bench, item = pending[future]
+            backend, bench, item = pending[future]
             rows.append(future.result())
-            print(f"[{index:02d}/{total:02d}] {bench.name}: {item.stage}-stage {item.design}", flush=True)
+            print(
+                f"[{index:02d}/{total:02d}] {backend} {bench.name}: "
+                f"{item.stage}-stage {item.design}", flush=True,
+            )
 
     validate_pairs(rows)
-    rows.sort(key=lambda row: (str(row["benchmark"]), int(row["stage"]), str(row["design"])))
-    write_csv(rows)
-    write_plot(rows, "cpi", "CPI", "cpi_comparison.svg")
-    write_plot(rows, "mpki", "MPKI", "mpki_comparison.svg")
-    print(f"PASS: validated {len(rows)//2} baseline/SGF pairs")
-    print(f"Results: {OUTPUT / 'results.csv'}")
+    rows.sort(key=lambda row: (
+        str(row["benchmark"]), int(row["stage"]), str(row["design"]), str(row["simulator"])
+    ))
+    if args.backend == "both":
+        validate_simulators(rows)
+        write_crosscheck_csv(rows)
+        print(f"PASS: {len(rows)//2} Icarus/Verilator configurations match exactly")
+        print(f"Cross-check: {OUTPUT / 'simulator_crosscheck.csv'}")
+    elif args.backend == "icarus":
+        write_csv(rows)
+        write_plot(rows, "cpi", "CPI", "cpi_comparison.svg")
+        write_plot(rows, "mpki", "MPKI", "mpki_comparison.svg")
+        print(f"PASS: validated {len(rows)//2} baseline/SGF pairs")
+        print(f"Results: {OUTPUT / 'results.csv'}")
+    else:
+        write_csv(rows, "results_verilator.csv")
+        print(f"PASS: validated {len(rows)//2} baseline/SGF pairs")
+        print(f"Results: {OUTPUT / 'results_verilator.csv'}")
     return 0
 
 

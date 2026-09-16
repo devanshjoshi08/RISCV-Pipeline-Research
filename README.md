@@ -124,7 +124,7 @@ python scripts/regen_power_figs.py            # power, efficiency (workload-SAIF
 python scripts/regen_bram_fig.py              # LUT- vs BRAM-memory F_max
 ```
 
-### End-to-end SGF evaluation with Icarus
+### End-to-end SGF evaluation with Icarus and Verilator
 
 Run the 6/7/8-stage baseline and SGF matrix using the prebuilt benchmark hex
 files:
@@ -154,6 +154,28 @@ Use `--benchmarks bench_branch_heavy coremark` for a selected smoke run. Compile
 and simulation diagnostics are retained in the ignored `results_new/logs/`
 directory; Icarus scratch is retained in the ignored `results_new/work/`
 directory.
+
+The same harness also supports Verilator. A single-Verilator run writes
+`results_new/results_verilator.csv`; an exact dual-simulator cross-check writes
+`results_new/simulator_crosscheck.csv` and fails if cycles, instructions,
+branches, mispredictions, or checksum differ:
+
+```bash
+python3 scripts/run_sgf_evaluation.py --backend verilator --resume --jobs 6
+python3 scripts/run_sgf_evaluation.py --backend both \
+  --benchmarks bench_branch_heavy coremark huffbench crc32 --resume --jobs 6
+```
+
+Generate per-workload reductions and stage summaries from the canonical CSV:
+
+```bash
+python3 scripts/analyze_sgf_results.py
+```
+
+This writes `results_new/analysis.csv` and
+`results_new/analysis_summary.md`. The simulator validation and historical
+6-stage CoreMark discrepancy investigation are documented in
+`results_new/validation_report.md`.
 
 ## Claim-to-Code Map
 
