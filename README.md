@@ -177,6 +177,28 @@ This writes `results_new/analysis.csv` and
 6-stage CoreMark discrepancy investigation are documented in
 `results_new/validation_report.md`.
 
+Characterize speculative vs committed-GHR lookups without changing prediction
+or training decisions:
+
+```bash
+python3 scripts/characterize_sgf.py
+```
+
+This compiles a simulation-only observer for the 6/7/8-stage SGF designs and
+requires all five benchmark result fields to match the existing `results.csv`.
+It writes only `results_new/characterization.csv`,
+`results_new/characterization_totals.csv`, and
+`results_new/characterization_report.md`. The joint bins retain both PHT counter
+states, unresolved conditional-branch depth, GHR equality, BTB hit, agreement,
+and correctness categories. Accepted/squashed and resolved prediction counts
+are distinguished; counts cover the whole program. The report includes
+confidence/depth strata and a fixed-stream direction-selector oracle bound,
+not a counterfactual speedup claim.
+
+Use `--backend icarus` for an Icarus observer run, `--benchmarks NAME ...` for a
+subset, and `--output-dir PATH` for isolated outputs. Observer builds/logs stay
+under the already ignored evaluation scratch directories.
+
 ## Claim-to-Code Map
 
 Every code-backed claim in the paper, mapped to the source / script / committed log that supports it.

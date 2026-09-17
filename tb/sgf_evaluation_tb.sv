@@ -25,6 +25,10 @@ module sgf_evaluation_tb;
   integer elapsed_cycles;
   logic [31:0] previous_pc;
 
+`ifdef SGF_CHARACTERIZE
+  `include "sgf_characterization_monitor.svh"
+`endif
+
   initial clk = 1'b0;
   always #5 clk = ~clk;
 
@@ -82,6 +86,11 @@ module sgf_evaluation_tb;
       $fatal(1);
     end
 
+`ifdef SGF_CHARACTERIZE
+    // Observe after the NBA updates; this changes no DUT state.
+    @(negedge clk);
+    dump_characterization();
+`endif
     $display("RESULT cycles=%0d instructions=%0d branches=%0d mispredictions=%0d checksum=%08x",
       dut.u_dmem.mem[0], dut.u_dmem.mem[1], dut.u_dmem.mem[2],
       dut.u_dmem.mem[3], dut.u_dmem.mem[4]);

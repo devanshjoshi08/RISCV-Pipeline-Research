@@ -1,0 +1,7 @@
+stage,design,top,source_commit,fpga_target,clock_period_ns,conf_filter,status,completed_runs,luts,ffs,dsps,bram_tiles,wns_ns,fmax_estimated_mhz,critical_path,lut_delta,ff_delta,dsp_delta,bram_delta,lut_increase_pct,ff_increase_pct,fmax_change_pct
+6,baseline,rv32i_pipeline_top,af884ea7d6fc40150687ce83386e2e5871454a8e,xc7a35tcpg236-1,5.000,,blocked_tool_unavailable,0,,,,,,,,,,,,,,
+6,sgf,rv32i_pipeline_sgf_top,af884ea7d6fc40150687ce83386e2e5871454a8e,xc7a35tcpg236-1,5.000,0,blocked_tool_unavailable,0,,,,,,,,,,,,,,
+7,baseline,rv32i_pipeline_7stage_top,af884ea7d6fc40150687ce83386e2e5871454a8e,xc7a35tcpg236-1,5.000,,blocked_tool_unavailable,0,,,,,,,,,,,,,,
+7,sgf,rv32i_pipeline_7stage_sgf_top,af884ea7d6fc40150687ce83386e2e5871454a8e,xc7a35tcpg236-1,5.000,0,blocked_tool_unavailable,0,,,,,,,,,,,,,,
+8,baseline,rv32i_pipeline_8stage_top,af884ea7d6fc40150687ce83386e2e5871454a8e,xc7a35tcpg236-1,5.000,,blocked_tool_unavailable,0,,,,,,,,,,,,,,
+8,sgf,rv32i_pipeline_8stage_sgf_top,af884ea7d6fc40150687ce83386e2e5871454a8e,xc7a35tcpg236-1,5.000,0,blocked_tool_unavailable,0,,,,,,,,,,,,,,
