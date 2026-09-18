@@ -1,0 +1,46 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.2 (win64) Build 5239630 Fri Nov 08 22:35:27 MST 2024
+| Date         : Thu Sep 17 19:46:24 2026
+| Host         : PavilionPlus1 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file V:/stage8_baseline/default/utilization_hierarchical.rpt
+| Design       : rv32i_pipeline_8stage_top
+| Device       : xc7a35tcpg236-1
+| Speed File   : -1
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-------------------------------+------------------+------------+------------+---------+------+------+--------+--------+------------+
+|            Instance           |      Module      | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
++-------------------------------+------------------+------------+------------+---------+------+------+--------+--------+------------+
+| rv32i_pipeline_8stage_top     |            (top) |       7819 |       6795 |    1024 |    0 | 8731 |      0 |      0 |         12 |
+|   (rv32i_pipeline_8stage_top) |            (top) |          0 |          0 |       0 |    0 |    6 |      0 |      0 |          0 |
+|   u_bp                        | branch_predictor |        738 |        738 |       0 |    0 | 2022 |      0 |      0 |          0 |
+|   u_csr                       |         csr_unit |        164 |        164 |       0 |    0 |  480 |      0 |      0 |          0 |
+|   u_dmem                      |             dmem |       1099 |         75 |    1024 |    0 |    0 |      0 |      0 |          0 |
+|   u_ex1_ex2                   |     pipe_ex1_ex2 |       1677 |       1677 |       0 |    0 |  297 |      0 |      0 |          0 |
+|   u_ex2_mem1                  |      pipe_ex_mem |        206 |        206 |       0 |    0 |  241 |      0 |      0 |          0 |
+|   u_icache                    |           icache |       1011 |       1011 |       0 |    0 | 3648 |      0 |      0 |          0 |
+|   u_id_ex1                    |       pipe_id_ex |        821 |        821 |       0 |    0 |  153 |      0 |      0 |          0 |
+|   u_if1_if2                   |     pipe_if1_if2 |         74 |         74 |       0 |    0 |  105 |      0 |      0 |          0 |
+|   u_if2_id                    |       pipe_if_id |        178 |        178 |       0 |    0 |   96 |      0 |      0 |          0 |
+|   u_imem                      |             imem |        123 |        123 |       0 |    0 |    0 |      0 |      0 |          0 |
+|   u_imm_gen                   |          imm_gen |          2 |          2 |       0 |    0 |    0 |      0 |      0 |          0 |
+|   u_mdu                       |              mdu |        410 |        410 |       0 |    0 |  307 |      0 |      0 |         12 |
+|   u_mem1_mem2                 |   pipe_mem1_mem2 |         67 |         67 |       0 |    0 |  139 |      0 |      0 |          0 |
+|   u_mem2_wb                   |      pipe_mem_wb |       1037 |       1037 |       0 |    0 |  154 |      0 |      0 |          0 |
+|   u_pc                        |               pc |        213 |        213 |       0 |    0 |   59 |      0 |      0 |          0 |
+|   u_regfile                   |          regfile |          0 |          0 |       0 |    0 | 1024 |      0 |      0 |          0 |
++-------------------------------+------------------+------------+------------+---------+------+------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

@@ -1,0 +1,10 @@
+Vivado result validation summary
+================================
+Rows checked: 18
+Expected matrix entries present exactly once: True
+All status=success: True
+All route_complete=true: True
+All hold WNS >= 0 ns: True
+Expected timing exclusions: rst_n has no input delay; 96 debug outputs have no output delay.
+DRC warnings allowed: CFGBVS-1, DSP pipelining recommendations, and DSP asynchronous-load checks.
+Validation error count: 0

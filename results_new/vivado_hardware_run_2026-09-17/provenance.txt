@@ -1,0 +1,8 @@
+prepared_utc=2026-09-17T16:55:53.0958306Z
+repo=C:\Users\shafi\Documents\Codex\2026-09-17\can-x20\work\github_sgf_evaluation_automation
+git_commit=dabefb19ef967db84bb55bc925f5499afc982643
+git_status=clean
+os=Microsoft Windows 10.0.26200
+part=xc7a35tcpg236-1
+clock_period_ns=5.000
+snapshot_note=GitHub branch sgf-evaluation-automation supplied by the user; RTL matches the handoff revision because HEAD only adds evaluation artifacts after af884ea.

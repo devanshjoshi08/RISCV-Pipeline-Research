@@ -1,0 +1,197 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.2 (win64) Build 5239630 Fri Nov 08 22:35:27 MST 2024
+| Date         : Thu Sep 17 16:20:02 2026
+| Host         : PavilionPlus1 running 64-bit major release  (build 9200)
+| Command      : check_timing -verbose -file V:/stage6_sgf/default/check_timing.rpt
+| Design       : rv32i_pipeline_sgf_top
+| Device       : 7a35t-cpg236
+| Speed File   : -1  PRODUCTION 1.23 2018-06-13
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock (0)
+2. checking constant_clock (0)
+3. checking pulse_width_clock (0)
+4. checking unconstrained_internal_endpoints (0)
+5. checking no_input_delay (1)
+6. checking no_output_delay (96)
+7. checking multiple_clock (0)
+8. checking generated_clocks (0)
+9. checking loops (0)
+10. checking partial_input_delay (0)
+11. checking partial_output_delay (0)
+12. checking latch_loops (0)
+
+1. checking no_clock (0)
+------------------------
+ There are 0 register/latch pins with no clock.
+
+
+2. checking constant_clock (0)
+------------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock (0)
+---------------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints (0)
+------------------------------------------------
+ There are 0 pins that are not constrained for maximum delay.
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay (1)
+------------------------------
+ There is 1 input port with no input delay specified. (HIGH)
+
+rst_n
+
+ There are 0 input ports with no input delay but user has a false path constraint.
+
+
+6. checking no_output_delay (96)
+--------------------------------
+ There are 96 ports with no output delay specified. (HIGH)
+
+debug_alu_result[0]
+debug_alu_result[10]
+debug_alu_result[11]
+debug_alu_result[12]
+debug_alu_result[13]
+debug_alu_result[14]
+debug_alu_result[15]
+debug_alu_result[16]
+debug_alu_result[17]
+debug_alu_result[18]
+debug_alu_result[19]
+debug_alu_result[1]
+debug_alu_result[20]
+debug_alu_result[21]
+debug_alu_result[22]
+debug_alu_result[23]
+debug_alu_result[24]
+debug_alu_result[25]
+debug_alu_result[26]
+debug_alu_result[27]
+debug_alu_result[28]
+debug_alu_result[29]
+debug_alu_result[2]
+debug_alu_result[30]
+debug_alu_result[31]
+debug_alu_result[3]
+debug_alu_result[4]
+debug_alu_result[5]
+debug_alu_result[6]
+debug_alu_result[7]
+debug_alu_result[8]
+debug_alu_result[9]
+debug_instr[0]
+debug_instr[10]
+debug_instr[11]
+debug_instr[12]
+debug_instr[13]
+debug_instr[14]
+debug_instr[15]
+debug_instr[16]
+debug_instr[17]
+debug_instr[18]
+debug_instr[19]
+debug_instr[1]
+debug_instr[20]
+debug_instr[21]
+debug_instr[22]
+debug_instr[23]
+debug_instr[24]
+debug_instr[25]
+debug_instr[26]
+debug_instr[27]
+debug_instr[28]
+debug_instr[29]
+debug_instr[2]
+debug_instr[30]
+debug_instr[31]
+debug_instr[3]
+debug_instr[4]
+debug_instr[5]
+debug_instr[6]
+debug_instr[7]
+debug_instr[8]
+debug_instr[9]
+debug_pc[0]
+debug_pc[10]
+debug_pc[11]
+debug_pc[12]
+debug_pc[13]
+debug_pc[14]
+debug_pc[15]
+debug_pc[16]
+debug_pc[17]
+debug_pc[18]
+debug_pc[19]
+debug_pc[1]
+debug_pc[20]
+debug_pc[21]
+debug_pc[22]
+debug_pc[23]
+debug_pc[24]
+debug_pc[25]
+debug_pc[26]
+debug_pc[27]
+debug_pc[28]
+debug_pc[29]
+debug_pc[2]
+debug_pc[30]
+debug_pc[31]
+debug_pc[3]
+debug_pc[4]
+debug_pc[5]
+debug_pc[6]
+debug_pc[7]
+debug_pc[8]
+debug_pc[9]
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There are 0 ports with no output delay but with a timing clock defined on it or propagating through it
+
+
+7. checking multiple_clock (0)
+------------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks (0)
+--------------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops (0)
+---------------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay (0)
+------------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay (0)
+-------------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops (0)
+----------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+
